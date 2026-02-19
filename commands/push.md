@@ -1,5 +1,5 @@
 ---
-description: Commit, push, and post a progress comment on the associated PR or issue
+description: Commit, push, and post a progress comment using session context or branch detection
 argument-hint: [optional-commit-message]
 allowed-tools: Bash, Read, Grep, Glob
 ---
@@ -55,11 +55,40 @@ If no upstream is set, push with `-u` flag to the current branch name.
 
 ## Step 4: Post Progress Comment
 
-Determine the associated PR or issue:
+Determine the associated PR or issue using the following priority order:
+
+### 1. Session context (primary)
+
+Check the current conversation for signals about what the user has been working on. If an earlier command in this session targeted a specific issue or PR, use that as the comment target.
+
+**Issue-oriented signals** — post on the issue:
+- `issue-implement` was invoked with an issue number
+- `issue-assessment` was invoked with an issue number
+- `issue-plan` was invoked with an issue number
+- `issue-review-plan` was invoked with an issue number
+
+**PR-oriented signals** — post on the PR:
+- `pr-review-fix` was invoked with a PR number
+- `pr-ci-fix` was invoked with a PR number
+- `pr-review` was invoked with a PR number
+- `pr-pre-merge` was invoked with a PR number
+
+If session context points to an issue but a PR also exists on the current branch (`gh pr view --json number,url` succeeds), prefer the PR -- it supersedes the issue as the active work context.
+
+If you can identify a specific target from earlier in this conversation, use it directly: `gh issue comment <number>` or `gh pr comment <number>`. Skip to the Comment content section below.
+
+### 2. Detection fallback
+
+If session context is ambiguous or unavailable (e.g., fresh session, standalone push):
 
 1. **Try PR first:** Run `gh pr view --json number,url` on the current branch. If a PR exists, comment on it.
 2. **Fall back to issue:** If no PR, check the branch name for an issue number pattern (e.g., `feature/issue-55-*` or `fix/issue-23-*`). If found, comment on that issue.
-3. **If neither found:** Skip commenting and inform the user.
+
+### 3. Skip gracefully
+
+If neither session context nor detection yields a target, skip commenting and inform the user.
+
+### Comment content
 
 Post a reply comment documenting what was done:
 - Brief summary of changes in this batch
@@ -72,4 +101,14 @@ Report to the user in CLI output (do NOT include next-step suggestions in the Gi
 - What was committed (files and message)
 - Where it was pushed
 - Where the progress comment was posted (with link)
-- Suggest next steps, always prefixed with `/clear` (e.g., "Next: `/clear` then `/mach10:issue-implement $ISSUE next-stage`" or "Next: `/clear` then `/mach10:pr-review $PR`")
+
+**Next-step suggestions** (always prefixed with `/clear`):
+
+First, determine the default branch:
+
+```
+gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'
+```
+
+- **If on the default branch:** Suggest issue-oriented next steps (e.g., "Next: `/clear` then `/mach10:issue-assessment $ISSUE`" or "Next: `/clear` then `/mach10:issue-implement $ISSUE next-stage`"). Do not suggest `/mach10:pr-create` or `/mach10:pr-review`.
+- **If on a feature branch:** Suggest PR-oriented next steps (e.g., "Next: `/clear` then `/mach10:pr-create`" or "Next: `/clear` then `/mach10:pr-review $PR`").
