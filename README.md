@@ -10,6 +10,8 @@ This changes the failure mode. The bottleneck is no longer typing speed or synta
 
 Mach 10 is a methodology that addresses these constraints directly: fresh sessions for each step, GitHub as persistent memory, staged implementation, and iterative review-fix cycles. This repository contains a Claude Code plugin that codifies the methodology into 15 slash commands, but the methodology stands on its own -- you can follow it manually with any agentic coding tool.
 
+Because the methodology builds entirely on standard developer practices -- issues, PRs, comments, feature branches, frequent commits -- there is no vendor lock-in. Every artifact Mach 10 produces is a normal GitHub artifact. If you stop using the plugin, you're left with well-documented issues, structured PRs, and a clean commit history. Nothing is stored in a proprietary format or locked behind a tool-specific layer.
+
 ## The methodology
 
 ### Your role as the human
