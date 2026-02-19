@@ -31,7 +31,7 @@ claude --plugin-dir /path/to/mach10
 
 ## Commands
 
-### Workflow (in typical order)
+### Issue lifecycle
 
 | Command | Description |
 |---------|-------------|
@@ -39,7 +39,12 @@ claude --plugin-dir /path/to/mach10
 | `/mach10:issue-plan <number>` | Read issue, explore codebase, create staged implementation plan, post as comment, create feature branch |
 | `/mach10:issue-review-plan <number>` | Read issue and all comments, review the implementation plan, and present findings |
 | `/mach10:issue-implement <issue> <stage>` | Implement a specific stage of the plan via feature-dev |
-| `/mach10:push` | Commit, push, and post progress comment on the associated PR/issue |
+| `/mach10:issue-create` | Create a structured GitHub issue from current context |
+
+### PR lifecycle
+
+| Command | Description |
+|---------|-------------|
 | `/mach10:pr-create [issue] [context]` | Create a PR for the current branch with structured description |
 | `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
 | `/mach10:pr-review-fix <pr> [issues]` | Fix specific review findings via feature-dev |
@@ -53,7 +58,7 @@ claude --plugin-dir /path/to/mach10
 
 | Command | Description |
 |---------|-------------|
-| `/mach10:issue-create` | Create a structured GitHub issue from current context |
+| `/mach10:push` | Commit, push, and post progress comment on the associated PR/issue |
 | `/mach10:test-audit` | Fan out subagents to audit test quality across the repo |
 
 ## Workflow

@@ -48,3 +48,7 @@ When adding or modifying commands, follow the existing pattern:
 - Use `gh` CLI for all GitHub operations (issues, PRs, comments, CI logs)
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
+
+## Working in This Repo
+
+- Proactively load any plugin development skills you think might be relevant when modifying or reviewing files in this repo.
