@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-mach10 is a Claude Code plugin that automates a structured, multi-session development workflow from GitHub issue analysis through PR merge. It provides 15 slash commands covering the complete issue-to-merge lifecycle, using GitHub issues, PRs, and comments as the inter-session persistence layer.
+mach10 defines a structured development methodology for agentic coding and provides a Claude Code plugin that implements it. The methodology centers on fresh sessions for each step, GitHub as the inter-session persistence layer, staged implementation, and iterative review-fix cycles. The plugin codifies this into 15 slash commands covering the complete issue-to-merge lifecycle.
 
 ## Architecture
 

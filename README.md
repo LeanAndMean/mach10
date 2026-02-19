@@ -1,69 +1,85 @@
 # Mach 10
 
-A Claude Code plugin that codifies a structured agentic development workflow into single-invocation commands.
+A development methodology for agentic coding -- and a Claude Code plugin that implements it.
 
-## What it does
+## What is Mach 10?
 
-mach10 wraps the repeated multi-step patterns of a GitHub-issue-driven development lifecycle into 15 slash commands. Each command handles context gathering, delegation, and documentation automatically.
+In agentic coding, the AI is not an autocomplete engine -- it is an active collaborator that writes code, reviews it, manages GitHub issues and PRs, runs tests, and documents its work. The human's role shifts from writing code to directing, aligning, and reviewing. You describe requirements, approve architectural decisions, and steer direction. The AI handles the searching, writing, testing, and bookkeeping.
 
-## Prerequisites
+This changes the failure mode. The bottleneck is no longer typing speed or syntax recall -- it is context management. LLM context windows are finite. A deep code review can consume most of the available context, leaving little room for implementation. Multi-session feature development requires persistent memory across sessions. And without a structured workflow, agentic coding produces inconsistent results: missed edge cases, orphaned TODOs, reviews that never converge.
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
-- [feature-dev](https://github.com/anthropics/claude-code-plugins) plugin (required by `/issue-implement`, `/pr-review-fix`)
-- [pr-review-toolkit](https://github.com/anthropics/claude-code-plugins) plugin (required by `/pr-review`)
-- `gh` CLI authenticated with your GitHub account
+Mach 10 is a methodology that addresses these constraints directly: fresh sessions for each step, GitHub as persistent memory, staged implementation, and iterative review-fix cycles. This repository contains a Claude Code plugin that codifies the methodology into 15 slash commands, but the methodology stands on its own -- you can follow it manually with any agentic coding tool.
 
-## Installation
+## The methodology
 
-### From the CLI menu
+### Your role as the human
 
-1. Start Claude Code: `claude`
-2. Type `/plugins`
-3. Select **Add plugin...**
-4. Choose **From GitHub URL**
-5. Enter: `https://github.com/merckgroup/mach10`
+You are directing, not spectating. The AI handles the mechanical work -- searching, writing, testing, documenting -- but you own the decisions:
 
-### Manual
+- **Push back on designs.** When the AI presents a plan, you don't have to accept it. Ask *why* it chose a particular approach. Ask it to present alternatives. If the architecture doesn't feel right, say so -- before implementation is the cheapest place to catch mistakes.
+- **Don't guess when the AI asks questions.** When it presents clarifying questions with options, ask it to explain the tradeoffs of each option rather than picking one blindly. You have a collaborator that can reason about the implications -- use it.
+- **Review plans, not just code.** Plans can be reviewed by AI agents just like code can. Catching a design flaw before implementation saves far more effort than catching it in code review.
+- **GitHub is the shared medium.** Plans, assessments, and reviews are posted as GitHub comments. Any future session -- yours or a teammate's -- can read and build on prior work. The persistence layer is GitHub, not your local machine.
 
-```bash
-claude --plugin-dir /path/to/mach10
-```
+### GitHub as shared memory
 
-## Commands
+Each CLI session starts with a fresh context window. Multi-session feature development requires persistent memory. Rather than maintaining bespoke planning documents on disk, the methodology uses GitHub's existing infrastructure -- issues, PRs, and comments -- as the inter-session communication layer:
 
-### Issue lifecycle
+- **Issues** capture requirements, analysis, and staged implementation plans.
+- **PR descriptions** summarize what was built.
+- **PR comments** carry reviews, fix documentation, and design discussions.
 
-| Command | Description |
-|---------|-------------|
-| `/mach10:issue-assessment <number>` | Read issue, perform independent assessment, and present findings with recommended next step |
-| `/mach10:issue-plan <number>` | Read issue, explore codebase, create staged implementation plan, post as comment, create feature branch |
-| `/mach10:issue-review-plan <number>` | Read issue and all comments, review the implementation plan, and present findings |
-| `/mach10:issue-implement <issue> <stage>` | Implement a specific stage of the plan via feature-dev |
-| `/mach10:issue-create` | Create a structured GitHub issue from current context |
+Everything persists across sessions and is accessible via `gh`. When a new session starts, it reads the relevant issue or PR and has full context without any filesystem state or memory.
 
-### PR lifecycle
+### Fresh sessions for every step
 
-| Command | Description |
-|---------|-------------|
-| `/mach10:pr-create [issue] [context]` | Create a PR for the current branch with structured description |
-| `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
-| `/mach10:pr-review-fix <pr> [issues]` | Fix specific review findings via feature-dev |
-| `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
-| `/mach10:pr-review-validate <pr>` | Standalone: independently assess review findings without re-running the review |
-| `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
-| `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (docs, version, CHANGELOG, tests) |
-| `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
+LLM context windows are finite. A deep code review can consume most of the available context, leaving little room for implementation. If you try to review and fix in the same session, the fixes suffer from a starved context budget.
 
-### Utilities
+The methodology is designed around this constraint:
 
-| Command | Description |
-|---------|-------------|
-| `/mach10:push` | Commit, push, and post progress comment on the associated PR/issue |
-| `/mach10:test-audit` | Fan out subagents to audit test quality across the repo |
+- **Planning** explores the codebase and persists its plan as a GitHub comment before the context fills up.
+- **Review** posts its findings as a PR comment and does not fix anything.
+- **Fixing** starts fresh with the full context budget available for implementation.
+- **Implementation** runs one stage per session so each stage gets full context depth.
 
-## Workflow
+### Staged implementation
 
-Each step below runs in a **fresh CLI session**. GitHub comments carry context between sessions -- no filesystem state or memory is required. This also means other team members' Claude sessions can pick up where yours left off by reading the same issue or PR.
+Large features are broken into numbered stages during the planning step. Each stage is implemented in its own session. This significantly improves one-shot success rates compared to attempting an entire feature in a single session -- each stage gets full context depth for codebase exploration, architecture design, implementation, and quality review.
+
+### Iterative review-fix cycles
+
+Code review is not a single pass. The methodology uses an iterative cycle:
+
+1. **Review + Assess** -- Run specialized review agents in parallel (code quality, test coverage, error handling, type design, comment accuracy, complexity). Post findings as a PR comment. Then independently assess each finding, classifying it as genuine, nitpick, false positive, or deferred. The assessment is the convergence signal.
+2. **Fix** -- In a new session, read the review comment and fix the genuine issues. Batch size depends on complexity: ~10 simple fixes, ~6 moderate, ~3 complex.
+3. **Re-review** -- Run the review suite again. Each review includes a fresh assessment.
+
+This continues until the assessment shows no genuine issues remaining.
+
+### Context-window-aware batch sizing
+
+Not all review findings are equal. A typo fix takes one line; a design flaw may require rearchitecting a module. Batch sizes are scaled accordingly:
+
+- **Simple one-line fixes**: up to ~10 at once
+- **Moderate fixes**: ~6 at a time
+- **Deep or complex fixes**: no more than ~3 at a time
+
+Similar issues are grouped together. Out-of-scope problems are deferred to new GitHub issues rather than addressed inline.
+
+### Safe by default
+
+The methodology prioritizes safety:
+
+- No `git add -A` or `git add .` -- files are staged by name.
+- No staging of secrets files (.env, credentials, etc.).
+- No force-pushes, no force-merges.
+- Merge uses the repository's default strategy.
+- Branch deletion uses the safe `-d` flag (refuses to delete unmerged branches).
+- The AI never pushes to remote unless explicitly told to.
+
+## The workflow
+
+The methodology in action across a feature's lifecycle. Each step below runs in a **fresh CLI session**. GitHub comments carry context between sessions -- no filesystem state or memory is required. This also means other team members' sessions can pick up where yours left off by reading the same issue or PR.
 
 ### Phase 1: Understand the issue
 
@@ -145,80 +161,64 @@ Session 13: /mach10:pr-pre-merge 108
 Session 14: /mach10:pr-merge 108
 ```
 
-## The methodology behind mach10
+## The plugin
 
-mach10 encodes a specific agentic development methodology. Understanding the philosophy behind it helps you get the most out of the plugin.
+### Prerequisites and installation
 
-### The core idea
+**Requirements:**
 
-In agentic coding, the AI is not an autocomplete engine — it is an active collaborator that writes code, reviews it, manages GitHub issues and PRs, runs tests, and documents its work. The human's role shifts from writing code to **directing, aligning, and reviewing**. You describe requirements, approve architectural decisions, and steer direction. The AI does the typing, searching, testing, and bookkeeping.
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
+- [feature-dev](https://github.com/anthropics/claude-code-plugins) plugin (required by `/issue-implement`, `/pr-review-fix`)
+- [pr-review-toolkit](https://github.com/anthropics/claude-code-plugins) plugin (required by `/pr-review`)
+- `gh` CLI authenticated with your GitHub account
 
-### Your role as the human
+**From the CLI menu:**
 
-You are directing, not spectating. The AI handles the mechanical work -- searching, writing, testing, documenting -- but you own the decisions:
+1. Start Claude Code: `claude`
+2. Type `/plugins`
+3. Select **Add plugin...**
+4. Choose **From GitHub URL**
+5. Enter: `https://github.com/merckgroup/mach10`
 
-- **Push back on designs.** When Claude presents a plan, you don't have to accept it. Ask *why* it chose a particular approach. Ask it to present alternatives. If the architecture doesn't feel right, say so -- before implementation is the cheapest place to catch mistakes.
-- **Don't guess when Claude asks questions.** When Claude presents clarifying questions with options, you can ask it to explain the tradeoffs of each option rather than picking one blindly. You have a collaborator that can reason about the implications -- use it.
-- **Review plans, not just code.** Plans can be reviewed by AI agents just like code can. The `issue-review-plan` step exists because catching a design flaw before implementation saves far more effort than catching it in code review.
-- **GitHub is the shared medium.** Plans, assessments, and reviews are posted as GitHub comments. This means any future Claude session -- yours or a teammate's -- can read and build on prior work. The persistence layer is GitHub, not your local machine.
+**Manual:**
 
-### Why GitHub is the backbone
+```bash
+claude --plugin-dir /path/to/mach10
+```
 
-Each Claude Code CLI session starts with a fresh context window. Multi-session feature development requires persistent memory. Rather than maintaining bespoke planning documents on disk, this workflow uses **GitHub's existing infrastructure** — Issues, PRs, and comments — as the inter-session communication layer:
+### Commands
 
-- **Issues** capture requirements, analysis, and staged implementation plans.
-- **PR descriptions** summarize what was built.
-- **PR comments** carry reviews, fix documentation, and design discussions.
+#### Issue lifecycle
 
-All of it persists across sessions and is accessible via `gh`. When a new session starts, it reads the relevant issue or PR and has full context without any filesystem state or memory.
+| Command | Description |
+|---------|-------------|
+| `/mach10:issue-assessment <number>` | Read issue, perform independent assessment, and present findings with recommended next step |
+| `/mach10:issue-plan <number>` | Read issue, explore codebase, create staged implementation plan, post as comment, create feature branch |
+| `/mach10:issue-review-plan <number>` | Read issue and all comments, review the implementation plan, and present findings |
+| `/mach10:issue-implement <issue> <stage>` | Implement a specific stage of the plan via feature-dev |
+| `/mach10:issue-create` | Create a structured GitHub issue from current context |
 
-### Why fresh sessions for every step
+#### PR lifecycle
 
-LLM context windows are finite. A deep code review can consume most of the available context, leaving little room for implementation. If you try to review and fix in the same session, the fixes suffer from a starved context budget.
+| Command | Description |
+|---------|-------------|
+| `/mach10:pr-create [issue] [context]` | Create a PR for the current branch with structured description |
+| `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
+| `/mach10:pr-review-fix <pr> [issues]` | Fix specific review findings via feature-dev |
+| `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
+| `/mach10:pr-review-validate <pr>` | Standalone: independently assess review findings without re-running the review |
+| `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
+| `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (docs, version, CHANGELOG, tests) |
+| `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
 
-mach10 is designed around this constraint:
+#### Utilities
 
-- **issue-plan** explores the codebase and persists its plan as a GitHub comment before the context fills up.
-- **pr-review** posts its findings as a PR comment and explicitly does not fix anything.
-- **pr-review-fix** starts fresh with the full context budget available for implementation.
-- **issue-implement** runs one stage per session so each stage gets full context depth.
+| Command | Description |
+|---------|-------------|
+| `/mach10:push` | Commit, push, and post progress comment on the associated PR/issue |
+| `/mach10:test-audit` | Fan out subagents to audit test quality across the repo |
 
-### Staged implementation
-
-Large features are broken into numbered stages during the analysis step. Each stage is implemented in its own session via `/mach10:issue-implement`. This significantly improves one-shot success rates compared to attempting an entire feature in a single session — each stage gets full context depth for codebase exploration, architecture design, implementation, and quality review.
-
-### The review-fix cycle
-
-Code review is not a single pass. mach10 uses an iterative cycle:
-
-1. **Review + Assess** — Run 6 specialized agents in parallel (code quality, test coverage, error handling, type design, comment accuracy, complexity). Post findings as a PR comment. Then independently assess each finding, classifying it as genuine, nitpick, false positive, or deferred. The assessment is the convergence signal.
-2. **Fix** — In a new session, read the review comment and fix the genuine issues. Batch size depends on complexity: ~10 simple fixes, ~6 moderate, ~3 complex.
-3. **Re-review** — Run the review suite again. Each review includes a fresh assessment.
-
-This continues until the assessment shows no genuine issues remaining, at which point the PR is clean enough for human review.
-
-### Context-window-aware batch sizing
-
-Not all review findings are equal. A typo fix takes one line; a design flaw may require rearchitecting a module. The pr-review-fix command recommends batch sizes:
-
-- **Simple one-line fixes**: up to ~10 at once
-- **Moderate fixes**: ~6 at a time
-- **Deep or complex fixes**: no more than ~3 at a time
-
-Similar issues are grouped together. Out-of-scope problems are deferred to new GitHub issues rather than addressed inline.
-
-### Safe by default
-
-The methodology prioritizes safety:
-
-- No `git add -A` or `git add .` — files are staged by name.
-- No staging of secrets files (.env, credentials, etc.).
-- No force-pushes, no force-merges.
-- Merge uses the repository's default strategy.
-- Branch deletion uses the safe `-d` flag (refuses to delete unmerged branches).
-- Claude never pushes to remote unless explicitly told to.
-
-## Design principles
+### Design principles
 
 - **Thin orchestration layer**: Commands gather context and delegate to existing plugins (feature-dev, pr-review-toolkit) rather than reimplementing workflows.
 - **GitHub as source of truth**: Plans, reviews, and progress are posted as issue/PR comments so future sessions can pick up where previous ones left off.
