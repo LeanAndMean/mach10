@@ -1,4 +1,4 @@
-# mach10
+# Mach 10
 
 A Claude Code plugin that codifies a structured agentic development workflow into single-invocation commands.
 
