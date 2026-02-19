@@ -63,7 +63,7 @@ This comment serves as an audit trail for the human reviewer, demonstrating that
 
 ## Step 5: Recommend Next Steps
 
-Based on the assessment:
+**CLI output only (do NOT include in the GitHub comment from Step 4):** Based on the assessment, recommend next step to the user:
 - If genuine issues remain: "`/clear` then `/mach10:pr-review-fix $ARGUMENTS <issue-numbers>`"
 - If only deferred items: "Create issues with `/mach10:issue-create`, then `/clear` and `/mach10:pr-pre-merge $ARGUMENTS`"
 - If clean: "`/clear` then `/mach10:pr-pre-merge $ARGUMENTS`"

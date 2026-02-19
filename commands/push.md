@@ -68,7 +68,7 @@ Post a reply comment documenting what was done:
 
 ## Step 5: Confirm
 
-Report to the user:
+Report to the user in CLI output (do NOT include next-step suggestions in the GitHub comment from Step 4):
 - What was committed (files and message)
 - Where it was pushed
 - Where the progress comment was posted (with link)

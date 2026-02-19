@@ -60,7 +60,7 @@ Format the comment as a well-structured markdown document that can serve as inpu
 
 ## Step 5: Summarize
 
-Report to the user:
+Report to the user in CLI output (do NOT include this in the GitHub comment from Step 4):
 - How many critical/important/suggestion issues were found
 - Link to the posted comment
 - Recommended next step:
