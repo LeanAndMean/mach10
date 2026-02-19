@@ -101,4 +101,14 @@ Report to the user in CLI output (do NOT include next-step suggestions in the Gi
 - What was committed (files and message)
 - Where it was pushed
 - Where the progress comment was posted (with link)
-- Suggest next steps, always prefixed with `/clear` (e.g., "Next: `/clear` then `/mach10:issue-implement $ISSUE next-stage`" or "Next: `/clear` then `/mach10:pr-review $PR`")
+
+**Next-step suggestions** (always prefixed with `/clear`):
+
+First, determine the default branch:
+
+```
+gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'
+```
+
+- **If on the default branch:** Suggest issue-oriented next steps (e.g., "Next: `/clear` then `/mach10:issue-assessment $ISSUE`" or "Next: `/clear` then `/mach10:issue-implement $ISSUE next-stage`"). Do not suggest `/mach10:pr-create` or `/mach10:pr-review`.
+- **If on a feature branch:** Suggest PR-oriented next steps (e.g., "Next: `/clear` then `/mach10:pr-create`" or "Next: `/clear` then `/mach10:pr-review $PR`").
