@@ -15,6 +15,16 @@ mach10 wraps the repeated multi-step patterns of a GitHub-issue-driven developme
 
 ## Installation
 
+### From the CLI menu
+
+1. Start Claude Code: `claude`
+2. Type `/plugins`
+3. Select **Add plugin...**
+4. Choose **From GitHub URL**
+5. Enter: `https://github.com/merckgroup/mach10`
+
+### Manual
+
 ```bash
 claude --plugin-dir /path/to/mach10
 ```
