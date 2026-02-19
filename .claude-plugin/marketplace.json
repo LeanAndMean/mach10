@@ -1,0 +1,13 @@
+{
+  "name": "merckgroup-mach10",
+  "owner": {
+    "name": "Kevin Ryan"
+  },
+  "plugins": [
+    {
+      "name": "mach10",
+      "source": ".",
+      "description": "Structured agentic development methodology - from issue analysis to merge"
+    }
+  ]
+}
