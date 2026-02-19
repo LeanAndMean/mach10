@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "mach10",
-      "source": ".",
+      "source": "./",
       "description": "Structured agentic development methodology - from issue analysis to merge"
     }
   ]
