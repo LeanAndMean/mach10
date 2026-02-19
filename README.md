@@ -57,73 +57,85 @@ claude --plugin-dir /path/to/mach10
 
 ## Workflow
 
-```
-  GitHub Issue #55                        main
-  +-----------------+                       |
-  | Problem         |    issue-plan         |
-  | description     |---+                   |
-  +-----------------+   |                   |
-                        v                   |
-         Plan posted    o--- feature/issue-55-fix-analytics
-         as comment     |
-                        |   issue-implement 55 1
-                        |   push
-                        o   Stage 1
-                        |
-                        |   issue-implement 55 2
-                        |   push
-                        o   Stage 2
-                        |
-                        |   issue-implement 55 N
-                        |   push
-                        o   Stage N
-                        |
-            PR #108 <---+   (create PR)
-                        |
-               +--------+--------+
-               |  Review cycle   |
-               |                 |
-               |   pr-review 108 |
-               |   pr-review-fix |
-               |   push          |
-               |        :        |  repeat until
-               |   pr-review 108 |  clean
-               |   pr-review-fix |
-               |   push          |
-               |                 |
-               |   [CI fails?]   |
-               |   pr-ci-fix 108 |
-               |   push          |
-               +--------+--------+
-                        |
-                        |   pr-review-validate 108
-                        o   Triage remaining findings
-                        |
-                        |   pr-pre-merge 108
-                        o   Docs, version, CHANGELOG, tests
-                        |
-                        |   pr-merge 108
-          main <--------+   Merge + delete branch + release
-            |
-            v
-```
+Each step below runs in a **fresh CLI session**. GitHub comments carry context between sessions -- no filesystem state or memory is required. This also means other team members' Claude sessions can pick up where yours left off by reading the same issue or PR.
 
-Each box is a **fresh CLI session**. GitHub comments carry context
-between sessions so no filesystem state or memory is required.
+### Phase 1: Understand the issue
 
-### Typical session log
+**Command:** `/mach10:issue-assessment <number>`
+
+Claude reads the issue, explores the relevant parts of the codebase, and presents its findings -- scope, risks, ambiguities, and a recommended next step.
+
+**Your role:** Read the assessment critically. Push back if the scope is wrong, if risks are missed, or if important ambiguities aren't surfaced. The assessment is posted as a GitHub comment, so it becomes shared context for every future session on this issue.
+
+### Phase 2: Plan the implementation
+
+**Command:** `/mach10:issue-plan <number>`
+
+Claude creates a staged implementation plan and posts it as a GitHub comment, then creates a feature branch.
+
+The plan is *staged* because each stage will get its own session with a full context budget. Trying to implement everything at once starves later work of context depth. The plan is *posted to GitHub* so that any future session -- yours or a teammate's -- can read it and pick up the work.
+
+**Your role:** This is the most important moment to invest your attention. Before approving:
+- Scrutinize the architecture. Ask Claude to explain *why* it chose a particular approach.
+- Ask it to present alternatives if you're not sure the design is right.
+- Push back on anything that doesn't feel right. This is the cheapest point to catch bad design decisions -- before any code is written.
+
+### Phase 3: Review the plan
+
+**Command:** `/mach10:issue-review-plan <number>`
+
+A fresh Claude session independently reviews the plan against the codebase. Plans can be reviewed just like code -- this is a second pair of eyes on the architecture before implementation begins.
+
+**Your role:** Read both the plan and the review. If the review raises valid concerns, direct Claude to revise the plan. You can iterate on plan-review cycles until the design is solid.
+
+### Phase 4: Implement stage by stage
+
+**Commands:** `/mach10:issue-implement <issue> <stage>` then `/mach10:push` (one session per stage)
+
+Each stage is implemented in its own fresh session, then committed and pushed with a progress comment on the issue. One stage per session means full context budget for codebase exploration, implementation, and testing.
+
+**Your role:** Review each stage's output before moving to the next. If something deviates from the plan or introduces problems, raise it now rather than letting it compound.
+
+### Phase 5: Create a PR
+
+**Command:** `/mach10:pr-create [issue]`
+
+Create a PR linking back to the issue with a structured description summarizing what was built.
+
+### Phase 6: Review-fix cycle
+
+**Commands:** `/mach10:pr-review <pr>`, `/mach10:pr-review-fix <pr> [issues]`, `/mach10:pr-ci-fix <pr>`
+
+This is an iterative cycle: review in one session, fix in the next, re-review, repeat. Review and fix are deliberately separate sessions because reviews consume most of the context budget -- fixing in the same session produces worse results.
+
+If CI fails after a fix, use `pr-ci-fix` to diagnose and resolve the failure.
+
+**Your role:** Check review findings before directing fixes. Not every finding is worth addressing -- some are nitpicks, some are false positives. Direct which ones to fix and which to defer.
+
+### Phase 7: Validate and merge
+
+**Commands:** `/mach10:pr-review-validate <pr>`, `/mach10:pr-pre-merge <pr>`, `/mach10:pr-merge <pr>`
+
+When the review converges to mostly minor findings, validate remaining items (genuine vs. nitpick vs. false positive), run the pre-merge checklist (docs, version, CHANGELOG, tests), and merge.
+
+### Quick reference
+
+Once you're familiar with the phases above, this session log serves as a cheat sheet:
 
 ```
-Session 1:  /mach10:issue-plan 55
-Session 2:  /mach10:issue-implement 55 1    then  /mach10:push
-Session 3:  /mach10:issue-implement 55 2    then  /mach10:push
-Session 4:  /mach10:pr-review 108
-Session 5:  /mach10:pr-review-fix 108 1,2,3  then  /mach10:push
-Session 6:  /mach10:pr-review 108
-Session 7:  /mach10:pr-ci-fix 108              then  /mach10:push
-Session 8:  /mach10:pr-review-validate 108
-Session 9:  /mach10:pr-pre-merge 108
-Session 10: /mach10:pr-merge 108
+Session 1:  /mach10:issue-assessment 55
+Session 2:  /mach10:issue-plan 55
+Session 3:  /mach10:issue-review-plan 55
+Session 4:  /mach10:issue-implement 55 1    then  /mach10:push
+Session 5:  /mach10:issue-implement 55 2    then  /mach10:push
+Session 6:  /mach10:pr-create 55
+Session 7:  /mach10:pr-review 108
+Session 8:  /mach10:pr-review-fix 108 1,2,3  then  /mach10:push
+Session 9:  /mach10:pr-review 108
+Session 10: /mach10:pr-ci-fix 108              then  /mach10:push
+Session 11: /mach10:pr-review-validate 108
+Session 12: /mach10:pr-pre-merge 108
+Session 13: /mach10:pr-merge 108
 ```
 
 ## The methodology behind mach10
@@ -133,6 +145,15 @@ mach10 encodes a specific agentic development methodology. Understanding the phi
 ### The core idea
 
 In agentic coding, the AI is not an autocomplete engine — it is an active collaborator that writes code, reviews it, manages GitHub issues and PRs, runs tests, and documents its work. The human's role shifts from writing code to **directing, aligning, and reviewing**. You describe requirements, approve architectural decisions, and steer direction. The AI does the typing, searching, testing, and bookkeeping.
+
+### Your role as the human
+
+You are directing, not spectating. The AI handles the mechanical work -- searching, writing, testing, documenting -- but you own the decisions:
+
+- **Push back on designs.** When Claude presents a plan, you don't have to accept it. Ask *why* it chose a particular approach. Ask it to present alternatives. If the architecture doesn't feel right, say so -- before implementation is the cheapest place to catch mistakes.
+- **Don't guess when Claude asks questions.** When Claude presents clarifying questions with options, you can ask it to explain the tradeoffs of each option rather than picking one blindly. You have a collaborator that can reason about the implications -- use it.
+- **Review plans, not just code.** Plans can be reviewed by AI agents just like code can. The `issue-review-plan` step exists because catching a design flaw before implementation saves far more effort than catching it in code review.
+- **GitHub is the shared medium.** Plans, assessments, and reviews are posted as GitHub comments. This means any future Claude session -- yours or a teammate's -- can read and build on prior work. The persistence layer is GitHub, not your local machine.
 
 ### Why GitHub is the backbone
 
