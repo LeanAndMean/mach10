@@ -1,0 +1,8 @@
+{
+  "name": "mach10",
+  "version": "0.1.0",
+  "description": "Agentic development workflow automation - from issue analysis to merge and release",
+  "author": {
+    "name": "Kevin Ryan"
+  }
+}
