@@ -41,10 +41,10 @@ claude --plugin-dir /path/to/mach10
 | `/mach10:issue-implement <issue> <stage>` | Implement a specific stage of the plan via feature-dev |
 | `/mach10:push` | Commit, push, and post progress comment on the associated PR/issue |
 | `/mach10:pr-create [issue] [context]` | Create a PR for the current branch with structured description |
-| `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review and post results as comment |
+| `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
 | `/mach10:pr-review-fix <pr> [issues]` | Fix specific review findings via feature-dev |
 | `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
-| `/mach10:pr-review-validate <pr>` | Independently assess remaining findings (genuine vs. nitpick vs. false positive) |
+| `/mach10:pr-review-validate <pr>` | Standalone: independently assess review findings without re-running the review |
 | `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
 | `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (docs, version, CHANGELOG, tests) |
 | `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
@@ -107,17 +107,17 @@ Create a PR linking back to the issue with a structured description summarizing 
 
 **Commands:** `/mach10:pr-review <pr>`, `/mach10:pr-review-fix <pr> [issues]`, `/mach10:pr-ci-fix <pr>`
 
-This is an iterative cycle: review in one session, fix in the next, re-review, repeat. Review and fix are deliberately separate sessions because reviews consume most of the context budget -- fixing in the same session produces worse results.
+This is an iterative cycle: review in one session, fix in the next, re-review, repeat. Each review posts its findings as a PR comment, then independently assesses every finding to classify it as genuine, nitpick, false positive, or deferred. The assessment tells you exactly which findings are worth fixing and serves as the convergence signal -- when all remaining findings are nitpicks or false positives, the PR is ready to merge.
 
 If CI fails after a fix, use `pr-ci-fix` to diagnose and resolve the failure.
 
-**Your role:** Check review findings before directing fixes. Not every finding is worth addressing -- some are nitpicks, some are false positives. Direct which ones to fix and which to defer.
+**Your role:** Read the assessment after each review. Direct which genuine issues to fix and which deferred items to track as new issues. The assessment does the triage for you, but you make the final call.
 
-### Phase 7: Validate and merge
+### Phase 7: Merge
 
-**Commands:** `/mach10:pr-review-validate <pr>`, `/mach10:doc-review <pr>` (optional), `/mach10:pr-pre-merge <pr>`, `/mach10:pr-merge <pr>`
+**Commands:** `/mach10:doc-review <pr>` (optional), `/mach10:pr-pre-merge <pr>`, `/mach10:pr-merge <pr>`
 
-When the review converges to mostly minor findings, validate remaining items (genuine vs. nitpick vs. false positive), optionally run a deep documentation review with `doc-review`, run the pre-merge checklist (docs, version, CHANGELOG, tests), and merge.
+Once the review-fix cycle converges (the assessment shows no genuine issues remaining), optionally run a deep documentation review with `doc-review`, run the pre-merge checklist (docs, version, CHANGELOG, tests), and merge.
 
 ### Quick reference
 
@@ -134,7 +134,7 @@ Session 7:  /mach10:pr-review 108
 Session 8:  /mach10:pr-review-fix 108 1,2,3  then  /mach10:push
 Session 9:  /mach10:pr-review 108
 Session 10: /mach10:pr-ci-fix 108              then  /mach10:push
-Session 11: /mach10:pr-review-validate 108
+Session 11: /mach10:pr-review 108              (converges when assessment shows no genuine issues)
 Session 12: /mach10:doc-review 108           (optional)
 Session 13: /mach10:pr-pre-merge 108
 Session 14: /mach10:pr-merge 108
@@ -186,12 +186,11 @@ Large features are broken into numbered stages during the analysis step. Each st
 
 Code review is not a single pass. mach10 uses an iterative cycle:
 
-1. **Review** — Run 6 specialized agents in parallel (code quality, test coverage, error handling, type design, comment accuracy, complexity). Post findings as a PR comment.
-2. **Fix** — In a new session, read the review comment and fix a batch of issues. Batch size depends on complexity: ~10 simple fixes, ~6 moderate, ~3 complex.
-3. **Re-review** — Run the review suite again. If issues remain, repeat.
-4. **Validate** — When the review converges to mostly nitpicks, independently assess each remaining finding. Classify as genuine, nitpick, false positive, or deferred. Post an audit comment documenting why certain items are not being addressed.
+1. **Review + Assess** — Run 6 specialized agents in parallel (code quality, test coverage, error handling, type design, comment accuracy, complexity). Post findings as a PR comment. Then independently assess each finding, classifying it as genuine, nitpick, false positive, or deferred. The assessment is the convergence signal.
+2. **Fix** — In a new session, read the review comment and fix the genuine issues. Batch size depends on complexity: ~10 simple fixes, ~6 moderate, ~3 complex.
+3. **Re-review** — Run the review suite again. Each review includes a fresh assessment.
 
-This continues until the PR is clean enough for human review, with confidence that it won't waste a colleague's time with unresolved issues.
+This continues until the assessment shows no genuine issues remaining, at which point the PR is clean enough for human review.
 
 ### Context-window-aware batch sizing
 
@@ -218,5 +217,5 @@ The methodology prioritizes safety:
 
 - **Thin orchestration layer**: Commands gather context and delegate to existing plugins (feature-dev, pr-review-toolkit) rather than reimplementing workflows.
 - **GitHub as source of truth**: Plans, reviews, and progress are posted as issue/PR comments so future sessions can pick up where previous ones left off.
-- **Context-window aware**: Review and fix are deliberately separate commands because reviews consume most of the context budget.
+- **Context-window aware**: Review and fix are separate commands to preserve context budget for implementation. Each review includes an independent assessment of its own findings.
 - **Safe by default**: No force-pushes, no `git add -A`, no staging of secrets files, no force-merges.

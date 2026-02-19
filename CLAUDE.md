@@ -28,7 +28,7 @@ Each command file is a self-contained workflow specification with:
 ## Key Design Decisions
 
 - **Thin orchestration**: Commands gather context and delegate to `feature-dev` and `pr-review-toolkit` plugins via the Skill tool rather than reimplementing workflows.
-- **Single-concern sessions**: Review and fix are separate commands because reviews consume most available context. Each command is designed to run in a fresh CLI session.
+- **Single-concern sessions**: Review and fix are separate commands to preserve context budget for implementation. Each command is designed to run in a fresh CLI session.
 - **GitHub as backbone**: Plans, reviews, and progress are posted as issue/PR comments so context persists across sessions.
 - **Safe defaults**: No `git add -A`, no staging of secrets, no force-pushes, branch deletion uses `-d` flag.
 
