@@ -172,13 +172,13 @@ Session 14: /mach10:pr-merge 108
 - [pr-review-toolkit](https://github.com/anthropics/claude-code-plugins) plugin (required by `/pr-review`)
 - `gh` CLI authenticated with your GitHub account
 
-**From the CLI menu:**
+**From the CLI:**
 
 1. Start Claude Code: `claude`
-2. Type `/plugins`
-3. Select **Add plugin...**
-4. Choose **From GitHub URL**
-5. Enter: `https://github.com/merckgroup/mach10`
+2. Register the repository as a marketplace: `/plugin marketplace add merckgroup/mach10`
+3. Install the plugin: `/plugin install mach10@merckgroup-mach10`
+
+You can also use the interactive plugin manager (`/plugin`) and browse the **Discover** tab after adding the marketplace.
 
 **Manual:**
 
