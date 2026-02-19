@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-mach10 is a Claude Code plugin that automates a structured, multi-session development workflow from GitHub issue analysis through PR merge. It provides 14 slash commands covering the complete issue-to-merge lifecycle, using GitHub issues, PRs, and comments as the inter-session persistence layer.
+mach10 is a Claude Code plugin that automates a structured, multi-session development workflow from GitHub issue analysis through PR merge. It provides 15 slash commands covering the complete issue-to-merge lifecycle, using GitHub issues, PRs, and comments as the inter-session persistence layer.
 
 ## Architecture
 
@@ -12,7 +12,7 @@ This is a pure plugin definition -- no build system, no runtime, no tests. Claud
 
 ```
 .claude-plugin/plugin.json   # Plugin manifest (name, version, author)
-commands/                     # 14 slash command definitions (markdown with YAML frontmatter)
+commands/                     # 15 slash command definitions (markdown with YAML frontmatter)
 ```
 
 Each command file is a self-contained workflow specification with:
@@ -22,7 +22,7 @@ Each command file is a self-contained workflow specification with:
 ## Command Structure
 
 **Issue workflow:** `issue-assessment`, `issue-plan`, `issue-review-plan`, `issue-implement`, `issue-create`
-**PR workflow:** `pr-create`, `pr-review`, `pr-review-fix`, `pr-ci-fix`, `pr-review-validate`, `pr-pre-merge`, `pr-merge`
+**PR workflow:** `pr-create`, `pr-review`, `pr-review-fix`, `pr-ci-fix`, `pr-review-validate`, `doc-review`, `pr-pre-merge`, `pr-merge`
 **Utilities:** `push`, `test-audit`
 
 ## Key Design Decisions

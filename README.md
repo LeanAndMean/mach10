@@ -4,7 +4,7 @@ A Claude Code plugin that codifies a structured agentic development workflow int
 
 ## What it does
 
-mach10 wraps the repeated multi-step patterns of a GitHub-issue-driven development lifecycle into 14 slash commands. Each command handles context gathering, delegation, and documentation automatically.
+mach10 wraps the repeated multi-step patterns of a GitHub-issue-driven development lifecycle into 15 slash commands. Each command handles context gathering, delegation, and documentation automatically.
 
 ## Prerequisites
 
@@ -45,6 +45,7 @@ claude --plugin-dir /path/to/mach10
 | `/mach10:pr-review-fix <pr> [issues]` | Fix specific review findings via feature-dev |
 | `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
 | `/mach10:pr-review-validate <pr>` | Independently assess remaining findings (genuine vs. nitpick vs. false positive) |
+| `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
 | `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (docs, version, CHANGELOG, tests) |
 | `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
 
@@ -114,9 +115,9 @@ If CI fails after a fix, use `pr-ci-fix` to diagnose and resolve the failure.
 
 ### Phase 7: Validate and merge
 
-**Commands:** `/mach10:pr-review-validate <pr>`, `/mach10:pr-pre-merge <pr>`, `/mach10:pr-merge <pr>`
+**Commands:** `/mach10:pr-review-validate <pr>`, `/mach10:doc-review <pr>` (optional), `/mach10:pr-pre-merge <pr>`, `/mach10:pr-merge <pr>`
 
-When the review converges to mostly minor findings, validate remaining items (genuine vs. nitpick vs. false positive), run the pre-merge checklist (docs, version, CHANGELOG, tests), and merge.
+When the review converges to mostly minor findings, validate remaining items (genuine vs. nitpick vs. false positive), optionally run a deep documentation review with `doc-review`, run the pre-merge checklist (docs, version, CHANGELOG, tests), and merge.
 
 ### Quick reference
 
@@ -134,8 +135,9 @@ Session 8:  /mach10:pr-review-fix 108 1,2,3  then  /mach10:push
 Session 9:  /mach10:pr-review 108
 Session 10: /mach10:pr-ci-fix 108              then  /mach10:push
 Session 11: /mach10:pr-review-validate 108
-Session 12: /mach10:pr-pre-merge 108
-Session 13: /mach10:pr-merge 108
+Session 12: /mach10:doc-review 108           (optional)
+Session 13: /mach10:pr-pre-merge 108
+Session 14: /mach10:pr-merge 108
 ```
 
 ## The methodology behind mach10
