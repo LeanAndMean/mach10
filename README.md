@@ -58,27 +58,6 @@ Code review is not a single pass. The methodology uses an iterative cycle:
 
 This continues until the assessment shows no genuine issues remaining.
 
-### Context-window-aware batch sizing
-
-Not all review findings are equal. A typo fix takes one line; a design flaw may require rearchitecting a module. Batch sizes are scaled accordingly:
-
-- **Simple one-line fixes**: up to ~10 at once
-- **Moderate fixes**: ~6 at a time
-- **Deep or complex fixes**: no more than ~3 at a time
-
-Similar issues are grouped together. Out-of-scope problems are deferred to new GitHub issues rather than addressed inline.
-
-### Safe by default
-
-The methodology prioritizes safety:
-
-- No `git add -A` or `git add .` -- files are staged by name.
-- No staging of secrets files (.env, credentials, etc.).
-- No force-pushes, no force-merges.
-- Merge uses the repository's default strategy.
-- Branch deletion uses the safe `-d` flag (refuses to delete unmerged branches).
-- The AI never pushes to remote unless explicitly told to.
-
 ## The workflow
 
 The methodology in action across a feature's lifecycle. Each step below runs in a **fresh CLI session**. GitHub comments carry context between sessions -- no filesystem state or memory is required. This also means other team members' sessions can pick up where yours left off by reading the same issue or PR.
@@ -225,4 +204,3 @@ claude --plugin-dir /path/to/mach10
 - **Thin orchestration layer**: Commands gather context and delegate to existing plugins (feature-dev, pr-review-toolkit) rather than reimplementing workflows.
 - **GitHub as source of truth**: Plans, reviews, and progress are posted as issue/PR comments so future sessions can pick up where previous ones left off.
 - **Context-window aware**: Review and fix are separate commands to preserve context budget for implementation. Each review includes an independent assessment of its own findings.
-- **Safe by default**: No force-pushes, no `git add -A`, no staging of secrets files, no force-merges.
