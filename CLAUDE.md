@@ -49,6 +49,14 @@ When adding or modifying commands, follow the existing pattern:
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
 
+## Release Process
+
+Every change merged into `main` must follow this process:
+
+1. **Version bump**: Before the PR is merged, bump the plugin version in `.claude-plugin/plugin.json`.
+2. **Tagged commit**: After the merge, create a git tag matching the new version (e.g., `v0.2.0`).
+3. **GitHub release**: Create a GitHub release for the tag with a description of the change.
+
 ## Working in This Repo
 
 - Proactively load any plugin development skills you think might be relevant when modifying or reviewing files in this repo.

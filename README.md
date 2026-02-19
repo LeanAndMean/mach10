@@ -129,15 +129,19 @@ Once you're familiar with the phases above, this session log serves as a cheat s
 Session 1:  /mach10:issue-assessment 55
 Session 2:  /mach10:issue-plan 55
 Session 3:  /mach10:issue-review-plan 55
-Session 4:  /mach10:issue-implement 55 1    then  /mach10:push
-Session 5:  /mach10:issue-implement 55 2    then  /mach10:push
+Session 4:  /mach10:issue-implement 55 1
+            /mach10:push
+Session 5:  /mach10:issue-implement 55 2
+            /mach10:push
 Session 6:  /mach10:pr-create 55
 Session 7:  /mach10:pr-review 108
-Session 8:  /mach10:pr-review-fix 108 1,2,3  then  /mach10:push
+Session 8:  /mach10:pr-review-fix 108 1,2,3
+            /mach10:push
 Session 9:  /mach10:pr-review 108
-Session 10: /mach10:pr-ci-fix 108              then  /mach10:push
-Session 11: /mach10:pr-review 108              (converges when assessment shows no genuine issues)
-Session 12: /mach10:doc-review 108           (optional)
+Session 10: /mach10:pr-ci-fix 108
+            /mach10:push
+Session 11: /mach10:pr-review 108             (converges when assessment shows no genuine issues)
+Session 12: /mach10:doc-review 108            (optional)
 Session 13: /mach10:pr-pre-merge 108
 Session 14: /mach10:pr-merge 108
 ```
