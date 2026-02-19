@@ -63,4 +63,4 @@ Once fixes are complete, the user will typically run `/mach10:push` to commit, p
 
 - Each fix session should be **fresh** to maximize available context.
 - If an issue is out of scope or would require significant refactoring, recommend deferring it to a new GitHub issue rather than fixing it inline. Offer to create the issue with `/mach10:issue-create`.
-- After all fix batches are done, the user should re-run `/mach10:pr-review <pr-number>` to verify the fixes.
+- After all fix batches are done, the user should `/clear` then re-run `/mach10:pr-review <pr-number>` to verify the fixes.

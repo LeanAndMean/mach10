@@ -87,4 +87,4 @@ Present a summary of what was done:
 - [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
 - [ ] Tests: [all passing / N failures noted]
 
-Recommend next step: `/mach10:pr-merge $ARGUMENTS`
+Recommend next step: `/clear` then `/mach10:pr-merge $ARGUMENTS`

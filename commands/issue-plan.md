@@ -70,4 +70,4 @@ After the user approves the plan:
    - Example: `feature/issue-55-fix-analytics-url`
    - Push the branch to remote with `-u` flag
 
-Confirm both actions to the user, and let them know the next step is `/mach10:issue-implement $ARGUMENTS 1` to begin Stage 1 of the implementation.
+Confirm both actions to the user, and let them know the next step is `/clear` then `/mach10:issue-implement $ARGUMENTS 1` to begin Stage 1 of the implementation in a fresh session.

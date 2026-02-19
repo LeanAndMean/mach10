@@ -64,9 +64,9 @@ Report to the user:
 - How many critical/important/suggestion issues were found
 - Link to the posted comment
 - Recommended next step:
-  - If critical issues found: "Next: `/mach10:pr-review-fix <pr-number> <issue-numbers>` (in a new session)"
-  - If only minor issues: "Next: `/mach10:pr-review-validate <pr-number>` to triage remaining findings"
-  - If clean: "Next: `/mach10:pr-pre-merge <pr-number>`"
+  - If critical issues found: "Next: `/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>`"
+  - If only minor issues: "Next: `/clear` then `/mach10:pr-review-validate <pr-number>` to triage remaining findings"
+  - If clean: "Next: `/clear` then `/mach10:pr-pre-merge <pr-number>`"
 
 ## Important
 

@@ -62,4 +62,4 @@ gh issue edit <number> --add-label "..."
 
 Report to the user:
 - Issue number and URL
-- Suggest next action if relevant (e.g., "You can plan this with `/mach10:issue-plan <number>`")
+- Suggest next action if relevant (e.g., "Next: `/clear` then `/mach10:issue-plan <number>`")

@@ -18,7 +18,11 @@ Confirm the PR is ready to merge:
 gh pr view $ARGUMENTS --json state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
 ```
 
-If there are blocking issues (failed checks, merge conflicts, etc.), report them to the user and stop. Do NOT force-merge.
+If there are blocking issues, report them to the user and stop. Do NOT force-merge.
+
+- **Failed CI checks**: Suggest `/clear` then `/mach10:pr-ci-fix <pr-number>` to diagnose and fix the failures.
+- **Merge conflicts**: Suggest resolving conflicts manually or rebasing the branch.
+- **Missing review approval**: Suggest requesting a review.
 
 ## Step 2: Merge
 

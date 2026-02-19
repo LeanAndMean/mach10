@@ -72,4 +72,4 @@ Report to the user:
 - What was committed (files and message)
 - Where it was pushed
 - Where the progress comment was posted (with link)
-- Suggest next steps (e.g., "Next: `/mach10:issue-implement $ISSUE next-stage`" or "Next: `/mach10:pr-review $PR`")
+- Suggest next steps, always prefixed with `/clear` (e.g., "Next: `/clear` then `/mach10:issue-implement $ISSUE next-stage`" or "Next: `/clear` then `/mach10:pr-review $PR`")

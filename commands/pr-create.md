@@ -128,4 +128,4 @@ Do NOT proceed to the confirmation step if PR creation failed.
 Report to the user:
 - PR number and URL
 - Linked issue (if any)
-- Suggest next step using the actual PR number: "Next: `/mach10:pr-review <pr-number>`"
+- Suggest next step using the actual PR number: "Next: `/clear` then `/mach10:pr-review <pr-number>`"
