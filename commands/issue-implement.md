@@ -68,10 +68,11 @@ After the branch is confirmed (whether by checkout, silent match, or user confir
 
 ## Step 3: Gather Context
 
-Read the issue and all comments to find the implementation plan:
+Read the issue body and all comments to find the implementation plan:
 
 ```
-gh issue view <issue-number> --comments
+gh issue view <issue-number>             # title + body
+gh issue view <issue-number> --comments  # comments only
 ```
 
 Locate the implementation plan comment (typically the most recent substantive comment). Identify the requested stage(s).
@@ -80,10 +81,10 @@ Locate the implementation plan comment (typically the most recent substantive co
 
 Use the Skill tool to invoke `/feature-dev:feature-dev` with the following context:
 
-> Read issue #<issue-number> and all comments. Locate the staged implementation plan in the comments, then implement the requested stage(s) using the 7-phase development plan. IMPORTANT: After reading the development plan phases, add each phase as a task to your todo list so you do not skip any phases.
+> Read issue #<issue-number> (both the issue body and all comments). Locate the staged implementation plan in the comments, then implement the requested stage(s) using the 7-phase development plan. Use the issue body for context on the problem statement, requirements, and acceptance criteria. IMPORTANT: After reading the development plan phases, add each phase as a task to your todo list so you do not skip any phases.
 
 If the stage reveals issues with the original plan, note them and suggest plan adjustments rather than silently deviating.
 
-After implementation is complete, suggest: "Next: `/clear` then `/mach10:push` to commit, push, and document progress."
+After implementation is complete, suggest: "Next: `/mach10:push` to commit, push, and document progress."
 
 Each stage should be implemented in a **fresh CLI session** to maximize available context.

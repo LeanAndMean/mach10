@@ -9,14 +9,22 @@ model: opus
 
 You are reviewing the implementation plan for a GitHub issue. Your goal is to read the issue and all comments, independently assess the plan, and present your findings.
 
-**Issue number:** $ARGUMENTS
+**User input:** $ARGUMENTS
 
-## Step 1: Read the Issue
+## Step 1: Parse Input
 
-Read the full issue and all comments:
+The user's input contains:
+- An **issue number** (required)
+
+Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
+
+## Step 2: Read the Issue
+
+Read the full issue body and all comments:
 
 ```
-gh issue view $ARGUMENTS --comments
+gh issue view <issue-number>             # title + body
+gh issue view <issue-number> --comments  # comments only
 ```
 
 Understand:
@@ -24,9 +32,9 @@ Understand:
 - The implementation plan (typically posted as a comment)
 - Any discussion, decisions, or clarifications in the comment thread
 
-Locate the implementation plan comment. If no plan exists, inform the user and suggest running `/mach10:issue-plan $ARGUMENTS` first.
+Locate the implementation plan comment. If no plan exists, inform the user and suggest running `/mach10:issue-plan <issue-number>` first.
 
-## Step 2: Explore the Codebase
+## Step 3: Explore the Codebase
 
 Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore) to verify the plan's assumptions:
 
@@ -36,7 +44,7 @@ Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Ex
 
 Each agent should return a list of key files and observations. After agents complete, read all identified files.
 
-## Step 3: Review the Plan
+## Step 4: Review the Plan
 
 For each stage in the plan, assess:
 
@@ -52,7 +60,7 @@ Also assess the plan holistically:
 - Does it follow existing codebase patterns and conventions?
 - Are there alternative approaches worth considering?
 
-## Step 4: Present Findings
+## Step 5: Present Findings
 
 Present your review to the user, organized as:
 

@@ -9,14 +9,22 @@ model: opus
 
 You are creating a staged implementation plan for a GitHub issue. Your goal is to deeply understand the issue, explore the relevant codebase, and produce a plan where each stage can be implemented within a single Claude Code CLI session.
 
-**Issue number:** $ARGUMENTS
+**User input:** $ARGUMENTS
 
-## Step 1: Read the Issue
+## Step 1: Parse Input
 
-Read the full issue and all comments:
+The user's input contains:
+- An **issue number** (required)
+
+Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
+
+## Step 2: Read the Issue
+
+Read the full issue body and all comments:
 
 ```
-gh issue view $ARGUMENTS --comments
+gh issue view <issue-number>             # title + body
+gh issue view <issue-number> --comments  # comments only
 ```
 
 Parse and understand:
@@ -25,7 +33,7 @@ Parse and understand:
 - Prior discussion or decisions in the comments
 - Acceptance criteria (if specified)
 
-## Step 2: Explore the Codebase
+## Step 3: Explore the Codebase
 
 Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore). Each agent should target a different aspect:
 
@@ -35,7 +43,7 @@ Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Ex
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
-## Step 3: Analyze and Plan
+## Step 4: Analyze and Plan
 
 Based on your understanding of the issue and codebase:
 
@@ -55,21 +63,21 @@ Based on your understanding of the issue and codebase:
 - The complexity of the logic involved
 - The testing surface area
 
-## Step 4: Post and Branch
+## Step 5: Post and Branch
 
 After the user approves the plan:
 
-1. **Post the plan as a reply comment on the issue** using `gh issue comment $ARGUMENTS --body "..."`. Format the comment so it serves as input to future CLI sessions. Include:
+1. **Post the plan as a reply comment on the issue** using `gh issue comment <issue-number> --body "..."`. Format the comment so it serves as input to future CLI sessions. Include:
    - The full implementation plan
    - The staged breakdown
    - A note that this comment will guide staged implementation
 
 2. **Create a feature branch**:
    - Derive a short slug from the issue title (lowercase, hyphens, 3-5 words max)
-   - Branch name format: `feature/issue-$ARGUMENTS-<slug>`
+   - Branch name format: `feature/issue-<issue-number>-<slug>`
    - Example: `feature/issue-55-fix-analytics-url`
    - Push the branch to remote with `-u` flag
 
 Confirm both actions to the user.
 
-**CLI output only (do NOT include in the GitHub comment):** Let the user know the next step is `/clear` then `/mach10:issue-implement $ARGUMENTS 1` to begin Stage 1 of the implementation in a fresh session.
+**CLI output only (do NOT include in the GitHub comment):** Let the user know the next step is `/clear` then `/mach10:issue-implement <issue-number> 1` to begin Stage 1 of the implementation in a fresh session.

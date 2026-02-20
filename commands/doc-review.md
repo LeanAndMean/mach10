@@ -36,7 +36,8 @@ git pull
 Build a picture of what changed in the PR:
 
 1. **Changed files**: `gh pr diff <pr-number> --name-only` and `git diff main...HEAD --stat`
-2. **PR description and discussion**: `gh pr view <pr-number> --comments`
+2. **PR description**: `gh pr view <pr-number>`
+3. **PR discussion**: `gh pr view <pr-number> --comments`
 
 From these, identify what features, APIs, behaviors, or configurations were added, changed, or removed. This summary is critical context for the review agents in Step 4.
 

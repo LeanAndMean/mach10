@@ -27,10 +27,11 @@ Extract the PR number. If issue numbers are provided, note them. If the input is
 
 ## Step 2: Gather Context
 
-Read the PR and all comments to find the review:
+Read the PR description and all comments to find the review:
 
 ```
-gh pr view <pr-number> --comments
+gh pr view <pr-number>             # title + description
+gh pr view <pr-number> --comments  # comments only
 ```
 
 Locate the most recent review comment (look for the structured review format with Critical/Important/Suggestions sections and model attribution).

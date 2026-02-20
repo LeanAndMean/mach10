@@ -9,14 +9,22 @@ model: opus
 
 You are performing an independent assessment of the most recent PR review findings. The goal is to determine which remaining issues are genuine problems versus nitpicks or false positives, so the PR can proceed to merge with confidence.
 
-**PR number:** $ARGUMENTS
+**User input:** $ARGUMENTS
 
-## Step 1: Read Everything
+## Step 1: Parse Input
 
-Read the PR and all associated comments:
+The user's input contains:
+- A **PR number** (required)
+
+Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+
+## Step 2: Read Everything
+
+Read the PR description and all associated comments:
 
 ```
-gh pr view $ARGUMENTS --comments
+gh pr view <pr-number>             # title + description
+gh pr view <pr-number> --comments  # comments only
 ```
 
 Understand:
@@ -24,7 +32,7 @@ Understand:
 - The full comment history (implementation notes, prior reviews, fix documentation)
 - The most recent review comment
 
-## Step 2: Independent Assessment
+## Step 3: Independent Assessment
 
 For each finding in the most recent review:
 
@@ -36,7 +44,7 @@ For each finding in the most recent review:
    - **False positive** — The reviewer flagged something that is not actually an issue. Explain why the code is correct.
    - **Deferred** — Real issue but out of scope for this PR. Should be tracked in a new issue.
 
-## Step 3: Present Findings
+## Step 4: Present Findings
 
 Present your assessment to the user as a clear table or list:
 
@@ -47,7 +55,7 @@ For each finding:
 
 Summarize: how many genuine, how many nitpicks, how many false positives, how many deferred.
 
-## Step 4: Post Comment
+## Step 5: Post Comment
 
 After user approval, post a reply comment on the PR documenting:
 
@@ -56,14 +64,14 @@ After user approval, post a reply comment on the PR documenting:
 - Any new issues created for deferred items
 
 ```
-gh pr comment $ARGUMENTS --body "..."
+gh pr comment <pr-number> --body "..."
 ```
 
 This comment serves as an audit trail for the human reviewer, demonstrating that each finding was considered rather than ignored.
 
-## Step 5: Recommend Next Steps
+## Step 6: Recommend Next Steps
 
-**CLI output only (do NOT include in the GitHub comment from Step 4):** Based on the assessment, recommend next step to the user:
-- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix $ARGUMENTS <issue-numbers>`"
-- If only deferred items: "Create issues with `/mach10:issue-create`, then `/clear` and `/mach10:pr-pre-merge $ARGUMENTS`"
-- If clean: "`/clear` then `/mach10:pr-pre-merge $ARGUMENTS`"
+**CLI output only (do NOT include in the GitHub comment from Step 5):** Based on the assessment, recommend next step to the user:
+- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>`"
+- If only deferred items: "Create issues with `/mach10:issue-create`, then `/clear` and `/mach10:pr-pre-merge <pr-number>`"
+- If clean: "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
