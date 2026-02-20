@@ -46,11 +46,13 @@ gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
 
 4. **Multiple matches found:** Present the list to the user and ask them to choose which branch to use.
 
-5. **No match found:** Ask the user: "No feature branch found for issue #N. Create a new one, or specify an existing branch name?" If creating a new one:
-   - Read the issue title: `gh issue view <issue-number> --json title --jq .title`
-   - Derive a slug: lowercase, replace spaces and special characters with hyphens, truncate to 3-5 words
-   - Create the branch: `git checkout -b feature/issue-<number>-<slug>`
-   - Push with upstream tracking: `git push -u origin <branch-name>`
+5. **No match found:** Ask the user: "No feature branch found for issue #N. Create a new one, or specify an existing branch name?" Then:
+   - **Create a new branch:**
+     - Read the issue title: `gh issue view <issue-number> --json title --jq .title`
+     - Derive a slug: lowercase, replace spaces and special characters with hyphens, truncate to 3-5 words
+     - Create the branch: `git checkout -b feature/issue-<number>-<slug>`
+     - Push with upstream tracking: `git push -u origin <branch-name>`
+   - **Use an existing branch:** Verify the branch exists in `git branch -a` output, check it out with `git checkout <branch>`, and `git pull`.
 
 ### If not on the default branch
 
@@ -83,3 +85,5 @@ Use the Skill tool to invoke `/feature-dev:feature-dev` with the following conte
 If the stage reveals issues with the original plan, note them and suggest plan adjustments rather than silently deviating.
 
 After implementation is complete, suggest: "Next: `/clear` then `/mach10:push` to commit, push, and document progress."
+
+Each stage should be implemented in a **fresh CLI session** to maximize available context.
