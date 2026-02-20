@@ -42,7 +42,7 @@ gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
 
 2. Search for convention-named branches that match the issue number. Run `git branch -a` and normalize each result by trimming leading whitespace and stripping the `remotes/origin/` prefix if present. Then filter for branches that start with `feature/issue-<number>-` or `fix/issue-<number>-`, or that equal `feature/issue-<number>` or `fix/issue-<number>` exactly. Use strict matching so that `issue-4-` does not match `issue-42-`.
 
-3. **Exactly one match found:** Check it out with `git checkout <branch>` and `git pull`.
+3. **Exactly one match found:** Check it out with `git checkout <branch>` and `git pull --ff-only`. If the pull fails because local and remote have diverged, stop and tell the user to resolve the divergence before continuing.
 
 4. **Multiple matches found:** Present the list to the user and ask them to choose which branch to use.
 
@@ -52,11 +52,11 @@ gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
      - Derive a slug: lowercase, replace spaces and special characters with hyphens, truncate to 3-5 words
      - Create the branch: `git checkout -b feature/issue-<number>-<slug>`
      - Push with upstream tracking: `git push -u origin <branch-name>`
-   - **Use an existing branch:** Verify the branch exists in `git branch -a` output, check it out with `git checkout <branch>`, and `git pull`.
+   - **Use an existing branch:** Verify the branch exists in `git branch -a` output, check it out with `git checkout <branch>`, and `git pull --ff-only`. If the pull fails because local and remote have diverged, stop and tell the user to resolve the divergence before continuing.
 
 ### If not on the default branch
 
-1. Check whether the current branch name appears related to the issue. Use strict delimited matching: the branch name should contain `issue-<number>-` or end with `issue-<number>` as a distinct segment (e.g., `feature/issue-4-branch-safety` matches issue 4, but `feature/issue-42-thing` does not). Also match `fix/issue-<number>-` and similar prefixed patterns.
+1. Check whether the current branch name appears related to the issue. Use strict delimited matching: the branch name should contain `issue-<number>-` or end with `issue-<number>` as a distinct segment (e.g., `feature/issue-4-branch-safety` matches issue 4, but `feature/issue-42-thing` does not). Also match `feature/issue-<number>-` and `fix/issue-<number>-` prefixed patterns.
 
 2. If the branch appears related to the issue, proceed silently.
 
