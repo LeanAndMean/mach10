@@ -8,14 +8,21 @@ allowed-tools: Bash
 
 You are merging a PR that has passed review and the pre-merge checklist, then optionally creating a release.
 
-**PR number:** $ARGUMENTS
+**User input:** $ARGUMENTS
 
-## Step 1: Verify Readiness
+## Step 1: Parse Input
+
+The user's input contains:
+- A **PR number** (required)
+
+Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+
+## Step 2: Verify Readiness
 
 Confirm the PR is ready to merge:
 
 ```
-gh pr view $ARGUMENTS --json state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
+gh pr view <pr-number> --json state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
 ```
 
 If there are blocking issues, report them to the user and stop. Do NOT force-merge.
@@ -24,12 +31,12 @@ If there are blocking issues, report them to the user and stop. Do NOT force-mer
 - **Merge conflicts**: Suggest resolving conflicts manually or rebasing the branch.
 - **Missing review approval**: Suggest requesting a review.
 
-## Step 2: Merge
+## Step 3: Merge
 
 Merge the PR using the repository's default merge strategy, and delete the remote feature branch in the same command:
 
 ```
-gh pr merge $ARGUMENTS --delete-branch
+gh pr merge <pr-number> --delete-branch
 ```
 
 Then update local main:
@@ -41,7 +48,7 @@ git checkout main && git pull
 Clean up the local feature branch if it still exists. Get the branch name from the PR:
 
 ```
-gh pr view $ARGUMENTS --json headRefName --jq .headRefName
+gh pr view <pr-number> --json headRefName --jq .headRefName
 ```
 
 Then delete the local branch:
@@ -50,13 +57,13 @@ Then delete the local branch:
 git branch -d <branch-name-from-above>
 ```
 
-## Step 3: Ask About Release
+## Step 4: Ask About Release
 
 Ask the user if they want to create a release for this merge.
 
-If yes, proceed to Step 4. If no, skip to Step 5.
+If yes, proceed to Step 5. If no, skip to Step 6.
 
-## Step 4: Create Release (If Requested)
+## Step 5: Create Release (If Requested)
 
 Read recent releases for style consistency:
 
@@ -81,7 +88,7 @@ Present the draft to the user for approval, then create:
 gh release create <tag> --title "..." --notes "..."
 ```
 
-## Step 5: Confirm
+## Step 6: Confirm
 
 Report to the user:
 - PR merged (with merge commit hash)

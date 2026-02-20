@@ -8,9 +8,16 @@ allowed-tools: Bash, Read, Grep, Glob, Edit, Write
 
 You are running the pre-merge checklist for a PR that has passed review. Walk through each checklist item, perform the necessary updates, and commit the results.
 
-**PR number:** $ARGUMENTS
+**User input:** $ARGUMENTS
 
-## Step 1: Read Contributing Guidelines
+## Step 1: Parse Input
+
+The user's input contains:
+- A **PR number** (required)
+
+Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+
+## Step 2: Read Contributing Guidelines
 
 Look for project contribution guidelines in order of precedence:
 
@@ -24,26 +31,26 @@ If found, read the file and extract any pre-merge requirements (version bumps, c
 
 If no contributing guide exists, use the standard checklist below.
 
-## Step 2: Checkout and Prepare
+## Step 3: Checkout and Prepare
 
 Ensure you are on the PR's branch with latest changes:
 
 ```
-gh pr checkout $ARGUMENTS
+gh pr checkout <pr-number>
 git pull
 ```
 
-## Step 3: Run Checklist
+## Step 4: Run Checklist
 
 Work through each item. For each, report whether action is needed and perform it if so.
 
-### 3a. Documentation
+### 4a. Documentation
 
 - Are there new features or changed behavior that need documentation updates?
 - Check README.md, any docs/ directory, docstrings, and help text.
 - Update as needed.
 
-### 3b. Version Bump
+### 4b. Version Bump
 
 - Check if the project uses semantic versioning (look for version in package.json, pyproject.toml, setup.cfg, __version__, etc.)
 - If version tracking exists, determine if a bump is warranted:
@@ -52,12 +59,12 @@ Work through each item. For each, report whether action is needed and perform it
   - **Major**: Breaking changes
 - Ask the user for the version bump level if not obvious.
 
-### 3c. CHANGELOG
+### 4c. CHANGELOG
 
 - Check if the project maintains a CHANGELOG.md or CHANGES.md.
 - If so, add an entry for this PR's changes following the existing format.
 
-### 3d. Tests
+### 4d. Tests
 
 Run the project's test suite:
 
@@ -70,7 +77,7 @@ Run the project's test suite:
 
 Report results. If tests fail, investigate and report — do NOT silently ignore failures.
 
-## Step 4: Commit
+## Step 5: Commit
 
 If any changes were made during the checklist, commit them:
 
@@ -79,7 +86,7 @@ If any changes were made during the checklist, commit them:
 
 Push to remote.
 
-## Step 5: Report
+## Step 6: Report
 
 Present a summary of what was done:
 - [ ] Documentation: [updated / no changes needed]
@@ -87,4 +94,4 @@ Present a summary of what was done:
 - [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
 - [ ] Tests: [all passing / N failures noted]
 
-Recommend next step: `/clear` then `/mach10:pr-merge $ARGUMENTS`
+Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`

@@ -9,14 +9,22 @@ model: opus
 
 You are performing an independent assessment of a GitHub issue. Your goal is to deeply understand the issue, explore the relevant codebase, and present your findings with a recommended next step.
 
-**Issue number:** $ARGUMENTS
+**User input:** $ARGUMENTS
 
-## Step 1: Read the Issue
+## Step 1: Parse Input
 
-Read the full issue and all comments:
+The user's input contains:
+- An **issue number** (required)
+
+Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
+
+## Step 2: Read the Issue
+
+Read the full issue body and all comments:
 
 ```
-gh issue view $ARGUMENTS --comments
+gh issue view <issue-number>             # title + body
+gh issue view <issue-number> --comments  # comments only
 ```
 
 Parse and understand:
@@ -26,7 +34,7 @@ Parse and understand:
 - Acceptance criteria (if specified)
 - Current state of the issue (open, closed, linked PRs, etc.)
 
-## Step 2: Explore the Codebase
+## Step 3: Explore the Codebase
 
 Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore). Each agent should target a different aspect:
 
@@ -36,7 +44,7 @@ Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Ex
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
-## Step 3: Assess
+## Step 4: Assess
 
 Based on your understanding of the issue and codebase, present your assessment to the user:
 
@@ -47,7 +55,7 @@ Based on your understanding of the issue and codebase, present your assessment t
 5. **Scope**: Your assessment of the size and complexity of the work.
 6. **Risks**: Potential pitfalls, edge cases, or architectural concerns.
 
-## Step 4: Recommend Next Step
+## Step 5: Recommend Next Step
 
 Based on your assessment, decide which of the following actions to recommend. Choose based on context — there is no single right answer.
 
@@ -63,12 +71,12 @@ Recommend this when the issue body needs corrections or additions AND there are 
 ### Option 4: Create a new issue (rare)
 Recommend this when your assessment reveals that the work described in the issue is already done (e.g., in an existing feature branch) or that the issue should be split into multiple distinct issues. Explain why and draft the new issue for user approval.
 
-## Step 5: Execute
+## Step 6: Execute
 
 After the user approves your recommendation:
 
-- **Update issue body**: `gh issue edit $ARGUMENTS --body "..."`
-- **Post comment**: `gh issue comment $ARGUMENTS --body "..."`
+- **Update issue body**: `gh issue edit <issue-number> --body "..."`
+- **Post comment**: `gh issue comment <issue-number> --body "..."`
 - **Create new issue**: `gh issue create --title "..." --body "..."`
 
 Confirm the actions taken and provide links.

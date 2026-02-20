@@ -44,7 +44,7 @@ When adding or modifying commands, follow the existing pattern:
 - YAML frontmatter must include `description` and `argument-hint`
 - Set `allowed-tools` to the minimum set needed (principle of least privilege)
 - Set `model: opus` for commands requiring deep reasoning (reviews, planning, implementation)
-- End commands with a "next step" suggestion that includes `/clear` guidance for session boundaries
+- End commands with a "next step" suggestion that includes `/clear` guidance for session boundaries (omit `/clear` when the next command needs session context, e.g., `/mach10:push` after implementation)
 - Use `gh` CLI for all GitHub operations (issues, PRs, comments, CI logs)
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
