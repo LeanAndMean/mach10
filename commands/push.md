@@ -95,6 +95,8 @@ Post a reply comment documenting what was done:
 - Commit hash(es) included
 - Any notable decisions or deviations from the plan
 
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 ## Step 5: Confirm
 
 Report to the user in CLI output (do NOT include next-step suggestions in the GitHub comment from Step 4):

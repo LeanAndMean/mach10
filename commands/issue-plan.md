@@ -83,6 +83,8 @@ After the user approves the plan:
    - Example: `feature/issue-55-fix-analytics-url`
    - Push the branch to remote with `-u` flag
 
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 Confirm both actions to the user.
 
 **CLI output only (do NOT include in the GitHub comment):** Let the user know the next step is `/clear` then `/mach10:issue-implement <issue-number> 1` to begin Stage 1 of the implementation in a fresh session.

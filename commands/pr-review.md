@@ -59,6 +59,8 @@ The comment must include:
 
 Format the comment as a well-structured markdown document that can serve as input to a future `/mach10:pr-review-fix` session.
 
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 After posting, retrieve the URL of the review comment (use `gh pr view <pr-number> --json comments` to get the URL of the last comment). You will need this URL in Step 6.
 
 ## Step 5: Independent Assessment
@@ -100,6 +102,8 @@ Post the assessment immediately as a reply comment on the PR — do not ask the 
 gh pr comment <pr-number> --body "..."
 ```
 
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 ## Step 7: Present CLI Summary
 
 After posting, present the assessment to the user in CLI output:
@@ -119,6 +123,8 @@ If any findings were classified as **deferred**, ask the user if they want to cr
 - A title summarizing the issue
 - A body referencing the PR and the specific finding
 - Any relevant labels
+
+When referring to numbered items (findings, suggestions, stages) in the issue body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 ## Step 9: Recommend Next Steps
 

@@ -32,6 +32,13 @@ Each command file is a self-contained workflow specification with:
 - **GitHub as backbone**: Plans, reviews, and progress are posted as issue/PR comments so context persists across sessions.
 - **Safe defaults**: No `git add -A`, no staging of secrets, no force-pushes, branch deletion uses `-d` flag.
 
+## GitHub Comment Formatting
+
+When composing content for GitHub comments or issue bodies:
+- Do not use bare `#<number>` notation for numbered items (findings, suggestions, stages) -- GitHub auto-links `#<number>` to issues and PRs.
+- Use plain words instead: "finding 3", "suggestion 3", "stage 2".
+- Reserve `#<number>` exclusively for intentional GitHub issue/PR references (e.g., `Fixes #55`).
+
 ## Plugin Dependencies
 
 - `gh` CLI (GitHub authentication required)

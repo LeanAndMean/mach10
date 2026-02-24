@@ -68,6 +68,8 @@ After user approval, post a reply comment on the PR documenting:
 - Which findings are not being addressed, with clear reasoning for each
 - Any new issues created for deferred items
 
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 ```
 gh pr comment <pr-number> --body "..."
 ```

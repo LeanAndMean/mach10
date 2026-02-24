@@ -84,4 +84,6 @@ After the user approves your recommendation:
 - **Post comment**: `gh issue comment <issue-number> --body "..."`
 - **Create new issue**: `gh issue create --title "..." --body "..."`
 
+When referring to numbered items (findings, suggestions, stages) in any `--body` content, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 Confirm the actions taken and provide links.
