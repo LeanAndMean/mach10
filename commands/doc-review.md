@@ -143,6 +143,8 @@ The comment should include:
 - Findings that were rejected (for the record)
 - Attribution: "Documentation reviewed by Claude Opus 4.6"
 
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 **CLI output only (do NOT include in the GitHub comment above):** Recommend next step to the user:
 - If this was run before code review: "Next: `/clear` then `/mach10:pr-review <pr-number>`"
 - If this was run after code review: "Next: `/clear` then `/mach10:pr-pre-merge <pr-number>`"

@@ -59,6 +59,8 @@ The comment must include:
 
 Format the comment as a well-structured markdown document that can serve as input to a future `/mach10:pr-review-fix` session.
 
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 After posting, retrieve the URL of the review comment (use `gh pr view <pr-number> --json comments` to get the URL of the last comment). You will need this URL in Step 6.
 
 ## Step 5: Independent Assessment

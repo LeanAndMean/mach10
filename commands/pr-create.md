@@ -87,6 +87,7 @@ Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
 - Include `Fixes #<issue-number>` only if an issue was identified.
+- When referring to numbered items (findings, suggestions, stages) in the body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs. (`Fixes #<issue-number>` is an intentional GitHub reference and should be kept as-is.)
 - If the user provided additional context in $ARGUMENTS, incorporate it into the summary or test plan as appropriate.
 
 Present the draft title and body to the user for approval. Ask if they want to modify anything before creating the PR. If the user wants to cancel, stop and confirm that no PR was created.

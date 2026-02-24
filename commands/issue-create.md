@@ -52,6 +52,8 @@ After approval, create the issue:
 gh issue create --title "..." --body "..."
 ```
 
+When referring to numbered items (findings, suggestions, stages) in the issue body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 Add labels if the user specified them or if the repo has standard labels:
 
 ```
