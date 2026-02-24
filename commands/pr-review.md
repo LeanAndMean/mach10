@@ -80,20 +80,20 @@ The subagent prompt should instruct it to:
    - **Nitpick** — Stylistic preference or minor point that doesn't affect correctness or maintainability. Explain why it doesn't matter.
    - **False positive** — The reviewer flagged something that isn't actually an issue. Explain why the code is correct.
    - **Deferred** — Real issue but out of scope for this PR. Should be tracked separately.
-   - If a finding was already addressed or deferred in PR discussion, classify it accordingly and reference the relevant comment.
+   - If a finding was already fixed in a subsequent commit or resolved in discussion, classify it as **False positive** with a note that it has been addressed. If explicitly deferred in discussion, classify it as **Deferred** and reference the relevant comment.
 4. After classifying all findings, produce a **staged implementation plan** covering everything worth fixing:
    - Number each stage with a descriptive name.
    - Required stages for genuine issues (must fix before merge).
    - Optional stages for nitpicks (nice-to-have improvements).
    - Each stage should list the specific findings it addresses and which files are affected.
-5. Return a structured result: for each finding, the original summary, classification, and 1-2 sentence reasoning referencing specific code. After all findings, include the full staged implementation plan produced in step 4.
+5. Return all classifications (each with the original finding summary and 1-2 sentence reasoning referencing specific code), followed by the staged implementation plan produced in instruction (4) above.
 
 ## Step 6: Post Assessment
 
 Post the assessment immediately as a reply comment on the PR — do not ask the user for approval first. The comment must:
 - Reference the review comment it is assessing (link to the specific comment URL from Step 4)
 - List each finding with its classification and reasoning
-- End with the staged implementation plan (required stages for genuine issues, optional stages for nitpicks)
+- End with the staged implementation plan
 - Include model attribution at the bottom
 
 ```
