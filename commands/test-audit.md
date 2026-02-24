@@ -1,7 +1,7 @@
 ---
 description: Fan out subagents to audit test quality across the repo
 argument-hint: [optional-scope]
-allowed-tools: Bash, Read, Grep, Glob, Task
+allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 model: opus
 ---
 
@@ -66,7 +66,10 @@ Present the full audit report to the user. For critical and moderate findings, i
 - The specific test and what's wrong with it
 - A concrete suggestion for how to fix it
 
-Ask the user how they want to proceed:
-- Fix critical issues now
-- Create a GitHub issue to track the cleanup
-- Review specific findings in detail
+Use `AskUserQuestion` to ask the user how they want to proceed:
+
+- **Fix critical issues now**: "Address the most severe test quality problems in this session"
+- **Create a GitHub issue**: "Track the cleanup work as a new issue for later"
+- **Review specific findings**: "Examine individual findings in detail before deciding"
+
+If the user selects "Create a GitHub issue", draft an issue summarizing the audit findings and offer to create it with `/mach10:issue-create`. If the user selects "Review specific findings", walk through the findings they want to explore, then ask again how to proceed.

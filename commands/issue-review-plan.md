@@ -1,7 +1,7 @@
 ---
 description: Read a GitHub issue and all comments, review the implementation plan, and present findings
 argument-hint: <issue-number>
-allowed-tools: Bash, Read, Grep, Glob, Task
+allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 model: opus
 ---
 
@@ -77,7 +77,11 @@ Present your review to the user, organized as:
    - **Suggestions**: Improvements that would make the plan better but are not blockers.
 4. **Questions**: Any clarifying questions that came up during your review.
 
-Ask the user how they want to proceed:
-- Update the plan and post a revised version
-- Proceed with the plan as-is
-- Discuss specific findings in more detail
+Use `AskUserQuestion` to ask the user how they want to proceed:
+
+- **Update the plan**: "Post a revised plan addressing the findings"
+- **Proceed as-is**: "Continue with the current plan despite findings"
+- **Discuss findings**: "Explore specific findings in more detail before deciding"
+- **Cancel**: "Stop here without updating or proceeding"
+
+If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. If the user selects "Cancel", stop and confirm that no changes were made.

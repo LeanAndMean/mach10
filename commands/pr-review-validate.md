@@ -1,7 +1,7 @@
 ---
 description: Independently assess remaining review findings to triage genuine issues from nitpicks
 argument-hint: <pr-number>
-allowed-tools: Bash, Read, Grep, Glob, Task
+allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 model: opus
 ---
 
@@ -62,7 +62,15 @@ Summarize: how many genuine, how many nitpicks, how many false positives, how ma
 
 ## Step 5: Post Comment
 
-After user approval, post a reply comment on the PR documenting:
+Present the assessment to the user, then use `AskUserQuestion` to ask for approval:
+
+- **Approve and post**: "Post the assessment as a comment on the PR"
+- **Modify before posting**: "Edit the assessment before posting it"
+- **Skip posting**: "Do not post a comment to the PR"
+
+If the user selects "Modify before posting", ask what they want to change, apply the changes, and present the updated assessment for approval again. If the user selects "Skip posting", skip to Step 6.
+
+After the user approves, post a reply comment on the PR documenting:
 
 - Which findings are being addressed (and in which commit/session)
 - Which findings are not being addressed, with clear reasoning for each
