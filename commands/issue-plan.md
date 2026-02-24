@@ -1,7 +1,7 @@
 ---
 description: Read a GitHub issue, analyze the codebase, and create a staged implementation plan
 argument-hint: <issue-number>
-allowed-tools: Bash, Read, Grep, Glob, Task
+allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 model: opus
 ---
 
@@ -69,6 +69,14 @@ Based on your understanding of the issue and codebase:
 - The testing surface area
 
 ## Step 5: Post and Branch
+
+Present the plan to the user, then use `AskUserQuestion` to ask for approval with these options:
+
+- **Approve**: "Post the plan and create the feature branch"
+- **Request changes**: "Suggest changes to the plan before posting"
+- **Cancel**: "Abort without posting the plan or creating a branch"
+
+If the user selects "Request changes", discuss their feedback, revise the plan, and present it for approval again. If the user selects "Cancel", stop and confirm that the plan was not posted and no branch was created.
 
 After the user approves the plan:
 
