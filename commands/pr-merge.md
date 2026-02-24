@@ -62,9 +62,9 @@ git branch -d <branch-name-from-above>
 Use `AskUserQuestion` to ask whether to create a release:
 
 - **Create release**: "Create a release for this merge"
-- **Skip**: "Skip release creation"
+- **Skip release**: "Skip release creation"
 
-If the user selects "Create release", proceed to Step 5. If "Skip", skip to Step 6.
+If the user selects "Create release", proceed to Step 5. If "Skip release", skip to Step 6.
 
 ## Step 5: Create Release (If Requested)
 

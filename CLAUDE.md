@@ -69,6 +69,7 @@ Conventions for `AskUserQuestion` instructions:
 - Include an escape-path option (e.g., "Cancel", "Skip", "Reject") when the user should be able to exit or skip the flow. For forced-choice questions where all options are valid continuations (e.g., version bump level), an escape path may be omitted.
 - Add follow-up instructions for non-terminal options (e.g., "If the user selects 'Modify', ask what they want to change, apply the changes, and present the updated draft for approval again.").
 - Use `multiSelect: true` when choices are not mutually exclusive. If more than 4 items, group into severity-based or category-based options.
+- `AskUserQuestion` always includes a built-in "Other" option that lets users provide free-text input. When a question could have more valid responses than the 4-option limit allows, reference the built-in "Other" option in the command instructions to cover the overflow (e.g., "list the 4 most recent and let the built-in 'Other' option cover the rest"). For uncommon-but-valid paths, coach the user in the response text before the question about what they can express via "Other" rather than adding a rarely-used explicit option.
 
 Example instruction text for a draft approval step:
 
