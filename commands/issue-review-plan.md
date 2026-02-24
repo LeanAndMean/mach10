@@ -20,11 +20,16 @@ Extract the issue number from the input. If the input is ambiguous, ask the user
 
 ## Step 2: Read the Issue
 
-Read the full issue body and all comments:
+Read the issue title and body:
 
 ```
-gh issue view <issue-number>             # title + body
-gh issue view <issue-number> --comments  # comments only
+gh issue view <issue-number>
+```
+
+Then read all comments (`--comments` returns only comments and silently drops the title and body, so both calls are required):
+
+```
+gh issue view <issue-number> --comments
 ```
 
 Understand:

@@ -20,11 +20,16 @@ Extract the PR number from the input. If the input is ambiguous, ask the user to
 
 ## Step 2: Read Everything
 
-Read the PR description and all associated comments:
+Read the PR title and description:
 
 ```
-gh pr view <pr-number>             # title + description
-gh pr view <pr-number> --comments  # comments only
+gh pr view <pr-number>
+```
+
+Then read all comments (`--comments` returns only comments and silently drops the title and description, so both calls are required):
+
+```
+gh pr view <pr-number> --comments
 ```
 
 Understand:
