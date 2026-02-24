@@ -11,6 +11,16 @@ You are creating a staged implementation plan for a GitHub issue. Your goal is t
 
 **User input:** $ARGUMENTS
 
+## Guardrails
+
+This command is strictly for **planning**. Do NOT:
+
+- Use `EnterPlanMode` or enter plan mode
+- Implement any code changes -- no file edits, no file writes
+- Attempt to execute the plan within this session
+
+Implementation happens in separate sessions via `/mach10:issue-implement`.
+
 ## Step 1: Parse Input
 
 The user's input contains:
