@@ -40,6 +40,7 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 
 - If specific aspects were requested, pass them: "Review PR #<pr-number>. Focus on: <aspects>"
 - If no aspects specified, run a full review: "Review PR #<pr-number>"
+- **Always** include this instruction in the Skill invocation: "IMPORTANT: Do NOT use `run_in_background: true` when launching review agents. For parallel execution, launch multiple foreground Task calls in a single message instead."
 
 Let the review complete fully. Do NOT attempt to fix any issues — this session is for review only.
 
@@ -58,24 +59,50 @@ The comment must include:
 
 Format the comment as a well-structured markdown document that can serve as input to a future `/mach10:pr-review-fix` session.
 
-After posting, retrieve the URL of the review comment (use `gh pr view <pr-number> --comments --json comments` to get the URL of the last comment). You will need this URL in Step 7.
+After posting, retrieve the URL of the review comment (use `gh pr view <pr-number> --json comments` to get the URL of the last comment). You will need this URL in Step 6.
 
 ## Step 5: Independent Assessment
 
-After posting the review, run an independent assessment of each finding using the Task tool with a `general-purpose` subagent. The subagent prompt should instruct it to:
+First, fetch the PR context so the assessment can account for prior discussion:
 
-1. Read the review comment that was just posted (provide the review text directly in the prompt — do not ask the subagent to fetch it from GitHub).
-2. For each finding, **read the actual code** referenced and **independently verify** whether the issue exists.
+```
+gh pr view <pr-number> --json title,body,comments
+```
+
+Then run an independent assessment of each finding using the Task tool with a `general-purpose` subagent. Include the review text and the PR context (title, body, and all comments) directly in the subagent prompt — do not ask the subagent to fetch them from GitHub.
+
+The subagent prompt should instruct it to:
+
+1. Review the PR title, body, and all existing comments. Note any findings that have already been discussed, resolved, or deferred in the PR conversation.
+2. For each review finding, **read the actual code** referenced and **independently verify** whether the issue exists.
 3. Classify each finding as one of:
    - **Genuine issue** — Real problem that should be fixed before merge. Explain why.
    - **Nitpick** — Stylistic preference or minor point that doesn't affect correctness or maintainability. Explain why it doesn't matter.
    - **False positive** — The reviewer flagged something that isn't actually an issue. Explain why the code is correct.
    - **Deferred** — Real issue but out of scope for this PR. Should be tracked separately.
-4. Return a structured result: for each finding, the original summary, classification, and 1-2 sentence reasoning referencing specific code.
+   - If a finding was already addressed or deferred in PR discussion, classify it accordingly and reference the relevant comment.
+4. After classifying all findings, produce a **staged implementation plan** covering everything worth fixing:
+   - Number each stage with a descriptive name.
+   - Required stages for genuine issues (must fix before merge).
+   - Optional stages for nitpicks (nice-to-have improvements).
+   - Each stage should list the specific findings it addresses and which files are affected.
+5. Return a structured result: for each finding, the original summary, classification, and 1-2 sentence reasoning referencing specific code. After all findings, include the full staged implementation plan produced in step 4.
 
-## Step 6: Present Assessment
+## Step 6: Post Assessment
 
-Present the subagent's assessment to the user in CLI output:
+Post the assessment immediately as a reply comment on the PR — do not ask the user for approval first. The comment must:
+- Reference the review comment it is assessing (link to the specific comment URL from Step 4)
+- List each finding with its classification and reasoning
+- End with the staged implementation plan (required stages for genuine issues, optional stages for nitpicks)
+- Include model attribution at the bottom
+
+```
+gh pr comment <pr-number> --body "..."
+```
+
+## Step 7: Present CLI Summary
+
+After posting, present the assessment to the user in CLI output:
 
 For each finding:
 - Original finding (brief summary)
@@ -84,18 +111,7 @@ For each finding:
 
 Summary counts: how many genuine, how many nitpicks, how many false positives, how many deferred.
 
-Ask the user if they want to adjust any classifications before posting.
-
-## Step 7: Post Assessment
-
-Post the assessment as a reply comment on the PR. The comment must:
-- Reference the review comment it is assessing (link to the specific comment URL from Step 4)
-- List each finding with its classification and reasoning
-- Include model attribution at the bottom
-
-```
-gh pr comment <pr-number> --body "..."
-```
+After the per-finding list and summary counts, display the staged implementation plan so the user can identify which issues to address next without switching to GitHub.
 
 ## Step 8: Handle Deferred Items
 
