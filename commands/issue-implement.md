@@ -68,11 +68,16 @@ After the branch is confirmed (whether by checkout, silent match, or user confir
 
 ## Step 3: Gather Context
 
-Read the issue body and all comments to find the implementation plan:
+Read the issue title and body:
 
 ```
-gh issue view <issue-number>             # title + body
-gh issue view <issue-number> --comments  # comments only
+gh issue view <issue-number>
+```
+
+Then read all comments to find the implementation plan (`--comments` returns only comments and silently drops the title and body, so both calls are required):
+
+```
+gh issue view <issue-number> --comments
 ```
 
 Locate the implementation plan comment (typically the most recent substantive comment). Identify the requested stage(s).
