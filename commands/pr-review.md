@@ -1,7 +1,7 @@
 ---
 description: Run a comprehensive PR review, post results, then independently assess each finding
 argument-hint: <pr-number> [aspects] [context]
-allowed-tools: Bash, Read, Grep, Glob, Task, Skill
+allowed-tools: Bash, Read, Grep, Glob, Task, Skill, AskUserQuestion
 model: opus
 ---
 
@@ -119,7 +119,15 @@ After the per-finding list and summary counts, display the staged implementation
 
 ## Step 8: Handle Deferred Items
 
-If any findings were classified as **deferred**, ask the user if they want to create GitHub issues for them. For each approved deferred item, use `gh issue create` with:
+If any findings were classified as **deferred**, use `AskUserQuestion` to ask the user how to handle them:
+
+- **Create issues for all**: "Create a GitHub issue for every deferred finding"
+- **Select which ones**: "Choose which deferred findings to create issues for"
+- **Skip deferred items**: "Do not create issues for deferred findings"
+
+If the user selects "Select which ones", present the deferred findings and use `AskUserQuestion` with `multiSelect: true` to let them choose (group into severity-based options if more than 4 items, with the built-in "Other" option for custom selection).
+
+For each approved deferred item, use `gh issue create` with:
 - A title summarizing the issue
 - A body referencing the PR and the specific finding
 - Any relevant labels

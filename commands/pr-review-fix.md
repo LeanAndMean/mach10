@@ -1,7 +1,7 @@
 ---
 description: Fix specific issues from a PR review using feature-dev
 argument-hint: <pr-number> [issue-numbers] [context]
-allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write, Skill
+allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write, Skill, AskUserQuestion
 model: opus
 ---
 
@@ -53,7 +53,7 @@ Locate the most recent review comment (look for the structured review format wit
   - **Moderate fixes:** ~6 at a time
   - **Deep or complex fixes:** no more than ~3 at a time
   - Group similar issues together
-- Ask the user which issues to tackle in this session.
+- Use `AskUserQuestion` with `multiSelect: true` to let the user select which issues to fix. If there are 4 or fewer findings, list each as a separate option. If there are more than 4 findings, group them by severity as options (e.g., "All critical findings (3)", "All important findings (5)"). The built-in "Other" option allows the user to specify individual issue numbers if they prefer a custom selection.
 
 ## Step 4: Delegate to Feature Dev
 

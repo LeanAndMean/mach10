@@ -1,7 +1,7 @@
 ---
 description: Merge a PR, delete the feature branch, and optionally create a release
 argument-hint: <pr-number>
-allowed-tools: Bash
+allowed-tools: Bash, AskUserQuestion
 ---
 
 # Merge and Release
@@ -59,9 +59,12 @@ git branch -d <branch-name-from-above>
 
 ## Step 4: Ask About Release
 
-Ask the user if they want to create a release for this merge.
+Use `AskUserQuestion` to ask whether to create a release:
 
-If yes, proceed to Step 5. If no, skip to Step 6.
+- **Create release**: "Create a release for this merge"
+- **Skip release**: "Skip release creation"
+
+If the user selects "Create release", proceed to Step 5. If "Skip release", skip to Step 6.
 
 ## Step 5: Create Release (If Requested)
 
@@ -82,7 +85,15 @@ Draft a release:
 - **Title**: Follow existing title convention. If none, use the PR title.
 - **Notes**: Summarize changes from this PR. Match the style of previous release notes.
 
-Present the draft to the user for approval, then create:
+Present the draft to the user, then use `AskUserQuestion` to ask for approval with these options:
+
+- **Approve**: "Create the release as drafted"
+- **Modify**: "Edit the release tag, title, or notes"
+- **Skip release**: "Skip release creation after all"
+
+If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again. If the user selects "Skip release", skip to Step 6.
+
+After approval, create the release:
 
 ```
 gh release create <tag> --title "..." --notes "..."

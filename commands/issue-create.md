@@ -1,7 +1,7 @@
 ---
 description: Create a structured GitHub issue from current context or description
 argument-hint: [optional-description]
-allowed-tools: Bash, Read, Grep, Glob
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
 ---
 
 # Create Issue
@@ -42,7 +42,13 @@ Draft a structured issue with these sections:
 
 ## Step 3: Review
 
-Present the drafted issue to the user for approval. Ask if they want to modify anything — title, body, labels, assignees.
+Present the drafted issue to the user, then use `AskUserQuestion` to ask for approval with these options:
+
+- **Approve**: "Create the issue as drafted"
+- **Modify**: "Edit the issue title, body, labels, or assignees"
+- **Cancel**: "Abort without creating an issue"
+
+If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again.
 
 ## Step 4: Create
 

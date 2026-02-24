@@ -1,7 +1,7 @@
 ---
 description: Read a GitHub issue, perform an independent assessment, and present findings
 argument-hint: <issue-number>
-allowed-tools: Bash, Read, Grep, Glob, Task
+allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 model: opus
 ---
 
@@ -62,27 +62,35 @@ Based on your understanding of the issue and codebase, present your assessment t
 
 ## Step 5: Recommend Next Step
 
-Based on your assessment, decide which of the following actions to recommend. Choose based on context — there is no single right answer.
+Based on your assessment, present your findings and then use `AskUserQuestion` to let the user select the next action:
 
-### Option 1: Update the issue body
-Recommend this when the issue description is incomplete, outdated, or missing key information that your assessment uncovered. Draft the updated issue body for user approval.
+- **Update issue body**: "The issue description is incomplete or outdated"
+- **Post a reply comment**: "The issue body is fine but the assessment adds valuable context"
+- **Both**: "Update the issue body and post a separate comment"
 
-### Option 2: Post a reply comment on the issue
-Recommend this when the issue body is fine but your assessment adds valuable context, clarifications, or questions that should be captured for future sessions. Draft the comment for user approval.
+Include your recommendation in the assessment text before presenting the choices. If the assessment reveals that the issue should be split into smaller work items or is already resolved, mention these as paths the user can express via the built-in "Other" option.
 
-### Option 3: Both update the issue body and post a comment
-Recommend this when the issue body needs corrections or additions AND there are separate findings (e.g., architectural observations, open questions) worth capturing in a comment.
+After the user selects an action, draft the appropriate content:
 
-### Option 4: Create a new issue (rare)
-Recommend this when your assessment reveals that the work described in the issue is already done (e.g., in an existing feature branch) or that the issue should be split into multiple distinct issues. Explain why and draft the new issue for user approval.
+- **Update issue body**: Draft the updated issue body.
+- **Post a reply comment**: Draft the comment.
+- **Both**: Draft the updated issue body and the comment.
+- **Other**: Handle the user's free-text response (e.g., splitting the issue, closing as resolved, or creating new issues as described).
 
 ## Step 6: Execute
 
-After the user approves your recommendation:
+Present the drafted content to the user, then use `AskUserQuestion` to ask for approval:
+
+- **Approve**: "Execute the recommended action"
+- **Modify**: "Edit the drafted content before executing"
+- **Cancel**: "Abort without making changes"
+
+If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again. If the user selects "Cancel", stop and confirm that no changes were made.
+
+After the user approves:
 
 - **Update issue body**: `gh issue edit <issue-number> --body "..."`
 - **Post comment**: `gh issue comment <issue-number> --body "..."`
-- **Create new issue**: `gh issue create --title "..." --body "..."`
 
 When referring to numbered items (findings, suggestions, stages) in any `--body` content, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 

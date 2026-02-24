@@ -56,6 +56,34 @@ When adding or modifying commands, follow the existing pattern:
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
 
+### User Interaction Patterns
+
+Every user interaction point in a command must explicitly specify its method: `AskUserQuestion` with structured choices, or free-text.
+
+- **Use `AskUserQuestion`** when the set of valid responses is known or can be inferred: draft approvals, yes/no decisions, multi-option selections, branch selection from a discovered list.
+- **Use free-text** only when the answer set cannot be enumerated: open-ended questions, follow-up prompts for specific values (e.g., branch names after a structured selection), modification descriptions.
+
+Conventions for `AskUserQuestion` instructions:
+
+- Use context-specific option descriptions tailored to the command (e.g., "Edit the PR title or body" rather than generic "Modify").
+- Include an escape-path option (e.g., "Cancel", "Skip", "Reject") when the user should be able to exit or skip the flow. For forced-choice questions where all options are valid continuations (e.g., version bump level), an escape path may be omitted.
+- Add follow-up instructions for non-terminal options (e.g., "If the user selects 'Modify', ask what they want to change, apply the changes, and present the updated draft for approval again.").
+- Use `multiSelect: true` when choices are not mutually exclusive. If more than 4 items, group into severity-based or category-based options.
+- `AskUserQuestion` always includes a built-in "Other" option that lets users provide free-text input. When a question could have more valid responses than the 4-option limit allows, reference the built-in "Other" option in the command instructions to cover the overflow (e.g., "list the 4 most recent and let the built-in 'Other' option cover the rest"). For uncommon-but-valid paths, coach the user in the response text before the question about what they can express via "Other" rather than adding a rarely-used explicit option.
+
+Example instruction text for a draft approval step:
+
+```
+Present the draft to the user, then use `AskUserQuestion` to ask for approval:
+
+- **Approve**: "Create the issue as drafted"
+- **Modify**: "Edit the issue title, body, labels, or assignees"
+- **Cancel**: "Abort without creating an issue"
+
+If the user selects "Modify", ask what they want to change, apply the changes,
+and present the updated draft for approval again.
+```
+
 ## Release Process
 
 Every change merged into `main` must follow this process:

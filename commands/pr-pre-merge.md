@@ -1,7 +1,7 @@
 ---
 description: Run pre-merge checklist — docs, version, CHANGELOG, tests
 argument-hint: <pr-number>
-allowed-tools: Bash, Read, Grep, Glob, Edit, Write
+allowed-tools: Bash, Read, Grep, Glob, Edit, Write, AskUserQuestion
 ---
 
 # Pre-Merge Checklist
@@ -57,7 +57,10 @@ Work through each item. For each, report whether action is needed and perform it
   - **Patch**: Bug fixes, minor improvements
   - **Minor**: New features, non-breaking changes
   - **Major**: Breaking changes
-- Ask the user for the version bump level if not obvious.
+- If the bump level is not obvious from the changes, use `AskUserQuestion` to ask:
+  - **Patch**: "Bug fixes and minor improvements"
+  - **Minor**: "New features, non-breaking changes"
+  - **Major**: "Breaking changes to existing behavior"
 
 ### 4c. CHANGELOG
 

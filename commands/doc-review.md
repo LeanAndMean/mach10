@@ -1,7 +1,7 @@
 ---
 description: Review and update documentation based on PR changes
 argument-hint: <pr-number> [scope]
-allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write
+allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write, AskUserQuestion
 model: opus
 ---
 
@@ -97,10 +97,13 @@ After all agents complete, combine findings into a single report:
 
 Present the report to the user. Maintain objectivity -- these are suggestions from automated reviewers that may be wrong. Frame findings as "the reviewer identified..." rather than definitive statements.
 
-For each finding, ask the user to:
-- **Accept** -- apply the suggested change as-is
-- **Modify** -- apply with adjustments (ask the user for the modification)
-- **Reject** -- skip this finding
+Process findings one at a time. For each finding, use `AskUserQuestion` to ask the user how to handle it:
+
+- **Accept**: "Apply the suggested change as-is"
+- **Modify**: "Apply with adjustments"
+- **Reject**: "Skip this finding"
+
+If the user selects "Modify", ask what they want to change (free-text), then apply the adjusted version.
 
 ## Step 6: Execute Edits
 

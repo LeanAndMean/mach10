@@ -44,15 +44,19 @@ gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
 
 3. **Exactly one match found:** Check it out with `git checkout <branch>` and `git pull --ff-only`. If the pull fails because local and remote have diverged, stop and tell the user to resolve the divergence before continuing.
 
-4. **Multiple matches found:** Present the list to the user and ask them to choose which branch to use.
+4. **Multiple matches found:** Present the list to the user, then use `AskUserQuestion` to let them choose. Use the branch names as option labels (if more than 4 branches match, list the 4 most recently updated and let the built-in "Other" option cover the rest).
 
-5. **No match found:** Ask the user: "No feature branch found for issue #N. Create a new one, or specify an existing branch name?" Then:
-   - **Create a new branch:**
+5. **No match found:** Use `AskUserQuestion` to ask the user how to proceed:
+
+   - **Create a new branch**: "Derive a branch name from the issue title"
+   - **Use an existing branch**: "Specify an existing branch to check out"
+
+   If the user selects "Create a new branch":
      - Read the issue title: `gh issue view <issue-number> --json title --jq .title`
      - Derive a slug: lowercase, replace spaces and special characters with hyphens, truncate to 3-5 words
      - Create the branch: `git checkout -b feature/issue-<number>-<slug>`
      - Push with upstream tracking: `git push -u origin <branch-name>`
-   - **Use an existing branch:** Verify the branch exists in `git branch -a` output, check it out with `git checkout <branch>`, and `git pull --ff-only`. If the pull fails because local and remote have diverged, stop and tell the user to resolve the divergence before continuing.
+   If the user selects "Use an existing branch", ask them for the branch name (free-text, since the target is open-ended). Verify the branch exists in `git branch -a` output, check it out with `git checkout <branch>`, and `git pull --ff-only`. If the pull fails because local and remote have diverged, stop and tell the user to resolve the divergence before continuing.
 
 ### If not on the default branch
 
@@ -60,7 +64,12 @@ gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
 
 2. If the branch appears related to the issue, proceed silently.
 
-3. If the branch does not appear related, warn the user: "You're on `<branch>` which doesn't appear to be related to issue #N. Continue on this branch?" Let them confirm or switch.
+3. If the branch does not appear related, warn the user and use `AskUserQuestion` to ask how to proceed:
+
+   - **Continue on this branch**: "Proceed with implementation on the current branch"
+   - **Switch branch**: "Check out a different branch first"
+
+   If the user selects "Switch branch", ask them for the branch name (free-text, since the target is open-ended). Verify the branch exists in `git branch -a` output, check it out with `git checkout <branch>`, and `git pull --ff-only`. If the pull fails because local and remote have diverged, stop and tell the user to resolve the divergence before continuing.
 
 ### Before proceeding
 
