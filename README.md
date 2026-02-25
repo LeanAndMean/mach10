@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="docs/logo.png" alt="Mach 10 Logo" width="50%">
+</div>
+
 # Mach 10
 
 A development methodology for agentic coding -- and a Claude Code plugin that implements it.
