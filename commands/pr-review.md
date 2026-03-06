@@ -53,6 +53,7 @@ gh pr comment <pr-number> --body "..."
 ```
 
 The comment must include:
+- `<!-- mach10-review -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
 - The complete review findings (Critical, Important, Suggestions, Strengths)
 - Model attribution at the bottom (e.g., "Reviewed by Claude Opus 4.6")
 - A note that this is an automated review
@@ -61,7 +62,13 @@ Format the comment as a well-structured markdown document that can serve as inpu
 
 When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-After posting, retrieve the URL of the review comment (use `gh pr view <pr-number> --json comments` to get the URL of the last comment). You will need this URL in Step 6.
+After posting, retrieve the URL of the review comment:
+
+```
+gh pr view <pr-number> --json comments --jq '.comments[-1].url'
+```
+
+Note the full URL (you will need it in Step 6) and extract the numeric comment ID from it — the number after `issuecomment-` in the URL (e.g., if the URL ends with `#issuecomment-1234567890`, the comment ID is `1234567890`). You will need this numeric ID in Step 9.
 
 ## Step 5: Independent Assessment
 
@@ -92,7 +99,8 @@ The subagent prompt should instruct it to:
 
 ## Step 6: Post Assessment
 
-Post the assessment immediately as a reply comment on the PR — do not ask the user for approval first. The comment must:
+Post the assessment immediately as a reply comment on the PR — do not ask the user for approval first. The comment must include:
+- `<!-- mach10-assessment -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
 - Reference the review comment it is assessing (link to the specific comment URL from Step 4)
 - List each finding with its classification and reasoning
 - End with the staged implementation plan
@@ -101,6 +109,14 @@ Post the assessment immediately as a reply comment on the PR — do not ask the 
 ```
 gh pr comment <pr-number> --body "..."
 ```
+
+After posting, retrieve the URL of the assessment comment:
+
+```
+gh pr view <pr-number> --json comments --jq '.comments[-1].url'
+```
+
+Extract the numeric comment ID from the URL (the number after `issuecomment-`). You will need this numeric ID in Step 9.
 
 When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
@@ -136,8 +152,14 @@ When referring to numbered items (findings, suggestions, stages) in the issue bo
 
 ## Step 9: Recommend Next Steps
 
-**CLI output only (do NOT include in any GitHub comment).** Based on the assessment:
-- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>` (only the genuine issues)"
+**CLI output only (do NOT include in any GitHub comment).**
+
+First, display the comment IDs for reference:
+- Review comment ID: `<review-comment-id from Step 4>`
+- Assessment comment ID: `<assessment-comment-id from Step 6>`
+
+Then, based on the assessment:
+- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <issue-numbers>` (only the genuine issues)"
 - If all findings are nitpicks/false positives (with or without deferred items): "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
 
 ## Important
