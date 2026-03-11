@@ -1,6 +1,6 @@
 ---
 description: Independently assess remaining review findings to triage genuine issues from nitpicks
-argument-hint: <pr-number>
+argument-hint: <pr-number> [--review-comment <id>]
 allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 model: opus
 ---
@@ -15,8 +15,13 @@ You are performing an independent assessment of the most recent PR review findin
 
 The user's input contains:
 - A **PR number** (required)
+- **`--review-comment <id>`** flag with a numeric comment ID (optional)
 
-Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+Example inputs:
+- `108`
+- `108 --review-comment 1234567890`
+
+Extract the PR number. Parse the `--review-comment` flag if present (followed by a numeric ID). If the input is ambiguous, ask the user to clarify.
 
 ## Step 2: Read Everything
 
@@ -26,7 +31,27 @@ Read the PR title and description:
 gh pr view <pr-number>
 ```
 
-Then read all comments (`--comments` returns only comments and silently drops the title and description, so both calls are required):
+### Locate the review comment
+
+**If `--review-comment` was provided:** Fetch the specific comment by ID:
+
+```
+gh api repos/:owner/:repo/issues/comments/<review-comment-id>
+```
+
+Extract the `body` field from the JSON response. This is the review comment content. Note the comment ID for use in Step 6.
+
+**If `--review-comment` was NOT provided (fallback):** Fetch all comments as JSON:
+
+```
+gh pr view <pr-number> --json comments
+```
+
+Parse the JSON array and search from the END (most recent first) for the first comment whose body contains the HTML marker `<!-- mach10-review -->`. If no comment contains the marker, fall back to finding the last comment with the structured review format (Critical/Important/Suggestions sections and model attribution). If a review comment is found, extract its numeric ID from the `url` field (the number after `issuecomment-`). Note this ID for use in Step 6.
+
+### Read remaining context
+
+Fetch the full comment history for context on prior discussion, fixes, and implementation notes:
 
 ```
 gh pr view <pr-number> --comments
@@ -35,7 +60,7 @@ gh pr view <pr-number> --comments
 Understand:
 - The PR's purpose and scope
 - The full comment history (implementation notes, prior reviews, fix documentation)
-- The most recent review comment
+- The review comment identified above
 
 ## Step 3: Independent Assessment
 
@@ -72,6 +97,7 @@ If the user selects "Modify before posting", ask what they want to change, apply
 
 After the user approves, post a reply comment on the PR documenting:
 
+- `<!-- mach10-assessment -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
 - Which findings are being addressed (and in which commit/session)
 - Which findings are not being addressed, with clear reasoning for each
 - Any new issues created for deferred items
@@ -84,9 +110,25 @@ gh pr comment <pr-number> --body "..."
 
 This comment serves as an audit trail for the human reviewer, demonstrating that each finding was considered rather than ignored.
 
+After posting, retrieve the URL of the assessment comment:
+
+```
+gh pr view <pr-number> --json comments --jq '.comments[-1].url'
+```
+
+Extract the numeric comment ID from the URL (the number after `issuecomment-`). Note this ID for use in Step 6.
+
 ## Step 6: Recommend Next Steps
 
-**CLI output only (do NOT include in the GitHub comment from Step 5):** Based on the assessment, recommend next step to the user:
-- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>`"
+**CLI output only (do NOT include in the GitHub comment from Step 5).**
+
+First, if an assessment comment was posted and its ID was captured, display the comment IDs for reference:
+- Review comment ID: `<review-comment-id from Step 2>`
+- Assessment comment ID: `<assessment-comment-id from Step 5>`
+
+Then, based on the assessment, recommend next step to the user:
+- If genuine issues remain and both comment IDs are known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <issue-numbers>`"
+- If genuine issues remain and only the review comment ID is known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> <issue-numbers>`"
+- If genuine issues remain but no comment IDs are available: "`/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>`"
 - If only deferred items: "Create issues with `/mach10:issue-create`, then `/clear` and `/mach10:pr-pre-merge <pr-number>`"
 - If clean: "`/clear` then `/mach10:pr-pre-merge <pr-number>`"

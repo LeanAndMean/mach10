@@ -1,6 +1,6 @@
 ---
 description: Fix specific issues from a PR review using feature-dev
-argument-hint: <pr-number> [issue-numbers] [context]
+argument-hint: <pr-number> [--review-comment <id>] [--assessment-comment <id>] [issue-numbers] [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write, Skill, AskUserQuestion
 model: opus
 ---
@@ -15,15 +15,18 @@ You are fixing specific issues identified in a PR review. This command gathers c
 
 The user's input typically contains:
 - A **PR number** (required)
+- **`--review-comment <id>`** flag with a numeric comment ID (optional)
+- **`--assessment-comment <id>`** flag with a numeric comment ID (optional)
 - **Issue numbers to fix** from the review (optional)
 - Additional context or constraints (optional)
 
 Example inputs:
 - `108` (PR only -- read the PR and determine which review findings to fix)
 - `108 1,2,3`
-- `108 1,2,3 focus on error handling`
+- `108 --review-comment 1234567890 --assessment-comment 1234567891 1,2,3`
+- `108 --review-comment 1234567890 1,2,3 focus on error handling`
 
-Extract the PR number. If issue numbers are provided, note them. If the input is ambiguous, ask the user to clarify.
+Extract the PR number. Parse `--review-comment` and `--assessment-comment` flags if present (each followed by a numeric ID). If issue numbers are provided, note them. If the input is ambiguous, ask the user to clarify.
 
 ## Step 2: Gather Context
 
@@ -33,13 +36,35 @@ Read the PR title and description:
 gh pr view <pr-number>
 ```
 
-Then read all comments to find the review (`--comments` returns only comments and silently drops the title and description, so both calls are required):
+### Locate the review comment
+
+**If `--review-comment` was provided:** Fetch the specific comment by ID:
 
 ```
-gh pr view <pr-number> --comments
+gh api repos/:owner/:repo/issues/comments/<review-comment-id>
 ```
 
-Locate the most recent review comment (look for the structured review format with Critical/Important/Suggestions sections and model attribution).
+Extract the `body` field from the JSON response. This is the review comment content.
+
+**If `--review-comment` was NOT provided (fallback):** Fetch all comments as JSON and find the review heuristically:
+
+```
+gh pr view <pr-number> --json comments
+```
+
+Parse the JSON array and search from the END (most recent first) for the first comment whose body contains the HTML marker `<!-- mach10-review -->`. If no comment contains the marker, fall back to finding the last comment with the structured review format (Critical/Important/Suggestions sections and model attribution).
+
+### Locate the assessment comment (optional)
+
+**If `--assessment-comment` was provided:** Fetch it by ID:
+
+```
+gh api repos/:owner/:repo/issues/comments/<assessment-comment-id>
+```
+
+**If not provided:** This is optional context. Do not attempt to locate the assessment heuristically — proceed without it.
+
+Save the review comment content for use in Step 4.
 
 ## Step 3: Identify Issues to Fix
 
@@ -59,7 +84,15 @@ Locate the most recent review comment (look for the structured review format wit
 
 Use the Skill tool to invoke `/feature-dev:feature-dev` with the following context:
 
-> Read PR #<pr-number> and all comments. Locate the most recent review comment, then implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: After reading the development plan phases, add each phase as a task to your todo list so you do not skip any phases.
+> Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: After reading the development plan phases, add each phase as a task to your todo list so you do not skip any phases.
+>
+> **Review comment:**
+> <paste the full review comment content retrieved in Step 2>
+
+If an assessment comment was also retrieved in Step 2, append it:
+
+> **Assessment comment:**
+> <paste the full assessment comment content>
 
 ## Step 5: After Fixes
 
