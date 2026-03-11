@@ -97,6 +97,7 @@ If the user selects "Modify before posting", ask what they want to change, apply
 
 After the user approves, post a reply comment on the PR documenting:
 
+- `<!-- mach10-assessment -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
 - Which findings are being addressed (and in which commit/session)
 - Which findings are not being addressed, with clear reasoning for each
 - Any new issues created for deferred items
@@ -109,10 +110,25 @@ gh pr comment <pr-number> --body "..."
 
 This comment serves as an audit trail for the human reviewer, demonstrating that each finding was considered rather than ignored.
 
+After posting, retrieve the URL of the assessment comment:
+
+```
+gh pr view <pr-number> --json comments --jq '.comments[-1].url'
+```
+
+Extract the numeric comment ID from the URL (the number after `issuecomment-`). Note this ID for use in Step 6.
+
 ## Step 6: Recommend Next Steps
 
-**CLI output only (do NOT include in the GitHub comment from Step 5):** Based on the assessment, recommend next step to the user:
-- If genuine issues remain and a review comment ID is known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> <issue-numbers>`"
-- If genuine issues remain but no review comment ID is available: "`/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>`"
+**CLI output only (do NOT include in the GitHub comment from Step 5).**
+
+First, if an assessment comment was posted and its ID was captured, display the comment IDs for reference:
+- Review comment ID: `<review-comment-id from Step 2>`
+- Assessment comment ID: `<assessment-comment-id from Step 5>`
+
+Then, based on the assessment, recommend next step to the user:
+- If genuine issues remain and both comment IDs are known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <issue-numbers>`"
+- If genuine issues remain and only the review comment ID is known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> <issue-numbers>`"
+- If genuine issues remain but no comment IDs are available: "`/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>`"
 - If only deferred items: "Create issues with `/mach10:issue-create`, then `/clear` and `/mach10:pr-pre-merge <pr-number>`"
 - If clean: "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
