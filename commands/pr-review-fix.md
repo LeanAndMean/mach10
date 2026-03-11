@@ -41,7 +41,7 @@ gh pr view <pr-number>
 **If `--review-comment` was provided:** Fetch the specific comment by ID:
 
 ```
-gh api repos/{owner}/{repo}/issues/comments/<review-comment-id>
+gh api repos/:owner/:repo/issues/comments/<review-comment-id>
 ```
 
 Extract the `body` field from the JSON response. This is the review comment content.
@@ -59,7 +59,7 @@ Parse the JSON array and search from the END (most recent first) for the first c
 **If `--assessment-comment` was provided:** Fetch it by ID:
 
 ```
-gh api repos/{owner}/{repo}/issues/comments/<assessment-comment-id>
+gh api repos/:owner/:repo/issues/comments/<assessment-comment-id>
 ```
 
 **If not provided:** This is optional context. Do not attempt to locate the assessment heuristically — proceed without it.

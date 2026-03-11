@@ -36,7 +36,7 @@ gh pr view <pr-number>
 **If `--review-comment` was provided:** Fetch the specific comment by ID:
 
 ```
-gh api repos/{owner}/{repo}/issues/comments/<review-comment-id>
+gh api repos/:owner/:repo/issues/comments/<review-comment-id>
 ```
 
 Extract the `body` field from the JSON response. This is the review comment content. Note the comment ID for use in Step 6.
