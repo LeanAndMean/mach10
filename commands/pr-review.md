@@ -41,6 +41,7 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 - If specific aspects were requested, pass them: "Review PR #<pr-number>. Focus on: <aspects>"
 - If no aspects specified, run a full review: "Review PR #<pr-number>"
 - **Always** include this instruction in the Skill invocation: "IMPORTANT: Do NOT use `run_in_background: true` when launching review agents. For parallel execution, launch multiple foreground Task calls in a single message instead."
+- **Always** include this instruction in the Skill invocation: "You are authorized to use review-relevant agents from any installed plugin, not just the agents bundled with pr-review-toolkit. When launching review agents in parallel, also include any domain-relevant agents from other installed plugins that would provide useful analysis for the PR content (e.g., plugin-dev:skill-reviewer when reviewing skill definitions, plugin-dev:plugin-validator when reviewing plugin code). Only include supplementary agents when they are relevant to the content being reviewed."
 
 Let the review complete fully. Do NOT attempt to fix any issues — this session is for review only.
 
@@ -54,7 +55,7 @@ gh pr comment <pr-number> --body "..."
 
 The comment must include:
 - `<!-- mach10-review -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
-- The complete review findings (Critical, Important, Suggestions, Strengths)
+- The complete review findings (Critical, Important, Suggestions, Strengths), including any findings from supplementary agents merged into the appropriate severity categories with inline source attribution (e.g., "per plugin-dev:skill-reviewer")
 - Model attribution at the bottom (e.g., "Reviewed by Claude Opus 4.6")
 - A note that this is an automated review
 
@@ -78,7 +79,7 @@ First, fetch the PR context so the assessment can account for prior discussion:
 gh pr view <pr-number> --json title,body,comments
 ```
 
-Then run an independent assessment of each finding using the Task tool with a `general-purpose` subagent. Include the review text and the PR context (title, body, and all comments) directly in the subagent prompt — do not ask the subagent to fetch them from GitHub.
+Then run an independent assessment of each finding — from both the primary review and any supplementary agents — using the Task tool with a `general-purpose` subagent. Include the review text and the PR context (title, body, and all comments) directly in the subagent prompt — do not ask the subagent to fetch them from GitHub.
 
 The subagent prompt should instruct it to:
 
