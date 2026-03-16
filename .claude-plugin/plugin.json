@@ -1,6 +1,6 @@
 {
   "name": "mach10",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Structured agentic development methodology - from issue analysis to merge",
   "author": {
     "name": "Kevin Ryan"
