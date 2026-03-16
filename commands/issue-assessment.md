@@ -95,3 +95,5 @@ After the user approves:
 When referring to numbered items (findings, suggestions, stages) in any `--body` content, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 Confirm the actions taken and provide links.
+
+**CLI output only (do NOT include in any GitHub comment):** Suggest next step: `/clear` then `/mach10:issue-plan <issue-number>` to create an implementation plan.

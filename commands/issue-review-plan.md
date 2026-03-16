@@ -85,3 +85,5 @@ Use `AskUserQuestion` to ask the user how they want to proceed:
 - **Cancel**: "Stop here without updating or proceeding"
 
 If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. If the user selects "Cancel", stop and confirm that no changes were made.
+
+After the user's choice is executed (unless cancelled), suggest as **CLI output only (do NOT include in any GitHub comment):** `/clear` then `/mach10:issue-implement <issue-number> 1` to begin implementation.
