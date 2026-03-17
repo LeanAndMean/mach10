@@ -67,6 +67,8 @@ Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Ex
 - **Architecture and patterns**: Validate that the plan aligns with existing codebase conventions and architecture.
 - **Gaps**: Look for code, constraints, or dependencies the plan may have missed.
 
+If project review criteria were recorded in Step 3a, include them in each agent's context so exploration can verify whether the plan covers the relevant project layers and testing infrastructure.
+
 Each agent should return a list of key files and observations. After agents complete, read all identified files.
 
 ## Step 4: Review the Plan
