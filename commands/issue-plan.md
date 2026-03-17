@@ -50,11 +50,33 @@ Parse and understand:
 
 ## Step 3: Explore the Codebase
 
+### 3a. Read Contributing Guidelines
+
+Before launching exploration agents, look for project contribution guidelines in order of precedence:
+
+```
+CONTRIBUTING.md
+DEVELOPMENT.md
+.github/CONTRIBUTING.md
+```
+
+Read only the first file found; skip the rest.
+
+If found, read the file and extract any planning-relevant guidance: expected project layers (e.g., models, migrations, API routes, services, UI, documentation), testing expectations (test frameworks, coverage requirements, test types), and any other requirements that should inform the implementation plan.
+
+Record these as **project planning requirements** -- they will inform both the exploration focus and the plan drafting in Step 4.
+
+If no contributing guide exists, proceed without project-specific requirements.
+
+### 3b. Explore
+
 Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore). Each agent should target a different aspect:
 
 - **Similar features**: Find existing code that solves related problems. Trace through implementation patterns.
 - **Architecture**: Map the relevant architecture layers, abstractions, and data flow.
 - **Integration points**: Identify where new code would connect to existing systems.
+
+If project planning requirements were identified in Step 3a, include them in each agent's context so exploration covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
@@ -71,6 +93,14 @@ Based on your understanding of the issue and codebase:
    - Which files will be created or modified
    - Dependencies between stages
    - Testing approach for each stage
+
+### Planning requirements
+
+Before finalizing the plan, verify it satisfies the following:
+
+**Project-layer coverage:** Cross-check the plan against the project layers discovered during codebase exploration and any layers specified in the project planning requirements recorded in Step 3a. Every affected layer should be addressed by at least one stage. If a discovered layer is not affected by this change, it may be omitted -- but if a layer is affected and no stage addresses it, add the missing work to the appropriate stage or create a new one.
+
+**Test coverage planning:** Identify what testing is appropriate for this project and codebase. If the project has an existing test suite or the project planning requirements specify testing expectations, each stage that introduces or modifies behavior must specify: what tests to add or modify, what test types are needed (unit, integration, end-to-end, etc.), and what behaviors or interfaces to cover. If the project has no testable runtime code (e.g., plugin definitions, documentation, configuration), note this in the plan and skip test planning.
 
 **Each stage must be scoped to what can be implemented within a single Claude Code CLI session.** A stage that is too large should be split. Consider:
 - The amount of codebase exploration needed

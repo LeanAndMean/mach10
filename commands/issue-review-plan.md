@@ -41,11 +41,33 @@ Locate the implementation plan comment. If no plan exists, inform the user and s
 
 ## Step 3: Explore the Codebase
 
+### 3a. Read Contributing Guidelines
+
+Before launching exploration agents, look for project contribution guidelines in order of precedence:
+
+```
+CONTRIBUTING.md
+DEVELOPMENT.md
+.github/CONTRIBUTING.md
+```
+
+Read only the first file found; skip the rest.
+
+If found, read the file and extract any planning-relevant guidance: expected project layers (e.g., models, migrations, API routes, services, UI, documentation), testing expectations (test frameworks, coverage requirements, test types), and any other requirements that a complete plan should satisfy.
+
+Record these as **project review criteria** -- they will serve as benchmarks when assessing the plan in Step 4.
+
+If no contributing guide exists, proceed without project-specific requirements.
+
+### 3b. Explore
+
 Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore) to verify the plan's assumptions:
 
 - **Files referenced in the plan**: Confirm they exist, check their current state, and verify the plan's characterization of them is accurate.
 - **Architecture and patterns**: Validate that the plan aligns with existing codebase conventions and architecture.
 - **Gaps**: Look for code, constraints, or dependencies the plan may have missed.
+
+If project review criteria were recorded in Step 3a, include them in each agent's context so exploration can verify whether the plan covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of key files and observations. After agents complete, read all identified files.
 
@@ -64,6 +86,8 @@ Also assess the plan holistically:
 - Does it address all requirements and acceptance criteria from the issue?
 - Does it follow existing codebase patterns and conventions?
 - Are there alternative approaches worth considering?
+- **Project-layer coverage**: Does the plan address all project layers discovered during codebase exploration or specified in the project review criteria recorded in Step 3a? Flag any affected layer that no stage covers.
+- **Test coverage planning**: If the project has an existing test suite or the project review criteria specify testing expectations, does each stage that introduces or modifies behavior include adequate test planning (what to test, test types, behaviors to cover)? If the project has no testable runtime code, verify the plan notes this rather than omitting test planning silently.
 
 ## Step 5: Present Findings
 

@@ -27,6 +27,8 @@ DEVELOPMENT.md
 .github/CONTRIBUTING.md
 ```
 
+Read only the first file found; skip the rest.
+
 If found, read the file and extract any pre-merge requirements (version bumps, changelog entries, documentation updates, test requirements, etc.).
 
 If no contributing guide exists, use the standard checklist below.
