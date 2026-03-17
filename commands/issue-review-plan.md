@@ -51,6 +51,8 @@ DEVELOPMENT.md
 .github/CONTRIBUTING.md
 ```
 
+Read only the first file found; skip the rest.
+
 If found, read the file and extract any planning-relevant guidance: expected project layers (e.g., models, migrations, API routes, services, UI, documentation), testing expectations (test frameworks, coverage requirements, test types), and any other requirements that a complete plan should satisfy.
 
 Record these as **project review criteria** -- they will serve as benchmarks when assessing the plan in Step 4.
@@ -82,8 +84,8 @@ Also assess the plan holistically:
 - Does it address all requirements and acceptance criteria from the issue?
 - Does it follow existing codebase patterns and conventions?
 - Are there alternative approaches worth considering?
-- **Project-layer coverage**: Does the plan address all project layers discovered during codebase exploration or specified in the contributing guide? Flag any affected layer that no stage covers.
-- **Test coverage planning**: If the project has an existing test suite or the contributing guide specifies testing expectations, does each stage that introduces or modifies behavior include adequate test planning (what to test, test types, behaviors to cover)? If the project has no testable runtime code, verify the plan notes this rather than omitting test planning silently.
+- **Project-layer coverage**: Does the plan address all project layers discovered during codebase exploration or specified in the project review criteria recorded in Step 3a? Flag any affected layer that no stage covers.
+- **Test coverage planning**: If the project has an existing test suite or the project review criteria specify testing expectations, does each stage that introduces or modifies behavior include adequate test planning (what to test, test types, behaviors to cover)? If the project has no testable runtime code, verify the plan notes this rather than omitting test planning silently.
 
 ## Step 5: Present Findings
 
