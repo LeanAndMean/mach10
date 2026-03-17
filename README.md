@@ -128,7 +128,7 @@ Claude reads the issue, explores the relevant parts of the codebase, and present
 
 **Command:** `/mach10:issue-plan <number>`
 
-Claude creates a staged implementation plan and posts it as a GitHub comment, then creates a feature branch.
+Claude creates a staged implementation plan and posts it as a GitHub comment, then creates a feature branch. If the project has a `CONTRIBUTING.md` (or `DEVELOPMENT.md` / `.github/CONTRIBUTING.md`), the plan incorporates its guidance on project layers and testing expectations (see [Customizing with CONTRIBUTING.md](#customizing-with-contributingmd) below).
 
 The plan is *staged* because each stage will get its own session with a full context budget. Trying to implement everything at once starves later work of context depth. The plan is *posted to GitHub* so that any future session -- yours or a teammate's -- can read it and pick up the work.
 
@@ -141,7 +141,7 @@ The plan is *staged* because each stage will get its own session with a full con
 
 **Command:** `/mach10:issue-review-plan <number>`
 
-A fresh Claude session independently reviews the plan against the codebase. Plans can be reviewed just like code -- this is a second pair of eyes on the architecture before implementation begins.
+A fresh Claude session independently reviews the plan against the codebase. If the project has contributing guidelines, the review checks the plan against their requirements for layer coverage and testing. Plans can be reviewed just like code -- this is a second pair of eyes on the architecture before implementation begins.
 
 **Your role:** Read both the plan and the review. If the review raises valid concerns, direct Claude to revise the plan. You can iterate on plan-review cycles until the design is solid.
 
@@ -262,3 +262,13 @@ claude --plugin-dir /path/to/mach10
 - **Thin orchestration layer**: Commands gather context and delegate to existing plugins (feature-dev, pr-review-toolkit) rather than reimplementing workflows.
 - **GitHub as source of truth**: Plans, reviews, and progress are posted as issue/PR comments so future sessions can pick up where previous ones left off.
 - **Context-window aware**: Review and fix are separate commands to preserve context budget for implementation. Each review includes an independent assessment of its own findings.
+
+### Customizing with CONTRIBUTING.md
+
+Several commands consult your project's contributing guidelines to tailor their behavior. Place a `CONTRIBUTING.md` at the repository root (or `DEVELOPMENT.md`, or `.github/CONTRIBUTING.md`) and the following commands will incorporate its guidance:
+
+- **`issue-plan`** -- Uses specified project layers (e.g., models, migrations, API routes, services, UI, documentation) to ensure the plan covers all affected layers. Uses testing expectations (frameworks, coverage requirements, test types) to include appropriate test planning in each stage.
+- **`issue-review-plan`** -- Checks the plan against the same layer and testing requirements, flagging gaps in coverage.
+- **`pr-pre-merge`** -- Reads pre-merge requirements (version bumps, changelog entries, documentation updates, test requirements) from the guide.
+
+Projects without a contributing guide work fine -- these commands fall back to discovery-based defaults from codebase exploration. The contributing guide simply lets you codify project-specific expectations so they are applied consistently across sessions and contributors.
