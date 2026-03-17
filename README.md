@@ -267,8 +267,8 @@ claude --plugin-dir /path/to/mach10
 
 Several commands consult your project's contributing guidelines to tailor their behavior. Place a `CONTRIBUTING.md` at the repository root (or `DEVELOPMENT.md`, or `.github/CONTRIBUTING.md`) and the following commands will incorporate its guidance:
 
-- **`issue-plan`** -- Uses specified project layers (e.g., models, migrations, API routes, services, UI, documentation) to ensure the plan covers all affected layers. Uses testing expectations (frameworks, coverage requirements, test types) to include appropriate test planning in each stage.
+- **`issue-plan`** -- Cross-checks project layers discovered during codebase exploration against any layers specified in the contributing guide (e.g., models, migrations, API routes, services, UI, documentation) to ensure the plan covers all affected layers. Uses testing expectations (frameworks, coverage requirements, test types) to include appropriate test planning in each stage.
 - **`issue-review-plan`** -- Checks the plan against the same layer and testing requirements, flagging gaps in coverage.
 - **`pr-pre-merge`** -- Reads pre-merge requirements (version bumps, changelog entries, documentation updates, test requirements) from the guide.
 
-Projects without a contributing guide work fine -- these commands fall back to discovery-based defaults from codebase exploration. The contributing guide simply lets you codify project-specific expectations so they are applied consistently across sessions and contributors.
+Projects without a contributing guide work fine -- the planning commands (`issue-plan`, `issue-review-plan`) proceed using discovery-based defaults from codebase exploration, and `pr-pre-merge` falls back to its built-in checklist. The contributing guide simply lets you codify project-specific expectations so they are applied consistently across sessions and contributors.
