@@ -55,6 +55,7 @@ When adding or modifying commands, follow the existing pattern:
 - Use `gh` CLI for all GitHub operations (issues, PRs, comments, CI logs)
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
+- **Contributing-guide lookup sync**: The lookup pattern (`CONTRIBUTING.md` → `DEVELOPMENT.md` → `.github/CONTRIBUTING.md`, first-match-stop) is duplicated in three command files: `commands/issue-plan.md` (Step 3a), `commands/issue-review-plan.md` (Step 3a), and `commands/pr-pre-merge.md` (contributing guide lookup). `README.md` (the "Customizing with CONTRIBUTING.md" section) also documents this feature. Any change to the lookup logic must be applied to all four locations.
 
 ### User Interaction Patterns
 
