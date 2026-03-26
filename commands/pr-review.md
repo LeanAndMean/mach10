@@ -42,6 +42,7 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 - If no aspects specified, run a full review: "Review PR #<pr-number>"
 - **Always** include this instruction in the Skill invocation: "IMPORTANT: Do NOT use `run_in_background: true` when launching review agents. For parallel execution, launch multiple foreground Task calls in a single message instead."
 - **Always** include this instruction in the Skill invocation: "You are authorized to use review-relevant agents from any installed plugin, not just the agents bundled with pr-review-toolkit. When launching review agents in parallel, also include any domain-relevant agents from other installed plugins that would provide useful analysis for the PR content (e.g., plugin-dev:skill-reviewer when reviewing skill definitions, plugin-dev:plugin-validator when reviewing plugin code). Only include supplementary agents when they are relevant to the content being reviewed."
+- **Always** include this instruction in the Skill invocation: "If the PR has a linked issue (look for issue references like 'Fixes #N', 'Closes #N', 'Part of #N', 'Issue #N', or a bare '#N' in the PR description), include the `feature-completeness-checker` agent alongside the other review agents. This agent verifies that the PR fully implements the requirements from the linked issue's acceptance criteria and implementation plan. Do not launch this agent if no linked issue is detected."
 
 Let the review complete fully. Do NOT attempt to fix any issues — this session is for review only.
 
