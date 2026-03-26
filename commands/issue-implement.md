@@ -89,7 +89,7 @@ Then read all comments to find the implementation plan (`--comments` returns onl
 gh issue view <issue-number> --comments
 ```
 
-Locate the implementation plan comment (typically the most recent substantive comment). Identify the requested stage(s).
+Locate the implementation plan comment by searching all issue comments for the `<!-- mach10-plan -->` HTML marker. If multiple comments contain the marker, use the last one (the most recent revision). If no comment contains the marker, fall back to identifying the most recent substantive comment that contains a staged implementation plan. Identify the requested stage(s).
 
 ## Step 4: Delegate to Feature Dev
 

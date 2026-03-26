@@ -57,6 +57,7 @@ When adding or modifying commands, follow the existing pattern:
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
 - **Contributing-guide lookup sync**: The lookup pattern (`CONTRIBUTING.md` → `DEVELOPMENT.md` → `.github/CONTRIBUTING.md`, first-match-stop) is duplicated in three command files: `commands/issue-plan.md` (Step 3a), `commands/issue-review-plan.md` (Step 3a), and `commands/pr-pre-merge.md` (contributing guide lookup). `README.md` (the "Customizing with CONTRIBUTING.md" section) also documents this feature. Any change to the lookup logic must be applied to all four locations.
+- **Plan marker sync**: The `<!-- mach10-plan -->` HTML marker is used to reliably locate implementation plan comments. The marker is emitted by `commands/issue-plan.md` (Step 5) and `commands/issue-review-plan.md` (revised plan posting). It is consumed by `commands/issue-implement.md` (Step 3), `commands/issue-review-plan.md` (Step 2), and `agents/feature-completeness-checker.md` (Step 1). Any change to the marker convention must be applied to all locations.
 
 ### User Interaction Patterns
 
@@ -85,6 +86,17 @@ Present the draft to the user, then use `AskUserQuestion` to ask for approval:
 If the user selects "Modify", ask what they want to change, apply the changes,
 and present the updated draft for approval again.
 ```
+
+## Writing Agents
+
+Agent definitions live in the `agents/` directory as markdown files with YAML frontmatter. When adding or modifying agents, follow the existing pattern:
+
+- YAML frontmatter must include `name`, `description`, `model`, and `color`
+- `description` should explain when the agent should be used, with `<example>` blocks showing trigger scenarios
+- Set `model: inherit` to use the caller's model, or specify a model explicitly (e.g., `model: opus`)
+- `color` provides visual distinction in CLI output (e.g., `magenta`, `cyan`)
+- The markdown body defines the agent's system prompt: its role, review process, output format, and tone
+- Agents are invoked via the Task tool with `subagent_type` -- they do not have `allowed-tools` or `argument-hint` fields
 
 ## Release Process
 
