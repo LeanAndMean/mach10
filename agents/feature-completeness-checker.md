@@ -22,7 +22,7 @@ Determine what this PR is supposed to deliver by collecting requirements from mu
 
 **Detect the linked issue:**
 - Check the PR description for issue references (e.g., "Fixes #45", "Closes #45", "Resolves #45", "Part of #45", "Issue #45", or bare "#45")
-- Check `gh pr view <number> --json body` for issue references
+- Check `gh pr view <pr-number> --json body` for issue references
 - If an issue number is found, read the issue body and all comments:
   ```
   gh issue view <issue-number>
