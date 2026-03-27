@@ -13,7 +13,7 @@ This is a pure plugin definition -- no build system, no runtime, no tests. Claud
 ```
 .claude-plugin/plugin.json   # Plugin manifest (name, version, author)
 agents/                       # Specialized agent definitions (markdown with YAML frontmatter)
-commands/                     # 15 slash command definitions (markdown with YAML frontmatter)
+commands/                     # Slash command definitions (markdown with YAML frontmatter)
 ```
 
 Each command file is a self-contained workflow specification with:
