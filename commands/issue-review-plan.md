@@ -37,7 +37,7 @@ Understand:
 - The implementation plan (typically posted as a comment)
 - Any discussion, decisions, or clarifications in the comment thread
 
-Locate the implementation plan comment. If no plan exists, inform the user and suggest running `/mach10:issue-plan <issue-number>` first.
+Locate the implementation plan comment by searching all issue comments for the `<!-- mach10-plan -->` HTML marker. If multiple comments contain the marker, use the last one (the most recent revision). If no comment contains the marker, fall back to identifying the most recent substantive comment that contains a staged implementation plan. If no plan exists at all, inform the user and suggest running `/mach10:issue-plan <issue-number>` first.
 
 ## Step 3: Explore the Codebase
 
@@ -108,6 +108,6 @@ Use `AskUserQuestion` to ask the user how they want to proceed:
 - **Discuss findings**: "Explore specific findings in more detail before deciding"
 - **Cancel**: "Stop here without updating or proceeding"
 
-If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. If the user selects "Cancel", stop and confirm that no changes were made.
+If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions). If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. If the user selects "Cancel", stop and confirm that no changes were made.
 
 After the user's choice is executed (unless cancelled), suggest as **CLI output only (do NOT include in any GitHub comment):** `/clear` then `/mach10:issue-implement <issue-number> 1` to begin implementation.

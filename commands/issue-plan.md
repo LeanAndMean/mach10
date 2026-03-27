@@ -121,6 +121,7 @@ If the user selects "Request changes", discuss their feedback, revise the plan, 
 After the user approves the plan:
 
 1. **Post the plan as a reply comment on the issue** using `gh issue comment <issue-number> --body "..."`. Format the comment so it serves as input to future CLI sessions. Include:
+   - `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
    - The full implementation plan
    - The staged breakdown
    - A note that this comment will guide staged implementation

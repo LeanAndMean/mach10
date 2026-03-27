@@ -12,7 +12,8 @@ This is a pure plugin definition -- no build system, no runtime, no tests. Claud
 
 ```
 .claude-plugin/plugin.json   # Plugin manifest (name, version, author)
-commands/                     # 15 slash command definitions (markdown with YAML frontmatter)
+agents/                       # Specialized agent definitions (markdown with YAML frontmatter)
+commands/                     # Slash command definitions (markdown with YAML frontmatter)
 ```
 
 Each command file is a self-contained workflow specification with:
@@ -55,7 +56,10 @@ When adding or modifying commands, follow the existing pattern:
 - Use `gh` CLI for all GitHub operations (issues, PRs, comments, CI logs)
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
+- **Repo structure sync**: The repository structure diagram is duplicated between `CLAUDE.md` (Architecture section) and `README.md` (Repository structure section). Any change to the structure block must be applied to both locations.
 - **Contributing-guide lookup sync**: The lookup pattern (`CONTRIBUTING.md` → `DEVELOPMENT.md` → `.github/CONTRIBUTING.md`, first-match-stop) is duplicated in three command files: `commands/issue-plan.md` (Step 3a), `commands/issue-review-plan.md` (Step 3a), and `commands/pr-pre-merge.md` (contributing guide lookup). `README.md` (the "Customizing with CONTRIBUTING.md" section) also documents this feature. Any change to the lookup logic must be applied to all four locations.
+- **Plan marker sync**: The `<!-- mach10-plan -->` HTML marker is used to reliably locate implementation plan comments. The marker is emitted by `commands/issue-plan.md` (Step 5) and `commands/issue-review-plan.md` (revised plan posting). It is consumed by `commands/issue-implement.md` (Step 3), `commands/issue-review-plan.md` (Step 2), and `agents/feature-completeness-checker.md` (Step 1). Any change to the marker convention must be applied to all locations.
+- **Issue-reference pattern sync**: The list of issue reference patterns (`Fixes #N`, `Closes #N`, `Resolves #N`, `Part of #N`, `Issue #N`, bare `#N`) is duplicated between `commands/pr-review.md` (Step 3, Skill invocation instruction) and `agents/feature-completeness-checker.md` (Step 1, "Detect the linked issue"). Any change to the pattern list must be applied to both locations.
 
 ### User Interaction Patterns
 
@@ -84,6 +88,17 @@ Present the draft to the user, then use `AskUserQuestion` to ask for approval:
 If the user selects "Modify", ask what they want to change, apply the changes,
 and present the updated draft for approval again.
 ```
+
+## Writing Agents
+
+Agent definitions live in the `agents/` directory as markdown files with YAML frontmatter. When adding or modifying agents, follow the existing pattern:
+
+- YAML frontmatter must include `name`, `description`, `model`, and `color`
+- `description` should explain when the agent should be used, with `<example>` blocks showing trigger scenarios
+- Set `model: inherit` to use the caller's model, or specify a model explicitly (e.g., `model: opus`)
+- `color` provides visual distinction in CLI output (e.g., `magenta`, `cyan`)
+- The markdown body defines the agent's system prompt: its role, review process, output format, and tone
+- Agents are invoked via the Task tool with `subagent_type` -- they do not have `allowed-tools` or `argument-hint` fields
 
 ## Release Process
 

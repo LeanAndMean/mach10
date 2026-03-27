@@ -263,6 +263,14 @@ claude --plugin-dir /path/to/mach10
 - **GitHub as source of truth**: Plans, reviews, and progress are posted as issue/PR comments so future sessions can pick up where previous ones left off.
 - **Context-window aware**: Review and fix are separate commands to preserve context budget for implementation. Each review includes an independent assessment of its own findings.
 
+### Repository structure
+
+```
+.claude-plugin/plugin.json   # Plugin manifest (name, version, author)
+agents/                       # Specialized agent definitions (markdown with YAML frontmatter)
+commands/                     # Slash command definitions (markdown with YAML frontmatter)
+```
+
 ### Customizing with CONTRIBUTING.md
 
 Several commands consult your project's contributing guidelines to tailor their behavior. Place a `CONTRIBUTING.md` at the repository root (or `DEVELOPMENT.md`, or `.github/CONTRIBUTING.md`) and the following commands will incorporate its guidance:
