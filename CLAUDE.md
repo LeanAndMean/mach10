@@ -43,7 +43,7 @@ When composing content for GitHub comments or issue bodies:
 ## Plugin Dependencies
 
 - `gh` CLI (GitHub authentication required)
-- `feature-dev` plugin (used by `issue-implement`, `pr-review-fix`, `pr-ci-fix`)
+- `feature-dev` plugin (used by `issue-plan`, `issue-implement`, `pr-review-fix`, `pr-ci-fix`)
 - `pr-review-toolkit` plugin (used by `pr-review`)
 
 ## Writing Commands
