@@ -90,17 +90,10 @@ Review the codebase findings from Step 3 against the issue requirements. Identif
 
 1. Present a clear analysis of the problem based on what you found in the codebase.
 2. Identify ambiguities, underspecified scope, unstated constraints, edge cases, integration concerns, and design preferences that will affect the implementation plan.
-3. Present all questions to the user in a clear, organized list (free-text -- the answer set cannot be enumerated).
+3. **Present all questions to the user in a clear, organized list.**
+4. **Wait for answers before proceeding to architecture design.**
 
-**Wait for the user's answers before proceeding to Step 5.** Do not skip ahead.
-
-If the user says "whatever you think is best", provide your recommendation for each open question, then use `AskUserQuestion` to confirm:
-
-- **Confirm**: "Proceed with these recommendations"
-- **Adjust**: "Change one or more recommendations before proceeding"
-- **Cancel**: "Stop planning and return to the issue"
-
-If the user selects "Adjust", ask what they want to change, apply the adjustments, and present the updated recommendations for confirmation again. If the user selects "Cancel", stop and confirm that no plan was created.
+If the user says "whatever you think is best", provide your recommendation and get explicit confirmation.
 
 ## Step 5: Architecture Design
 
@@ -114,18 +107,9 @@ Each agent should produce a full implementation blueprint: files to create or mo
 
 After all agents complete, review their approaches and form your own recommendation based on the issue's scope, the codebase's conventions, and the user's clarified requirements.
 
-Present to the user:
-- A brief summary of each approach and its trade-offs
-- Your recommendation with reasoning
+Present to the user: brief summary of each approach, trade-offs comparison, **your recommendation with reasoning**, concrete implementation differences.
 
-Then use `AskUserQuestion` to ask the user which approach to use as the foundation for the plan:
-
-- **Minimal changes**: "Use the minimal-changes approach"
-- **Clean architecture**: "Use the clean-architecture approach"
-- **Pragmatic balance**: "Use the pragmatic-balance approach"
-- **Blend or customize**: "Combine elements from multiple approaches or adjust the recommendation"
-
-If the user selects "Blend or customize", ask what they want to change, apply the adjustments, and present the revised approach for approval again.
+**Ask user which approach they prefer.**
 
 ## Step 6: Plan Drafting
 
