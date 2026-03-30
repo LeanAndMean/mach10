@@ -61,11 +61,11 @@ If no contributing guide exists, proceed without project-specific requirements.
 
 ### 3b. Explore
 
-Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore) to verify the plan's assumptions:
+Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification:
 
-- **Files referenced in the plan**: Confirm they exist, check their current state, and verify the plan's characterization of them is accurate.
-- **Architecture and patterns**: Validate that the plan aligns with existing codebase conventions and architecture.
-- **Gaps**: Look for code, constraints, or dependencies the plan may have missed.
+- **Files referenced in the plan**: Trace through each file referenced in the plan comprehensively, confirming they exist, checking their current state, and verifying the plan's characterization of their structure, responsibilities, and integration points is accurate.
+- **Architecture and patterns**: Trace through the relevant architecture comprehensively, validating that the plan aligns with existing codebase conventions, abstractions, data flow, and design decisions.
+- **Gaps**: Trace through code adjacent to the plan's scope comprehensively, looking for constraints, dependencies, cross-cutting concerns, or affected areas the plan may have missed.
 
 If project review criteria were recorded in Step 3a, include them in each agent's context so exploration can verify whether the plan covers the relevant project layers and testing infrastructure.
 
