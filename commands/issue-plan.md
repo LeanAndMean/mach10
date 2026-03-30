@@ -98,8 +98,9 @@ If the user says "whatever you think is best", provide your recommendation for e
 
 - **Confirm**: "Proceed with these recommendations"
 - **Adjust**: "Change one or more recommendations before proceeding"
+- **Cancel**: "Stop planning and return to the issue"
 
-If the user selects "Adjust", ask what they want to change, apply the adjustments, and present the updated recommendations for confirmation again.
+If the user selects "Adjust", ask what they want to change, apply the adjustments, and present the updated recommendations for confirmation again. If the user selects "Cancel", stop and confirm that no plan was created.
 
 ## Step 5: Architecture Design
 
@@ -122,9 +123,9 @@ Then use `AskUserQuestion` to ask the user which approach to use as the foundati
 - **Minimal changes**: "Use the minimal-changes approach"
 - **Clean architecture**: "Use the clean-architecture approach"
 - **Pragmatic balance**: "Use the pragmatic-balance approach"
-- **Modify**: "Adjust the recommendation before proceeding"
+- **Blend or customize**: "Combine elements from multiple approaches or adjust the recommendation"
 
-If the user selects "Modify", ask what they want to change, apply the adjustments, and present the revised approach for approval again.
+If the user selects "Blend or customize", ask what they want to change, apply the adjustments, and present the revised approach for approval again.
 
 ## Step 6: Plan Drafting
 
