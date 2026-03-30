@@ -64,35 +64,61 @@ Read only the first file found; skip the rest.
 
 If found, read the file and extract any planning-relevant guidance: expected project layers (e.g., models, migrations, API routes, services, UI, documentation), testing expectations (test frameworks, coverage requirements, test types), and any other requirements that should inform the implementation plan.
 
-Record these as **project planning requirements** -- they will inform both the exploration focus and the plan drafting in Step 4.
+Record these as **project planning requirements** -- they will inform both the exploration focus and the plan drafting in Step 6.
 
 If no contributing guide exists, proceed without project-specific requirements.
 
 ### 3b. Explore
 
-Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore). Each agent should target a different aspect:
+Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
 
-- **Similar features**: Find existing code that solves related problems. Trace through implementation patterns.
-- **Architecture**: Map the relevant architecture layers, abstractions, and data flow.
-- **Integration points**: Identify where new code would connect to existing systems.
+- **Similar features**: Find existing code that solves related problems. Trace through their implementation comprehensively, identifying patterns and conventions the new work should follow.
+- **Architecture**: Map the architecture and abstractions for the relevant area, tracing through the code comprehensively to understand the layers, data flow, and design decisions.
+- **Integration points**: Identify where new code would connect to existing systems, including extension surfaces, testing infrastructure, and cross-cutting concerns.
 
 If project planning requirements were identified in Step 3a, include them in each agent's context so exploration covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
-## Step 4: Analyze and Plan
+Present a comprehensive summary of findings and patterns discovered.
 
-Based on your understanding of the issue and codebase:
+## Step 4: Clarifying Questions
 
-1. Present a clear analysis of the problem.
-2. Identify any ambiguities or underspecified aspects.
-3. Ask the user clarifying questions before finalizing the plan.
-4. Draft a **staged implementation plan** with:
-   - Clear stages (numbered, with descriptive names)
-   - What each stage accomplishes
-   - Which files will be created or modified
-   - Dependencies between stages
-   - Testing approach for each stage
+**CRITICAL**: This is one of the most important steps. DO NOT SKIP.
+
+Review the codebase findings from Step 3 against the issue requirements. Identify all underspecified aspects:
+
+1. Present a clear analysis of the problem based on what you found in the codebase.
+2. Identify ambiguities, underspecified scope, unstated constraints, edge cases, integration concerns, and design preferences that will affect the implementation plan.
+3. **Present all questions to the user in a clear, organized list.**
+4. **Wait for answers before proceeding to architecture design.**
+
+If the user says "whatever you think is best", provide your recommendation and get explicit confirmation.
+
+## Step 5: Architecture Design
+
+Based on the codebase findings and clarified requirements, launch 2-3 architecture agents in parallel using the Task tool (subagent_type: "feature-dev:code-architect"). Assign each agent a different architectural lens:
+
+- **Minimal changes**: Design the implementation with the smallest change surface. Maximize reuse of existing patterns. Minimize new abstractions.
+- **Clean architecture**: Design the implementation prioritizing clear separation of concerns, maintainability, and well-defined abstractions.
+- **Pragmatic balance**: Design the implementation balancing speed with code quality and extensibility.
+
+Each agent should produce a full implementation blueprint: files to create or modify, component responsibilities, data flow, and a phased build sequence.
+
+After all agents complete, review their approaches and form your own recommendation based on the issue's scope, the codebase's conventions, and the user's clarified requirements.
+
+Present to the user: brief summary of each approach, trade-offs comparison, **your recommendation with reasoning**, concrete implementation differences.
+
+**Ask user which approach they prefer.**
+
+## Step 6: Plan Drafting
+
+Using the architecture selected in Step 5 as the structural foundation, draft a **staged implementation plan** with:
+- Clear stages (numbered, with descriptive names)
+- What each stage accomplishes
+- Which files will be created or modified
+- Dependencies between stages
+- Testing approach for each stage
 
 ### Planning requirements
 
@@ -108,7 +134,7 @@ Before finalizing the plan, verify it satisfies the following:
 - The complexity of the logic involved
 - The testing surface area
 
-## Step 5: Post and Branch
+## Step 7: Post and Branch
 
 Present the plan to the user, then use `AskUserQuestion` to ask for approval with these options:
 

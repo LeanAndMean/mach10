@@ -43,7 +43,7 @@ When composing content for GitHub comments or issue bodies:
 ## Plugin Dependencies
 
 - `gh` CLI (GitHub authentication required)
-- `feature-dev` plugin (used by `issue-implement`, `pr-review-fix`, `pr-ci-fix`)
+- `feature-dev` plugin (used by `issue-plan`, `issue-implement`, `pr-review-fix`, `pr-ci-fix`)
 - `pr-review-toolkit` plugin (used by `pr-review`)
 
 ## Writing Commands
@@ -55,10 +55,11 @@ When adding or modifying commands, follow the existing pattern:
 - End commands with a "next step" suggestion that includes `/clear` guidance for session boundaries (omit `/clear` when the next command needs session context, e.g., `/mach10:push` after implementation)
 - Use `gh` CLI for all GitHub operations (issues, PRs, comments, CI logs)
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
+- Commands that need codebase exploration or architecture analysis can use the Task tool with `subagent_type` to invoke agents from dependent plugins (e.g., `feature-dev:code-explorer`, `feature-dev:code-architect`)
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
 - **Repo structure sync**: The repository structure diagram is duplicated between `CLAUDE.md` (Architecture section) and `README.md` (Repository structure section). Any change to the structure block must be applied to both locations.
 - **Contributing-guide lookup sync**: The lookup pattern (`CONTRIBUTING.md` → `DEVELOPMENT.md` → `.github/CONTRIBUTING.md`, first-match-stop) is duplicated in three command files: `commands/issue-plan.md` (Step 3a), `commands/issue-review-plan.md` (Step 3a), and `commands/pr-pre-merge.md` (contributing guide lookup). `README.md` (the "Customizing with CONTRIBUTING.md" section) also documents this feature. Any change to the lookup logic must be applied to all four locations.
-- **Plan marker sync**: The `<!-- mach10-plan -->` HTML marker is used to reliably locate implementation plan comments. The marker is emitted by `commands/issue-plan.md` (Step 5) and `commands/issue-review-plan.md` (revised plan posting). It is consumed by `commands/issue-implement.md` (Step 3), `commands/issue-review-plan.md` (Step 2), and `agents/feature-completeness-checker.md` (Step 1). Any change to the marker convention must be applied to all locations.
+- **Plan marker sync**: The `<!-- mach10-plan -->` HTML marker is used to reliably locate implementation plan comments. The marker is emitted by `commands/issue-plan.md` (Step 7) and `commands/issue-review-plan.md` (revised plan posting). It is consumed by `commands/issue-implement.md` (Step 3), `commands/issue-review-plan.md` (Step 2), and `agents/feature-completeness-checker.md` (Step 1). Any change to the marker convention must be applied to all locations.
 - **Issue-reference pattern sync**: The list of issue reference patterns (`Fixes #N`, `Closes #N`, `Resolves #N`, `Part of #N`, `Issue #N`, bare `#N`) is duplicated between `commands/pr-review.md` (Step 3, Skill invocation instruction) and `agents/feature-completeness-checker.md` (Step 1, "Detect the linked issue"). Any change to the pattern list must be applied to both locations.
 
 ### User Interaction Patterns
