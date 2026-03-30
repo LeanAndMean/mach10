@@ -55,6 +55,7 @@ When adding or modifying commands, follow the existing pattern:
 - End commands with a "next step" suggestion that includes `/clear` guidance for session boundaries (omit `/clear` when the next command needs session context, e.g., `/mach10:push` after implementation)
 - Use `gh` CLI for all GitHub operations (issues, PRs, comments, CI logs)
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
+- Commands that need codebase exploration or architecture analysis can use the Task tool with `subagent_type` to invoke agents from dependent plugins (e.g., `feature-dev:code-explorer`, `feature-dev:code-architect`)
 - Commands that review code delegate to `/pr-review-toolkit:review-pr` via the Skill tool
 - **Repo structure sync**: The repository structure diagram is duplicated between `CLAUDE.md` (Architecture section) and `README.md` (Repository structure section). Any change to the structure block must be applied to both locations.
 - **Contributing-guide lookup sync**: The lookup pattern (`CONTRIBUTING.md` → `DEVELOPMENT.md` → `.github/CONTRIBUTING.md`, first-match-stop) is duplicated in three command files: `commands/issue-plan.md` (Step 3a), `commands/issue-review-plan.md` (Step 3a), and `commands/pr-pre-merge.md` (contributing guide lookup). `README.md` (the "Customizing with CONTRIBUTING.md" section) also documents this feature. Any change to the lookup logic must be applied to all four locations.

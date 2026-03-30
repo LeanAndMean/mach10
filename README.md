@@ -128,13 +128,12 @@ Claude reads the issue, explores the relevant parts of the codebase, and present
 
 **Command:** `/mach10:issue-plan <number>`
 
-Claude creates a staged implementation plan and posts it as a GitHub comment, then creates a feature branch. If the project has a `CONTRIBUTING.md` (or `DEVELOPMENT.md` / `.github/CONTRIBUTING.md`), the plan incorporates its guidance on project layers and testing expectations (see [Customizing with CONTRIBUTING.md](#customizing-with-contributingmd) below).
+Claude explores the codebase, asks clarifying questions about underspecified requirements, then presents multiple architecture approaches (minimal changes, clean architecture, pragmatic balance) for you to choose from before drafting a staged implementation plan. The plan is posted as a GitHub comment, and a feature branch is created. If the project has a `CONTRIBUTING.md` (or `DEVELOPMENT.md` / `.github/CONTRIBUTING.md`), the plan incorporates its guidance on project layers and testing expectations (see [Customizing with CONTRIBUTING.md](#customizing-with-contributingmd) below).
 
 The plan is *staged* because each stage will get its own session with a full context budget. Trying to implement everything at once starves later work of context depth. The plan is *posted to GitHub* so that any future session -- yours or a teammate's -- can read it and pick up the work.
 
-**Your role:** This is the most important moment to invest your attention. Before approving:
-- Scrutinize the architecture. Ask Claude to explain *why* it chose a particular approach.
-- Ask it to present alternatives if you're not sure the design is right.
+**Your role:** This is the most important moment to invest your attention. The command will present clarifying questions and architecture alternatives automatically -- answer the questions thoughtfully rather than deferring, and evaluate the architecture options carefully before choosing. Before approving the final plan:
+- Scrutinize the selected architecture. Ask Claude to explain trade-offs if the choice isn't clear.
 - Push back on anything that doesn't feel right. This is the cheapest point to catch bad design decisions -- before any code is written.
 
 ### Phase 3: Review the plan
@@ -207,7 +206,7 @@ Session 14: /mach10:pr-merge 108
 **Requirements:**
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
-- [feature-dev](https://github.com/anthropics/claude-code-plugins) plugin (required by `/issue-implement`, `/pr-review-fix`)
+- [feature-dev](https://github.com/anthropics/claude-code-plugins) plugin (required by `/issue-plan`, `/issue-implement`, `/pr-review-fix`, `/pr-ci-fix`)
 - [pr-review-toolkit](https://github.com/anthropics/claude-code-plugins) plugin (required by `/pr-review`)
 - `gh` CLI authenticated with your GitHub account
 
@@ -232,7 +231,7 @@ claude --plugin-dir /path/to/mach10
 | Command | Description |
 |---------|-------------|
 | `/mach10:issue-assessment <number>` | Read issue, perform independent assessment, and present findings with recommended next step |
-| `/mach10:issue-plan <number>` | Read issue, explore codebase, create staged implementation plan, post as comment, create feature branch |
+| `/mach10:issue-plan <number>` | Read issue, explore codebase, ask clarifying questions, design architecture with user, create staged implementation plan, post as comment, create feature branch |
 | `/mach10:issue-review-plan <number>` | Read issue and all comments, review the implementation plan, and present findings |
 | `/mach10:issue-implement <issue> <stage>` | Implement a specific stage of the plan via feature-dev |
 | `/mach10:issue-create` | Create a structured GitHub issue from current context |
