@@ -145,12 +145,38 @@ If any findings were classified as **deferred**, use `AskUserQuestion` to ask th
 
 If the user selects "Select which ones", present the deferred findings and use `AskUserQuestion` with `multiSelect: true` to let them choose (group into severity-based options if more than 4 items, with the built-in "Other" option for custom selection).
 
-For each approved deferred item, use `gh issue create` with:
-- A title summarizing the issue
-- A body referencing the PR and the specific finding
-- Any relevant labels
+For each approved deferred item, check for existing issues before creating a new one:
+
+1. Extract 2-3 key terms from the proposed issue title and search:
+
+   ```
+   gh issue list --search "<keywords>" --state all --limit 5 --json number,title,state,url
+   ```
+
+2. Handle results based on similarity:
+
+   - **No results**: Proceed to create the issue.
+   - **Clear duplicate**: If an existing **open** issue's title is nearly identical, skip creation and post a comment on the existing issue linking the new finding. If the near-identical match is a closed issue, treat it as an ambiguous match instead (a previously-closed issue should not block creation).
+
+     ```
+     gh issue comment <existing-issue-number> --body "Related finding from PR #<pr-number> review: <summary of the deferred finding>."
+     ```
+
+   - **Ambiguous match**: If results are related but not clearly duplicates, still create the issue but add a "Potentially related" note at the end of the issue body listing the matched issue numbers, titles, and states.
+
+3. If no duplicate was found (or the match was ambiguous), create the issue with `gh issue create`:
+   - A title summarizing the issue
+   - A body referencing the PR and the specific finding
+   - If ambiguous matches exist, append: "Potentially related: <list of matched issue numbers and titles>"
+   - Any relevant labels
 
 When referring to numbered items (findings, suggestions, stages) in the issue body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
+After processing all deferred items, display a summary block in CLI output listing each item and the action taken:
+- **Created**: Issue was created (include the new issue number and URL)
+- **Skipped (duplicate)**: Matched an existing issue (include the existing issue number and the link comment URL)
+- **Created (with overlap note)**: Issue was created with a note about potentially related issues
+- **Skipped (not selected)**: User chose not to create an issue for this finding
 
 ## Step 9: Recommend Next Steps
 
