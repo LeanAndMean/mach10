@@ -63,23 +63,39 @@ gh issue list --search "<keywords>" --state all --limit 5 --json number,title,st
 Handle results based on similarity:
 
 - **No results**: Proceed silently to Step 5.
-- **Clear duplicate**: If an existing open issue's title is nearly identical, act autonomously -- post a comment on the existing issue referencing the new context and skip creation. Report what was done to the user.
+- **Clear duplicate**: If an existing **open** issue's title is nearly identical, present the match to the user (showing issue number, title, state, and URL) and use `AskUserQuestion` to ask how to proceed:
+
+  - **Link to existing**: "Post a comment on the existing issue and skip creation"
+  - **Create anyway**: "Create the new issue despite the potential duplicate"
+  - **Skip**: "Do not create an issue"
+
+  If the user selects "Link to existing", post a comment on the existing issue referencing the new context, then skip creation. Report the existing issue number, URL, and the comment URL to the user.
 
   ```
   gh issue comment <existing-issue-number> --body "Related context: <summary of the new finding or context that prompted this issue>."
   ```
 
+  Capture the comment URL after posting (parse it from the `gh issue comment` output or retrieve via `gh api`).
+
+  If the user selects "Create anyway", proceed to Step 5. If the user selects "Skip", proceed directly to Step 6 and report that issue creation was skipped.
+
+  If the near-identical match is a **closed** issue, treat it as an ambiguous match instead -- a previously-closed issue should not block creation.
+
 - **Ambiguous matches**: If results are related but not clearly duplicates, present the matches to the user (showing issue number, title, state, and URL for each). Flag closed issues prominently (e.g., "This issue was previously closed"). Then use `AskUserQuestion` to ask how to proceed:
 
   - **Proceed**: "Create the new issue anyway"
   - **Link**: "Add this finding as a comment on one of the listed issues"
-  - **Skip**: "Do not create an issue for this finding"
+  - **Skip**: "Do not create an issue"
 
-  If the user selects "Link" and multiple matches were shown, ask which existing issue to link to (free-text, since the user may want to specify by number). Post a comment on the chosen issue referencing the new context, then skip creation:
+  If the user selects "Link" and multiple matches were shown, ask which existing issue to link to (free-text, since the user may want to specify by number). Post a comment on the chosen issue referencing the new context, then skip creation. Report the existing issue number, URL, and the comment URL to the user.
 
   ```
   gh issue comment <chosen-issue-number> --body "Related context: <summary of the new finding or context that prompted this issue>."
   ```
+
+  Capture the comment URL after posting (parse it from the `gh issue comment` output or retrieve via `gh api`).
+
+  If the user selects "Skip", proceed directly to Step 6 and report that issue creation was skipped.
 
 ## Step 5: Create
 

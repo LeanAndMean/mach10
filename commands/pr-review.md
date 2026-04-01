@@ -162,6 +162,8 @@ For each approved deferred item, check for existing issues before creating a new
      gh issue comment <existing-issue-number> --body "Related finding from PR #<pr-number> review: <summary of the deferred finding>."
      ```
 
+     Capture the comment URL after posting (parse it from the `gh issue comment` output or retrieve via `gh api`) for use in the summary block.
+
    - **Ambiguous match**: If results are related but not clearly duplicates, still create the issue but add a "Potentially related" note at the end of the issue body listing the matched issue numbers, titles, and states.
 
 3. If no duplicate was found (or the match was ambiguous), create the issue with `gh issue create`:
