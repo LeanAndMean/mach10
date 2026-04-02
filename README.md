@@ -125,7 +125,7 @@ The methodology in action across a feature's lifecycle. Each step below runs in 
 
 **Command:** `/mach10:issue-create`
 
-When no issue exists yet, start here. Claude helps you draft a structured GitHub issue from a description of the problem or feature you have in mind. The command walks you through title, body, labels, and assignees, then creates the issue. If you already have an issue, skip directly to Phase 1.
+When no issue exists yet, start here. Claude helps you draft a structured GitHub issue from a description of the problem or feature you have in mind. The command walks you through title, body, and labels, then creates the issue. If you already have an issue, skip directly to Phase 1.
 
 **Your role:** Provide the context -- what needs to be built or fixed and why. Review the drafted issue before it's created to make sure scope and requirements are right.
 
