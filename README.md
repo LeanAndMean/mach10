@@ -67,6 +67,11 @@ This continues until the assessment shows no genuine issues remaining.
 The methodology in action across a feature's lifecycle. Each step below runs in a **fresh CLI session**. GitHub comments carry context between sessions -- no filesystem state or memory is required. This also means other team members' sessions can pick up where yours left off by reading the same issue or PR.
 
 ```
+                     ┌───────────┐
+                     │  Create   │
+                     │   Issue   │
+                     └─────┬─────┘
+                           │
                          Issue
                            │
                      ┌─────▼─────┐
@@ -115,6 +120,14 @@ The methodology in action across a feature's lifecycle. Each step below runs in 
                      │   Merge   │
                      └───────────┘
 ```
+
+### Phase 0: Create the issue
+
+**Command:** `/mach10:issue-create`
+
+When no issue exists yet, start here. Claude helps you draft a structured GitHub issue from a description of the problem or feature you have in mind. The command walks you through title, body, labels, and assignees, then creates the issue. If you already have an issue, skip directly to Phase 1.
+
+**Your role:** Provide the context -- what needs to be built or fixed and why. Review the drafted issue before it's created to make sure scope and requirements are right.
 
 ### Phase 1: Understand the issue
 
@@ -179,6 +192,7 @@ Once the review-fix cycle converges (the assessment shows no genuine issues rema
 Once you're familiar with the phases above, this session log serves as a cheat sheet:
 
 ```
+Session 0:  /mach10:issue-create            (when no issue exists yet)
 Session 1:  /mach10:issue-assessment 55
 Session 2:  /mach10:issue-plan 55
 Session 3:  /mach10:issue-review-plan 55
