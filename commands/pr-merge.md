@@ -30,6 +30,7 @@ If there are blocking issues, report them to the user and stop. Do NOT force-mer
 - **Failed CI checks**: Suggest `/clear` then `/mach10:pr-ci-fix <pr-number>` to diagnose and fix the failures.
 - **Merge conflicts**: Suggest resolving conflicts manually or rebasing the branch.
 - **Missing review approval**: Suggest requesting a review.
+- **Branch behind main**: When `mergeStateStatus` is `BEHIND`, suggest `/clear` then `/mach10:pr-pre-merge <pr-number>` to update the branch before merging.
 
 ## Step 3: Merge
 
