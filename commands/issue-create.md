@@ -50,9 +50,56 @@ Present the drafted issue to the user, then use `AskUserQuestion` to ask for app
 
 If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again.
 
-## Step 4: Create
+## Step 4: Check for Duplicates
 
-After approval, create the issue:
+After the user approves the draft, check for existing issues that may already cover the same topic before creating.
+
+Extract 2-3 key terms from the approved issue title and search:
+
+```
+gh issue list --search "<keywords>" --state all --limit 5 --json number,title,state,url
+```
+
+Handle results based on similarity:
+
+- **No results**: Proceed silently to Step 5.
+- **Clear duplicate**: If an existing **open** issue's title is nearly identical, present the match to the user (showing issue number, title, state, and URL) and use `AskUserQuestion` to ask how to proceed:
+
+  - **Link to existing**: "Post a comment on the existing issue and skip creation"
+  - **Create anyway**: "Create the new issue despite the potential duplicate"
+  - **Skip**: "Do not create an issue"
+
+  If the user selects "Link to existing", post a comment on the existing issue referencing the new context, then skip creation. Report the existing issue number, URL, and the comment URL to the user.
+
+  ```
+  gh issue comment <existing-issue-number> --body "Related context: <summary of the new finding or context that prompted this issue>."
+  ```
+
+  Capture the comment URL after posting (parse it from the `gh issue comment` output or retrieve via `gh api`).
+
+  If the user selects "Create anyway", proceed to Step 5. If the user selects "Skip", proceed directly to Step 6 and report that issue creation was skipped.
+
+  If the near-identical match is a **closed** issue, treat it as an ambiguous match instead -- a previously-closed issue should not block creation.
+
+- **Ambiguous matches**: If results are related but not clearly duplicates, present the matches to the user (showing issue number, title, state, and URL for each). Flag closed issues prominently (e.g., "This issue was previously closed"). Then use `AskUserQuestion` to ask how to proceed:
+
+  - **Proceed**: "Create the new issue anyway"
+  - **Link**: "Add this finding as a comment on one of the listed issues"
+  - **Skip**: "Do not create an issue"
+
+  If the user selects "Link" and multiple matches were shown, ask which existing issue to link to (free-text, since the user may want to specify by number). Post a comment on the chosen issue referencing the new context, then skip creation. Report the existing issue number, URL, and the comment URL to the user.
+
+  ```
+  gh issue comment <chosen-issue-number> --body "Related context: <summary of the new finding or context that prompted this issue>."
+  ```
+
+  Capture the comment URL after posting (parse it from the `gh issue comment` output or retrieve via `gh api`).
+
+  If the user selects "Skip", proceed directly to Step 6 and report that issue creation was skipped.
+
+## Step 5: Create
+
+After approval and duplicate check, create the issue:
 
 ```
 gh issue create --title "..." --body "..."
@@ -66,7 +113,7 @@ Add labels if the user specified them or if the repo has standard labels:
 gh issue edit <number> --add-label "..."
 ```
 
-## Step 5: Confirm
+## Step 6: Confirm
 
 Report to the user:
 - Issue number and URL
