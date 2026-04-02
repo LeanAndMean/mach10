@@ -42,17 +42,59 @@ gh pr checkout <pr-number>
 git pull
 ```
 
-## Step 4: Run Checklist
+## Step 4: Branch Freshness Check
+
+Ensure the feature branch is up to date with the default branch before running the checklist.
+
+Determine the default branch and fetch the latest remote state:
+
+```
+gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
+git fetch origin
+```
+
+Count how many commits the branch is behind:
+
+```
+git rev-list --count HEAD..origin/<default-branch>
+```
+
+If the count is **0**, the branch is current — continue to Step 5.
+
+If the count is **greater than 0**, inform the user that the branch is N commits behind `origin/<default-branch>`, then use `AskUserQuestion` to ask how to proceed:
+
+- **Merge**: "Merge the default branch into this branch now"
+- **Skip**: "Leave the branch as-is and continue the checklist"
+- **Cancel**: "Stop without running the checklist"
+
+If the user selects **Cancel**, stop the session.
+
+If the user selects **Skip**, note the skipped status for the report and continue to Step 5.
+
+If the user selects **Merge**, run:
+
+```
+git merge origin/<default-branch>
+```
+
+**If the merge succeeds cleanly**, push the merge commit (`git push`). If the push fails, report the error to the user and stop — do not continue the checklist with an unpushed merge commit. On success, continue to Step 5.
+
+**If the merge has conflicts**, check whether all conflicted files are version files — files whose conflicts are limited to version fields (e.g., `plugin.json`, `package.json`, `pyproject.toml`, `setup.cfg`). Use your judgement for other files that appear to contain only trivial version-field conflicts.
+
+- **All conflicts are trivial (version files only):** For each conflicted file, resolve by taking the default branch's version (`git checkout --theirs <file>` then `git add <file>`), then finalize the merge with `git commit --no-edit`. Push the result (`git push`). If the push fails, report the error and stop. Record which files were auto-resolved for the report.
+- **Any non-trivial conflicts exist:** Abort the merge with `git merge --abort`. Report the list of conflicted files to the user and stop the session — the user must resolve conflicts manually.
+
+## Step 5: Run Checklist
 
 Work through each item. For each, report whether action is needed and perform it if so.
 
-### 4a. Documentation
+### 5a. Documentation
 
 - Are there new features or changed behavior that need documentation updates?
 - Check README.md, any docs/ directory, docstrings, and help text.
 - Update as needed.
 
-### 4b. Version Bump
+### 5b. Version Bump
 
 - Check if the project uses semantic versioning (look for version in package.json, pyproject.toml, setup.cfg, __version__, etc.)
 - If version tracking exists, determine if a bump is warranted:
@@ -64,12 +106,12 @@ Work through each item. For each, report whether action is needed and perform it
   - **Minor**: "New features, non-breaking changes"
   - **Major**: "Breaking changes to existing behavior"
 
-### 4c. CHANGELOG
+### 5c. CHANGELOG
 
 - Check if the project maintains a CHANGELOG.md or CHANGES.md.
 - If so, add an entry for this PR's changes following the existing format.
 
-### 4d. Tests
+### 5d. Tests
 
 Run the project's test suite:
 
@@ -82,7 +124,7 @@ Run the project's test suite:
 
 Report results. If tests fail, investigate and report — do NOT silently ignore failures.
 
-## Step 5: Commit
+## Step 6: Commit
 
 If any changes were made during the checklist, commit them:
 
@@ -91,9 +133,10 @@ If any changes were made during the checklist, commit them:
 
 Push to remote.
 
-## Step 6: Report
+## Step 7: Report
 
 Present a summary of what was done:
+- [ ] Branch freshness: [current with main / merged N commits from main / auto-resolved conflicts in: <files> / behind main (user skipped merge)]
 - [ ] Documentation: [updated / no changes needed]
 - [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed]
 - [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
