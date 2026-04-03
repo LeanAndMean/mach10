@@ -185,7 +185,7 @@ If CI fails after a fix, use `pr-ci-fix` to diagnose and resolve the failure.
 
 **Commands:** `/mach10:doc-review <pr>` (optional), `/mach10:pr-pre-merge <pr>`, `/mach10:pr-merge <pr>`
 
-Once the review-fix cycle converges (the assessment shows no genuine issues remaining), optionally run a deep documentation review with `doc-review`, run the pre-merge checklist (docs, version, CHANGELOG, tests), and merge.
+Once the review-fix cycle converges (the assessment shows no genuine issues remaining), optionally run a deep documentation review with `doc-review`, run the pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests), and merge.
 
 ### Quick reference
 
@@ -260,7 +260,7 @@ claude --plugin-dir /path/to/mach10
 | `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
 | `/mach10:pr-review-validate <pr>` | Standalone: independently assess review findings without re-running the review |
 | `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
-| `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (docs, version, CHANGELOG, tests) |
+| `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests) |
 | `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
 
 #### Utilities

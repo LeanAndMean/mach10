@@ -1,5 +1,5 @@
 ---
-description: Run pre-merge checklist — docs, version, CHANGELOG, tests
+description: Run pre-merge checklist — branch freshness, docs, version, CHANGELOG, tests
 argument-hint: <pr-number>
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write, AskUserQuestion
 ---
