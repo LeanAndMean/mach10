@@ -83,9 +83,27 @@ Present the drafted content to the user, then use `AskUserQuestion` to ask for a
 
 - **Approve**: "Execute the recommended action"
 - **Modify**: "Edit the drafted content before executing"
-- **Cancel**: "Abort without making changes"
+- **Cancel**: "Abort without making changes (a brief audit note will be posted)"
 
-If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again. If the user selects "Cancel", stop and confirm that no changes were made.
+If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again.
+
+If the user selects "Cancel":
+
+1. Confirm that no changes were made to the issue.
+2. Post a lightweight decision comment on the issue to record that an assessment was conducted:
+
+   ```
+   gh issue comment <issue-number> --body "..."
+   ```
+
+   Comment format:
+   - First line: `<!-- mach10-decisions -->`
+   - A note that an independent assessment was performed and the user chose not to act
+   - Condensed Summary from Step 4 (2-3 sentences)
+   - Condensed Gaps from Step 4 (2-3 sentences)
+   - Keep the entire comment body under 15 lines
+
+   When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 After the user approves:
 

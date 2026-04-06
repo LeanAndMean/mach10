@@ -180,6 +180,28 @@ After processing all deferred items, display a summary block in CLI output listi
 - **Created (with overlap note)**: Issue was created with a note about potentially related issues
 - **Skipped (not selected)**: User chose not to create an issue for this finding
 
+### Persist Deferred-Item Decisions
+
+After displaying the summary block, post a decision comment on the PR to record the disposition of each deferred item for future sessions:
+
+```
+gh pr comment <pr-number> --body "..."
+```
+
+Comment format:
+- First line: `<!-- mach10-decisions -->`
+- A note that deferred findings were processed after the review
+- One line per deferred item showing its disposition:
+  - Created as issue (with issue number) — user selected "Create" for this item
+  - Created as issue with overlap note (with issue number and related issue numbers) — user selected "Create" but potentially related issues were found
+  - Skipped as duplicate (with existing issue number) — matched an existing issue during duplicate check
+  - Skipped (not selected) (with one-sentence rationale if the user provided one) — user chose "Skip deferred items" or did not select this item in "Select which ones"
+- Keep the entire comment body under 20 lines
+
+**Guard:** Skip this comment entirely if zero findings were classified as deferred.
+
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 ## Step 9: Recommend Next Steps
 
 **CLI output only (do NOT include in any GitHub comment).**
