@@ -63,6 +63,21 @@ For complex changes, use your Read and Grep tools to examine specific modified f
 2. If no issue number was provided, try to infer one from the branch name (e.g., `feature/issue-55-*`, `fix/issue-23-*`, or `55-some-description`). If found, read that issue.
 3. If no issue can be identified, proceed without one.
 
+**Sub-issue detection:**
+
+If an issue was identified, detect any sub-issues so closing keywords can be included for them in the PR body. Skip this block entirely if no issue was identified.
+
+1. **Strategy A (API):** First resolve the repository identifier, then query the GitHub sub-issues API:
+   ```
+   REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+   gh api repos/$REPO/issues/<issue-number>/sub_issues --jq '.[].number'
+   ```
+   If the API call succeeds and returns one or more numbers, use them as the confirmed sub-issue list.
+
+2. **Strategy B (body-parse fallback):** If the API call fails (e.g., 404, permission error) or returns no results, scan the issue body for sub-issue references. Match `#<number>` references that appear on checkbox list lines -- lines beginning with `- [ ]` or `- [x]` (with optional leading whitespace). Exclude any `#<number>` preceded by relational keywords like "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself. Use these as candidate sub-issues. Note: this fallback is less reliable than the API -- flag these as candidates when presenting the draft (see Step 3).
+
+3. If neither strategy yields results, the sub-issue list is empty.
+
 ## Step 3: Draft PR
 
 Compose a PR title and body based on the gathered context.
@@ -81,12 +96,18 @@ Compose a PR title and body based on the gathered context.
 - [ ] <bulleted checklist of how to verify the changes>
 
 Fixes #<issue-number>
+Fixes #<sub-issue-1>
+Fixes #<sub-issue-2>
 
 ---
 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
-- Include `Fixes #<issue-number>` only if an issue was identified.
+**Closing keywords inclusion rule:**
+- **No issue identified:** Omit all closing keywords.
+- **Issue without sub-issues:** Include only `Fixes #<issue-number>`.
+- **Issue with sub-issues:** Include `Fixes #<issue-number>` for the parent, followed by one `Fixes #<N>` line for each sub-issue. When presenting the draft, tell the user they can remove unwanted closing keywords via the "Modify" option (e.g., if this PR only addresses some of the sub-issues). If the sub-issues were detected via Strategy B (body-parse fallback), note this to the user so they can verify the list is correct.
+
 - When referring to numbered items (findings, suggestions, stages) in the body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs. (`Fixes #<issue-number>` is an intentional GitHub reference and should be kept as-is.)
 - If the user provided additional context in $ARGUMENTS, incorporate it into the summary or test plan as appropriate.
 
