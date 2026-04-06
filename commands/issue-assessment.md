@@ -90,7 +90,7 @@ If the user selects "Modify", ask what they want to change, apply the changes, a
 If the user selects "Cancel":
 
 1. Confirm that no changes were made to the issue.
-2. If the assessment from Step 4 was presented to the user, post a lightweight decision comment on the issue to record that an assessment was conducted:
+2. Post a lightweight decision comment on the issue to record that an assessment was conducted:
 
    ```
    gh issue comment <issue-number> --body "..."

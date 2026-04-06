@@ -129,7 +129,7 @@ If the user selects "Proceed as-is" and all findings are Suggestions only, do NO
 If the user selects "Cancel":
 
 1. Confirm that no changes were made to the plan.
-2. If findings were presented to the user in this session, post a lightweight decision comment on the issue:
+2. Post a lightweight decision comment on the issue:
 
    ```
    gh issue comment <issue-number> --body "..."
