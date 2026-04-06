@@ -72,11 +72,13 @@ If an issue was identified, detect any sub-issues so closing keywords can be inc
    REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
    gh api repos/$REPO/issues/<issue-number>/sub_issues --jq '.[].number'
    ```
-   If the API call succeeds and returns one or more numbers, use them as the confirmed sub-issue list.
+   - If the API call **succeeds and returns one or more numbers**, use them as the confirmed sub-issue list.
+   - If the API call **succeeds but returns no results** (empty array), the issue has no sub-issues. Do NOT fall through to Strategy B -- treat the sub-issue list as empty.
+   - If the API call **fails** (e.g., 404, permission error, network timeout), proceed to Strategy B.
 
-2. **Strategy B (body-parse fallback):** If the API call fails (e.g., 404, permission error) or returns no results, scan the issue body for sub-issue references. Match `#<number>` references that appear on checkbox list lines -- lines beginning with `- [ ]` or `- [x]` (with optional leading whitespace). Exclude any `#<number>` preceded by relational keywords like "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself. Use these as candidate sub-issues. Note: this fallback is less reliable than the API -- flag these as candidates when presenting the draft (see Step 3).
+2. **Strategy B (body-parse fallback):** This strategy runs only when the API call in Strategy A failed. Scan the issue body for sub-issue references. Match `#<number>` references that appear on GitHub task list lines -- lines beginning with optional whitespace followed by a list marker (`-`, `*`, or `+`) and a checkbox (`[ ]`, `[x]`, or `[X]`). Exclude any `#<number>` preceded by relational keywords like "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself. Use these as candidate sub-issues. Note: this fallback is less reliable than the API -- flag these as candidates when presenting the draft (see Step 3).
 
-3. If neither strategy yields results, the sub-issue list is empty.
+3. If Strategy A returned an empty result or Strategy B yielded no matches, the sub-issue list is empty.
 
 ## Step 3: Draft PR
 
@@ -96,8 +98,6 @@ Compose a PR title and body based on the gathered context.
 - [ ] <bulleted checklist of how to verify the changes>
 
 Fixes #<issue-number>
-Fixes #<sub-issue-1>
-Fixes #<sub-issue-2>
 
 ---
 Generated with [Claude Code](https://claude.com/claude-code)
