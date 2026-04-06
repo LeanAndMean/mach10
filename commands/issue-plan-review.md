@@ -5,7 +5,7 @@ allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 model: opus
 ---
 
-# Issue Review Plan
+# Issue Plan Review
 
 You are reviewing the implementation plan for a GitHub issue. Your goal is to read the issue and all comments, independently assess the plan, and present your findings.
 

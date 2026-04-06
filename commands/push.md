@@ -65,7 +65,7 @@ Check the current conversation for signals about what the user has been working 
 - `issue-implement` was invoked with an issue number
 - `issue-assessment` was invoked with an issue number
 - `issue-plan` was invoked with an issue number
-- `issue-review-plan` was invoked with an issue number
+- `issue-plan-review` was invoked with an issue number
 
 **PR-oriented signals** — post on the PR:
 - `pr-review-fix` was invoked with a PR number

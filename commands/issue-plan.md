@@ -162,4 +162,4 @@ When referring to numbered items (findings, suggestions, stages) in the comment 
 
 Confirm both actions to the user.
 
-**CLI output only (do NOT include in the GitHub comment):** Let the user know the next step is `/clear` then `/mach10:issue-implement <issue-number> 1` to begin Stage 1 of the implementation in a fresh session.
+**CLI output only (do NOT include in the GitHub comment):** Let the user know the next steps are `/clear` then optionally `/mach10:issue-plan-review <issue-number>` to review the plan, or `/mach10:issue-implement <issue-number> 1` to begin Stage 1 of the implementation in a fresh session.

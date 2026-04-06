@@ -151,7 +151,7 @@ The plan is *staged* because each stage will get its own session with a full con
 
 ### Phase 3: Review the plan
 
-**Command:** `/mach10:issue-review-plan <number>`
+**Command:** `/mach10:issue-plan-review <number>`
 
 A fresh Claude session independently reviews the plan against the codebase. If the project has contributing guidelines, the review checks the plan against their requirements for layer coverage and testing. Plans can be reviewed just like code -- this is a second pair of eyes on the architecture before implementation begins.
 
@@ -195,7 +195,7 @@ Once you're familiar with the phases above, this session log serves as a cheat s
 Session 0:  /mach10:issue-create            (when no issue exists yet)
 Session 1:  /mach10:issue-assessment 55
 Session 2:  /mach10:issue-plan 55
-Session 3:  /mach10:issue-review-plan 55
+Session 3:  /mach10:issue-plan-review 55
 Session 4:  /mach10:issue-implement 55 1
             /mach10:push
 Session 5:  /mach10:issue-implement 55 2
@@ -246,7 +246,7 @@ claude --plugin-dir /path/to/mach10
 |---------|-------------|
 | `/mach10:issue-assessment <number>` | Read issue, perform independent assessment, and present findings with recommended next step |
 | `/mach10:issue-plan <number>` | Read issue, explore codebase, ask clarifying questions, design architecture with user, create staged implementation plan, post as comment, create feature branch |
-| `/mach10:issue-review-plan <number>` | Read issue and all comments, review the implementation plan, and present findings |
+| `/mach10:issue-plan-review <number>` | Read issue and all comments, review the implementation plan, and present findings |
 | `/mach10:issue-implement <issue> <stage>` | Implement a specific stage of the plan via feature-dev |
 | `/mach10:issue-create` | Create a structured GitHub issue from current context |
 
@@ -289,7 +289,7 @@ commands/                     # Slash command definitions (markdown with YAML fr
 Several commands consult your project's contributing guidelines to tailor their behavior. Place a `CONTRIBUTING.md` at the repository root (or `DEVELOPMENT.md`, or `.github/CONTRIBUTING.md`) and the following commands will incorporate its guidance:
 
 - **`issue-plan`** -- Cross-checks project layers discovered during codebase exploration against any layers specified in the contributing guide (e.g., models, migrations, API routes, services, UI, documentation) to ensure the plan covers all affected layers. Uses testing expectations (frameworks, coverage requirements, test types) to include appropriate test planning in each stage.
-- **`issue-review-plan`** -- Checks the plan against the same layer and testing requirements, flagging gaps in coverage.
+- **`issue-plan-review`** -- Checks the plan against the same layer and testing requirements, flagging gaps in coverage.
 - **`pr-pre-merge`** -- Reads pre-merge requirements (version bumps, changelog entries, documentation updates, test requirements) from the guide.
 
-Projects without a contributing guide work fine -- the planning commands (`issue-plan`, `issue-review-plan`) proceed using discovery-based defaults from codebase exploration, and `pr-pre-merge` falls back to its built-in checklist. The contributing guide simply lets you codify project-specific expectations so they are applied consistently across sessions and contributors.
+Projects without a contributing guide work fine -- the planning commands (`issue-plan`, `issue-plan-review`) proceed using discovery-based defaults from codebase exploration, and `pr-pre-merge` falls back to its built-in checklist. The contributing guide simply lets you codify project-specific expectations so they are applied consistently across sessions and contributors.
