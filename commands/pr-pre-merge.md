@@ -42,6 +42,8 @@ gh pr checkout <pr-number>
 git pull
 ```
 
+If either command fails (PR not found, authentication error, merge conflicts during pull), report the error to the user and stop -- the checklist cannot proceed without a clean, up-to-date working copy of the PR branch.
+
 ## Step 4: Branch Freshness Check
 
 Ensure the feature branch is up to date with the default branch before running the checklist.
@@ -52,6 +54,8 @@ Determine the default branch and fetch the latest remote state:
 gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
 git fetch origin
 ```
+
+If either command fails (authentication error, rate limit, network error), report the error to the user and stop -- the freshness check cannot proceed without knowing the default branch and having up-to-date remote state.
 
 Count how many commits the branch is behind:
 
@@ -79,10 +83,12 @@ git merge origin/<default-branch>
 
 **If the merge succeeds cleanly**, push the merge commit (`git push`). If the push fails, report the error to the user and stop — do not continue the checklist with an unpushed merge commit. Advise the user they can retry with `git push`, or undo the merge with `git reset --hard HEAD~1`. On success, continue to Step 5.
 
-**If the merge has conflicts**, check whether all conflicted files are version files — files whose conflicts are limited to version fields (e.g., `plugin.json`, `package.json`, `pyproject.toml`, `setup.cfg`). Use your judgement for other files that appear to contain only trivial version-field conflicts.
+**If the merge has conflicts**, check whether all conflicted files are on the version-file allowlist: `plugin.json`, `package.json`, `pyproject.toml`, `setup.cfg`, `Cargo.toml`, `build.gradle`. Only files on this allowlist are eligible for auto-resolution.
 
 - **All conflicts are trivial (version files only):** For each conflicted file, resolve by taking the default branch's version (`git checkout --theirs <file>` then `git add <file>`), then finalize the merge with `git commit --no-edit`. Push the result (`git push`). If the push fails, report the error and stop — advise the user they can retry with `git push`, or undo the merge with `git reset --hard HEAD~1`. Record which files were auto-resolved for the report.
 - **Any non-trivial conflicts exist:** Abort the merge with `git merge --abort`. Report the list of conflicted files to the user and stop the session — the user must resolve conflicts manually.
+
+**If the merge fails for any reason other than conflicts** (invalid ref, dirty working tree, internal error), report the full error output to the user and stop.
 
 ## Step 5: Run Checklist
 
@@ -131,7 +137,7 @@ If any changes were made during the checklist, commit them:
 - Stage only the files modified during this checklist
 - Commit message: "Pre-merge checklist: [brief summary of what was updated]"
 
-Push to remote.
+Push to remote. If the push fails, report the error to the user and advise them to retry manually with `git push`.
 
 ## Step 7: Report
 
