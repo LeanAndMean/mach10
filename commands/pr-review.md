@@ -193,6 +193,7 @@ Comment format:
 - A note that deferred findings were processed after the review
 - One line per deferred item showing its disposition:
   - Created as issue (with issue number)
+  - Created as issue with overlap note (with issue number and related issue numbers)
   - Skipped as duplicate (with existing issue number)
   - Skipped by user choice (with one-sentence rationale if the user provided one)
   - Not selected by user

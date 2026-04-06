@@ -143,4 +143,6 @@ If the user selects "Cancel":
 
    When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
+   **CLI output only (do NOT include in any GitHub comment):** Suggest next step: `/clear` then `/mach10:issue-plan-review <issue-number>` to re-run the review, or `/mach10:issue-implement <issue-number> 1` to proceed with the existing plan.
+
 After the user's choice is executed (unless cancelled), suggest as **CLI output only (do NOT include in any GitHub comment):** `/clear` then `/mach10:issue-implement <issue-number> 1` to begin implementation.
