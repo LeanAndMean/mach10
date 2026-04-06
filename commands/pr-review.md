@@ -192,11 +192,10 @@ Comment format:
 - First line: `<!-- mach10-decisions -->`
 - A note that deferred findings were processed after the review
 - One line per deferred item showing its disposition:
-  - Created as issue (with issue number)
-  - Created as issue with overlap note (with issue number and related issue numbers)
-  - Skipped as duplicate (with existing issue number)
-  - Skipped by user choice (with one-sentence rationale if the user provided one)
-  - Not selected by user
+  - Created as issue (with issue number) — user selected "Create" for this item
+  - Created as issue with overlap note (with issue number and related issue numbers) — user selected "Create" but potentially related issues were found
+  - Skipped as duplicate (with existing issue number) — matched an existing issue during duplicate check
+  - Skipped (not selected) (with one-sentence rationale if the user provided one) — user chose "Skip deferred items" or did not select this item in "Select which ones"
 - Keep the entire comment body under 20 lines
 
 **Guard:** Skip this comment entirely if zero findings were classified as deferred.
