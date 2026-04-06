@@ -93,7 +93,21 @@ Present the assessment to the user, then use `AskUserQuestion` to ask for approv
 - **Modify before posting**: "Edit the assessment before posting it"
 - **Skip posting**: "Do not post a comment to the PR"
 
-If the user selects "Modify before posting", ask what they want to change, apply the changes, and present the updated assessment for approval again. If the user selects "Skip posting", skip to Step 6.
+If the user selects "Modify before posting", ask what they want to change, apply the changes, and present the updated assessment for approval again (do NOT post a separate decision comment -- the modified and posted assessment IS the record).
+
+If the user selects "Skip posting", post a lightweight decision comment on the PR before skipping to Step 6:
+
+```
+gh pr comment <pr-number> --body "..."
+```
+
+Comment format:
+- First line: `<!-- mach10-decisions -->`
+- A note that a validation assessment was performed and the user chose not to post
+- Finding counts from Step 4 (e.g., "Findings: 2 genuine, 1 nitpick, 0 false positives, 1 deferred")
+- Keep the entire comment body to 5 lines or fewer
+
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 After the user approves, post a reply comment on the PR documenting:
 
