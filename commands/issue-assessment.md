@@ -83,7 +83,7 @@ Present the drafted content to the user, then use `AskUserQuestion` to ask for a
 
 - **Approve**: "Execute the recommended action"
 - **Modify**: "Edit the drafted content before executing"
-- **Cancel**: "Abort without making changes"
+- **Cancel**: "Abort without making changes (a brief audit note will be posted)"
 
 If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again.
 

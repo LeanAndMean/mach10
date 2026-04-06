@@ -106,7 +106,7 @@ Use `AskUserQuestion` to ask the user how they want to proceed:
 - **Update the plan**: "Post a revised plan addressing the findings"
 - **Proceed as-is**: "Continue with the current plan despite findings"
 - **Discuss findings**: "Explore specific findings in more detail before deciding"
-- **Cancel**: "Stop here without updating or proceeding"
+- **Cancel**: "Stop here without updating or proceeding (a brief audit note will be posted)"
 
 If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions). If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed.
 
