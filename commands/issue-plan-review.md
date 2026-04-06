@@ -108,6 +108,39 @@ Use `AskUserQuestion` to ask the user how they want to proceed:
 - **Discuss findings**: "Explore specific findings in more detail before deciding"
 - **Cancel**: "Stop here without updating or proceeding"
 
-If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions). If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. If the user selects "Cancel", stop and confirm that no changes were made.
+If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions). If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed.
+
+If the user selects "Proceed as-is" and at least one Critical or Important finding exists, post a decision comment on the issue to record the user's choice:
+
+```
+gh issue comment <issue-number> --body "..."
+```
+
+Comment format:
+- First line: `<!-- mach10-decisions -->`
+- A note that a plan review was conducted and the user chose to proceed without changes
+- Each Critical and Important finding on its own line (one sentence each)
+- Keep the entire comment body under 15 lines
+
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+
+If the user selects "Proceed as-is" and all findings are Suggestions only, do NOT post a decision comment -- proceeding past suggestions is the expected path.
+
+If the user selects "Cancel":
+
+1. Confirm that no changes were made to the plan.
+2. If findings were presented to the user in this session, post a lightweight decision comment on the issue:
+
+   ```
+   gh issue comment <issue-number> --body "..."
+   ```
+
+   Comment format:
+   - First line: `<!-- mach10-decisions -->`
+   - A note that a plan review was conducted and the session ended without updating or proceeding
+   - Finding counts by severity (e.g., "2 Critical, 1 Important, 3 Suggestions")
+   - Keep the entire comment body to 5 lines or fewer
+
+   When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 After the user's choice is executed (unless cancelled), suggest as **CLI output only (do NOT include in any GitHub comment):** `/clear` then `/mach10:issue-implement <issue-number> 1` to begin implementation.
