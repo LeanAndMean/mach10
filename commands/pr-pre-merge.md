@@ -77,11 +77,11 @@ If the user selects **Merge**, run:
 git merge origin/<default-branch>
 ```
 
-**If the merge succeeds cleanly**, push the merge commit (`git push`). If the push fails, report the error to the user and stop — do not continue the checklist with an unpushed merge commit. On success, continue to Step 5.
+**If the merge succeeds cleanly**, push the merge commit (`git push`). If the push fails, report the error to the user and stop — do not continue the checklist with an unpushed merge commit. Advise the user they can retry with `git push`, or undo the merge with `git reset --hard HEAD~1`. On success, continue to Step 5.
 
 **If the merge has conflicts**, check whether all conflicted files are version files — files whose conflicts are limited to version fields (e.g., `plugin.json`, `package.json`, `pyproject.toml`, `setup.cfg`). Use your judgement for other files that appear to contain only trivial version-field conflicts.
 
-- **All conflicts are trivial (version files only):** For each conflicted file, resolve by taking the default branch's version (`git checkout --theirs <file>` then `git add <file>`), then finalize the merge with `git commit --no-edit`. Push the result (`git push`). If the push fails, report the error and stop. Record which files were auto-resolved for the report.
+- **All conflicts are trivial (version files only):** For each conflicted file, resolve by taking the default branch's version (`git checkout --theirs <file>` then `git add <file>`), then finalize the merge with `git commit --no-edit`. Push the result (`git push`). If the push fails, report the error and stop — advise the user they can retry with `git push`, or undo the merge with `git reset --hard HEAD~1`. Record which files were auto-resolved for the report.
 - **Any non-trivial conflicts exist:** Abort the merge with `git merge --abort`. Report the list of conflicted files to the user and stop the session — the user must resolve conflicts manually.
 
 ## Step 5: Run Checklist
@@ -136,7 +136,7 @@ Push to remote.
 ## Step 7: Report
 
 Present a summary of what was done:
-- [ ] Branch freshness: [current with main / merged N commits from main / auto-resolved conflicts in: <files> / behind main (user skipped merge)]
+- [ ] Branch freshness: [current with <default-branch> / merged N commits from <default-branch> / auto-resolved conflicts in: <files> / behind <default-branch> (user skipped merge)]
 - [ ] Documentation: [updated / no changes needed]
 - [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed]
 - [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
