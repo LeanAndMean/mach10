@@ -150,6 +150,10 @@ After the user approves the plan:
    - `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
    - The full implementation plan
    - The staged breakdown
+   - A `## Decision Log` section appended after the staged breakdown. This section captures the reasoning behind key decisions made during planning:
+     - **Clarifying Questions (Step 4):** For each question asked and answered, include the question and a synthesized answer. Only include exchanges where the answer changed or constrained the plan. Omit exchanges where the user confirmed a default or said "whatever you think is best."
+     - **Architecture Choice (Step 5):** The selected approach, the rationale for choosing it, and the alternatives considered with brief reasons for rejection.
+     - **Omission condition:** Skip the Decision Log section entirely if Step 4 produced no questions AND Step 5 had no meaningful differentiation between approaches (e.g., only one viable approach existed).
    - A note that this comment will guide staged implementation
 
 2. **Create a feature branch**:
