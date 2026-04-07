@@ -96,7 +96,7 @@ If an assessment comment was also retrieved in Step 2, append it:
 
 ## Step 5: After Fixes
 
-Once fixes are complete, the user will typically run `/mach10:push` to commit, push, and document the fixes on the PR.
+Once fixes are complete, suggest: "Next: `/mach10:push` to commit, push, and document the fixes on the PR."
 
 ## Important Notes
 
