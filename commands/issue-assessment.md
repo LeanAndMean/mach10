@@ -60,6 +60,20 @@ Based on your understanding of the issue and codebase, present your assessment t
 5. **Scope**: Your assessment of the size and complexity of the work.
 6. **Risks**: Potential pitfalls, edge cases, or architectural concerns.
 
+## Step 4a: Track Interaction Findings
+
+From this point forward through Step 6, track any substantive findings that emerge from your interaction with the user. These include:
+
+- **Reframed problems**: The user corrects or reframes the issue's core problem
+- **Resolved ambiguities**: Answers to open questions surfaced in Step 4
+- **Discovered constraints**: New requirements or limitations that weren't in the issue
+- **Shifted root causes**: Evidence that the actual problem differs from what the issue describes
+- **Action rationale**: Why the user chose a particular action in Step 5, or why they requested modifications in Step 6
+
+This is a persistent instruction, not a one-time snapshot. Continue tracking through Step 5 (action selection) and Step 6 (drafting, modification loops, and approval). Findings are carried forward to Step 6, where they are included in the content posted to GitHub so they persist for future sessions.
+
+Do not manufacture findings. If the interaction is straightforward and produces no substantive findings beyond what is already captured in the assessment, that is fine -- Step 6 will skip the Assessment Notes section entirely.
+
 ## Step 5: Recommend Next Step
 
 Based on your assessment, present your findings and then use `AskUserQuestion` to let the user select the next action:
@@ -103,9 +117,16 @@ If the user selects "Cancel":
    - Condensed Gaps from Step 4 (2-3 sentences)
    - Keep the entire comment body under 15 lines
 
-   When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
-
 After the user approves:
+
+If Step 4a produced substantive findings, append an `## Assessment Notes` section to the content before posting. Use freeform format -- a narrative paragraph or tight bullet list, whichever fits the findings naturally. If Step 4a produced no substantive findings, omit the section entirely (do not post an empty or placeholder section).
+
+Path-specific behavior for the Assessment Notes section:
+
+- **"Post a reply comment" or "Both"**: Append `## Assessment Notes` to the reply comment draft.
+- **"Update issue body" only**: Do not append Assessment Notes to the issue body -- the issue body is a shared artifact that should contain the problem description, not session-specific interaction history. First execute the body edit, then post a small follow-up comment containing only the `## Assessment Notes` section. Do not include a `<!-- mach10-decisions -->` marker on this comment -- it is primary-path content, not an audit stub.
+
+Execute the action:
 
 - **Update issue body**: `gh issue edit <issue-number> --body "..."`
 - **Post comment**: `gh issue comment <issue-number> --body "..."`
