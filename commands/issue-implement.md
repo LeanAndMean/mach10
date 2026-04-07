@@ -75,6 +75,20 @@ gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
 
 After the branch is confirmed (whether by checkout, silent match, or user confirmation), check for uncommitted changes with `git status --porcelain`. If the working tree is dirty, stop and tell the user to commit or stash their changes before proceeding.
 
+### Assign the issue
+
+After the branch is confirmed and the working tree is clean, assign the current user to the issue:
+
+1. Check existing assignees: `gh issue view <issue-number> --json assignees --jq '[.assignees[].login] | join(",")'`
+2. Check current user: `gh api user --jq .login`
+3. If the current user is already assigned, skip silently. This is the expected case when returning for subsequent stages after `issue-plan` already assigned the user.
+4. If there are no assignees, run `gh issue edit <issue-number> --add-assignee @me`.
+5. If other assignees exist (not including the current user), warn the user and use `AskUserQuestion` to ask how to proceed:
+   - **Add me**: "Add yourself as an additional assignee alongside the existing assignee(s)" -- run `gh issue edit <issue-number> --add-assignee @me`
+   - **Skip**: "Leave the current assignee(s) unchanged" -- no-op, continue
+   - **Replace**: "Remove existing assignee(s) and assign only yourself" -- run `gh issue edit <issue-number> --remove-assignee <existing-logins> --add-assignee @me`
+6. If the assignment command fails (e.g., insufficient permissions), warn the user in CLI output and continue -- assignment failure must not block the workflow.
+
 ## Step 3: Gather Context
 
 Read the issue title and body:
