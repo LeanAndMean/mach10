@@ -89,6 +89,35 @@ After the branch is confirmed and the working tree is clean, assign the current 
    - **Replace**: "Remove existing assignee(s) and assign only yourself" -- run `gh issue edit <issue-number> --remove-assignee <existing-logins> --add-assignee @me`
 6. If the assignment command fails (e.g., insufficient permissions), warn the user in CLI output and continue -- assignment failure must not block the workflow.
 
+### Assign sub-issues
+
+After the parent issue assignment, assign sub-issues to the current user:
+
+1. Detect sub-issues using the two-strategy approach:
+
+   - **Strategy A (API):** First resolve the repository identifier, then query the GitHub sub-issues API:
+     ```
+     REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+     gh api repos/$REPO/issues/<issue-number>/sub_issues --jq '.[].number'
+     ```
+     - If the API call **succeeds and returns one or more numbers**, use them as the confirmed sub-issue list.
+     - If the API call **succeeds but returns no results** (empty array), the issue has no sub-issues. Do NOT fall through to Strategy B -- treat the sub-issue list as empty.
+     - If the API call **fails** (e.g., 404, permission error, network timeout), proceed to Strategy B.
+
+   - **Strategy B (body-parse fallback):** This strategy runs only when Strategy A **failed**. Scan the issue body for sub-issue references. Match `#<number>` references that appear on GitHub task list lines -- lines beginning with optional whitespace followed by a list marker (`-`, `*`, or `+`) and a checkbox (`[ ]`, `[x]`, or `[X]`). Exclude any `#<number>` preceded by relational keywords: "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself.
+
+2. If sub-issues are found, get the current user login via `gh api user --jq .login` (reuse the value from the parent assignment step if already retrieved). For each sub-issue, check assignees via `gh issue view <sub-issue> --json assignees --jq '[.assignees[].login] | join(",")'`. Three paths:
+   - Current user already assigned: skip silently. This is the expected case when returning for subsequent stages after `issue-plan` already assigned sub-issues.
+   - No assignees: auto-assign with `gh issue edit <sub-issue> --add-assignee @me`
+   - Other assignees exist: collect into a "conflicting" list
+
+3. If the conflicting list is non-empty, use `AskUserQuestion` to ask the user how to proceed with a single bulk decision:
+   - **Add me**: "Add yourself as an additional assignee on all conflicting sub-issues" -- run `gh issue edit <sub-issue> --add-assignee @me` for each
+   - **Skip**: "Leave the current assignee(s) unchanged on all sub-issues" -- no-op
+   - **Replace**: "Remove existing assignee(s) and assign only yourself on all sub-issues" -- run `gh issue edit <sub-issue> --remove-assignee <existing-logins> --add-assignee @me` for each
+
+4. Assignment failures are non-blocking (warn and continue).
+
 ## Step 3: Gather Context
 
 Read the issue title and body:
