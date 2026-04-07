@@ -117,8 +117,6 @@ If the user selects "Cancel":
    - Condensed Gaps from Step 4 (2-3 sentences)
    - Keep the entire comment body under 15 lines
 
-   When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
-
 After the user approves:
 
 If Step 4a produced substantive findings, append an `## Assessment Notes` section to the content before posting. Use freeform format -- a narrative paragraph or tight bullet list, whichever fits the findings naturally. If Step 4a produced no substantive findings, omit the section entirely (do not post an empty or placeholder section).
@@ -126,7 +124,7 @@ If Step 4a produced substantive findings, append an `## Assessment Notes` sectio
 Path-specific behavior for the Assessment Notes section:
 
 - **"Post a reply comment" or "Both"**: Append `## Assessment Notes` to the reply comment draft.
-- **"Update issue body" only**: Do not append Assessment Notes to the issue body -- the issue body is a shared artifact that should contain the problem description, not session-specific interaction history. First execute the body edit, then post a small follow-up comment containing only the `## Assessment Notes` section. Do not include a `<!-- mach10-decisions -->` marker on this comment -- it is primary-path content, not an audit stub. When referring to numbered items in the Assessment Notes content, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+- **"Update issue body" only**: Do not append Assessment Notes to the issue body -- the issue body is a shared artifact that should contain the problem description, not session-specific interaction history. First execute the body edit, then post a small follow-up comment containing only the `## Assessment Notes` section. Do not include a `<!-- mach10-decisions -->` marker on this comment -- it is primary-path content, not an audit stub.
 
 Execute the action:
 
