@@ -43,6 +43,7 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 - **Always** include this instruction in the Skill invocation: "IMPORTANT: Do NOT use `run_in_background: true` when launching review agents. For parallel execution, launch multiple foreground Task calls in a single message instead."
 - **Always** include this instruction in the Skill invocation: "You are authorized to use review-relevant agents from any installed plugin, not just the agents bundled with pr-review-toolkit. When launching review agents in parallel, also include any domain-relevant agents from other installed plugins that would provide useful analysis for the PR content (e.g., plugin-dev:skill-reviewer when reviewing skill definitions, plugin-dev:plugin-validator when reviewing plugin code). Only include supplementary agents when they are relevant to the content being reviewed."
 - **Always** include this instruction in the Skill invocation: "If the PR has a linked issue (look for issue references like 'Fixes #N', 'Closes #N', 'Resolves #N', 'Part of #N', 'Issue #N', or a bare '#N' in the PR description), include the `feature-completeness-checker` agent alongside the other review agents. This agent verifies that the PR fully implements the requirements from the linked issue's acceptance criteria and implementation plan. Do not launch this agent if no linked issue is detected."
+- **Always** include this instruction in the Skill invocation: "Label each Critical and Important finding with a sequential F-prefixed identifier (F1, F2, F3, ...) numbered continuously across both sections. Label each Suggestion with a sequential S-prefixed identifier (S1, S2, S3, ...) using a separate counter. Use bold prefixes in the output (e.g., `**F1:** Missing null check`, `**S1:** Consider extracting helper`)."
 
 Let the review complete fully. Do NOT attempt to fix any issues — this session is for review only.
 
@@ -57,12 +58,13 @@ gh pr comment <pr-number> --body "..."
 The comment must include:
 - `<!-- mach10-review -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
 - The complete review findings (Critical, Important, Suggestions, Strengths), including any findings from supplementary agents merged into the appropriate severity categories with inline source attribution (e.g., "per plugin-dev:skill-reviewer")
+- F/S identifiers on every finding -- Critical and Important findings use `F<n>` numbered sequentially across both sections, Suggestions use `S<n>` with a separate counter (e.g., `**F1:** ...`, `**F2:** ...`, `**S1:** ...`)
 - Model attribution at the bottom (e.g., "Reviewed by Claude Opus 4.6")
 - A note that this is an automated review
 
 Format the comment as a well-structured markdown document that can serve as input to a future `/mach10:pr-review-fix` session.
 
-When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 After posting, retrieve the URL of the review comment:
 
@@ -86,13 +88,13 @@ The subagent prompt should instruct it to:
 
 1. Review the PR title, body, and all existing comments. Note any findings that have already been discussed, resolved, or deferred in the PR conversation.
 2. For each review finding, **read the actual code** referenced and **independently verify** whether the issue exists.
-3. Classify each finding as one of:
+3. Classify each finding using its F/S identifier from the review comment (e.g., "F1 -- Genuine", "S2 -- Nitpick"). Classify as one of:
    - **Genuine issue** — Real problem that should be fixed before merge. Explain why.
    - **Nitpick** — Stylistic preference or minor point that doesn't affect correctness or maintainability. Explain why it doesn't matter.
    - **False positive** — The reviewer flagged something that isn't actually an issue. Explain why the code is correct.
    - **Deferred** — Real issue but out of scope for this PR. Should be tracked separately.
    - If a finding was already fixed in a subsequent commit or resolved in discussion, classify it as **False positive** with a note that it has been addressed. If explicitly deferred in discussion, classify it as **Deferred** and reference the relevant comment.
-4. After classifying all findings, produce a **staged implementation plan** covering everything worth fixing:
+4. After classifying all findings, produce a **staged implementation plan** covering everything worth fixing. Reference findings by their F/S identifiers (e.g., "stage 1 addresses F1 and F3"):
    - Number each stage with a descriptive name.
    - Required stages for genuine issues (must fix before merge).
    - Optional stages for nitpicks (nice-to-have improvements).
@@ -120,7 +122,7 @@ gh pr view <pr-number> --json comments --jq '.comments[-1].url'
 
 Extract the numeric comment ID from the URL (the number after `issuecomment-`). You will need this numeric ID in Step 9.
 
-When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 ## Step 7: Present CLI Summary
 
@@ -172,7 +174,7 @@ For each approved deferred item, check for existing issues before creating a new
    - If ambiguous matches exist, append: "Potentially related: <list of matched issue numbers and titles>"
    - Any relevant labels
 
-When referring to numbered items (findings, suggestions, stages) in the issue body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 After processing all deferred items, display a summary block in CLI output listing each item and the action taken:
 - **Created**: Issue was created (include the new issue number and URL)
@@ -200,7 +202,7 @@ Comment format:
 
 **Guard:** Skip this comment entirely if zero findings were classified as deferred.
 
-When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 ## Step 9: Recommend Next Steps
 
@@ -211,7 +213,7 @@ First, display the comment IDs for reference:
 - Assessment comment ID: `<assessment-comment-id from Step 6>`
 
 Then, based on the assessment:
-- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <issue-numbers>` (only the genuine issues)"
+- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <findings>` (e.g., F1 F3 S2 -- only the genuine issues)"
 - If all findings are nitpicks/false positives (with or without deferred items): "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
 
 ## Important

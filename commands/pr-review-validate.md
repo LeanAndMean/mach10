@@ -68,7 +68,7 @@ For each finding in the most recent review:
 
 1. **Read the actual code** referenced by the finding. Do not rely on the review's description alone.
 2. **Verify independently** whether the issue exists.
-3. **Classify** each finding as one of:
+3. **Classify** each finding using its F/S identifier from the review comment (e.g., "F1 -- Genuine", "S2 -- Nitpick"). Classify as one of:
    - **Genuine issue** — Real problem that should be fixed before merge. Explain why.
    - **Nitpick** — Stylistic preference or minor point that does not affect correctness or maintainability. Explain why it does not matter.
    - **False positive** — The reviewer flagged something that is not actually an issue. Explain why the code is correct.
@@ -107,7 +107,7 @@ Comment format:
 - Finding counts from Step 4 (e.g., "Findings: 2 genuine, 1 nitpick, 0 false positives, 1 deferred")
 - Keep the entire comment body to 5 lines or fewer
 
-When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 After the user approves, post a reply comment on the PR documenting:
 
@@ -116,7 +116,7 @@ After the user approves, post a reply comment on the PR documenting:
 - Which findings are not being addressed, with clear reasoning for each
 - Any new issues created for deferred items
 
-When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 ```
 gh pr comment <pr-number> --body "..."
@@ -141,8 +141,11 @@ First, if an assessment comment was posted and its ID was captured, display the 
 - Assessment comment ID: `<assessment-comment-id from Step 5>`
 
 Then, based on the assessment, recommend next step to the user:
-- If genuine issues remain and both comment IDs are known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <issue-numbers>`"
-- If genuine issues remain and only the review comment ID is known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> <issue-numbers>`"
-- If genuine issues remain but no comment IDs are available: "`/clear` then `/mach10:pr-review-fix <pr-number> <issue-numbers>`"
+- If genuine issues remain and both comment IDs are known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <findings>`"
+- If genuine issues remain and only the review comment ID is known: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> <findings>`"
+- If genuine issues remain but no comment IDs are available: "`/clear` then `/mach10:pr-review-fix <pr-number> <findings>`"
+
+`<findings>` is a space-separated list of finding identifiers from the review comment (e.g., `F1 F2 S3`). Include only the genuine issues.
+
 - If only deferred items: "Create issues with `/mach10:issue-create`, then `/clear` and `/mach10:pr-pre-merge <pr-number>`"
 - If clean: "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
