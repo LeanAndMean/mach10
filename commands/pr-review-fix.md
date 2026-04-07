@@ -1,6 +1,6 @@
 ---
 description: Fix specific issues from a PR review using feature-dev
-argument-hint: <pr-number> [--review-comment <id>] [--assessment-comment <id>] [issue-numbers] [context]
+argument-hint: <pr-number> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write, Skill, AskUserQuestion
 model: opus
 ---
@@ -17,16 +17,16 @@ The user's input typically contains:
 - A **PR number** (required)
 - **`--review-comment <id>`** flag with a numeric comment ID (optional)
 - **`--assessment-comment <id>`** flag with a numeric comment ID (optional)
-- **Issue numbers to fix** from the review (optional)
+- **Finding identifiers to fix** -- space-separated F/S identifiers (e.g., `F1 F2 S3`) or bare numbers as fallback (optional)
 - Additional context or constraints (optional)
 
 Example inputs:
 - `108` (PR only -- read the PR and determine which review findings to fix)
-- `108 1,2,3`
-- `108 --review-comment 1234567890 --assessment-comment 1234567891 1,2,3`
-- `108 --review-comment 1234567890 1,2,3 focus on error handling`
+- `108 F1 F2 S3`
+- `108 --review-comment 1234567890 --assessment-comment 1234567891 F1 F2 S3`
+- `108 --review-comment 1234567890 F1 S2 focus on error handling`
 
-Extract the PR number. Parse `--review-comment` and `--assessment-comment` flags if present (each followed by a numeric ID). If issue numbers are provided, note them. If the input is ambiguous, ask the user to clarify.
+Extract the PR number. Parse `--review-comment` and `--assessment-comment` flags if present (each followed by a numeric ID). If finding identifiers are provided (F/S prefixed or bare numbers), note them. If the input is ambiguous, ask the user to clarify.
 
 ## Step 2: Gather Context
 
@@ -68,17 +68,17 @@ Save the review comment content for use in Step 4.
 
 ## Step 3: Identify Issues to Fix
 
-**If issue numbers were provided in the input:**
-- Extract those specific issues from the review comment.
+**If finding identifiers were provided in the input:**
+- Match identifiers against the F/S labels in the review comment (e.g., `F1` matches `**F1:**`). If bare numbers were given, match by sequential position across Critical and Important sections. If the review comment lacks F/S labels (e.g., older reviews), fall back to matching by ordinal position within each severity section. Extract the full finding descriptions.
 
-**If only a PR number was provided with no specific issue numbers:**
+**If only a PR number was provided with no specific finding identifiers:**
 - Present all review findings to the user, organized by severity.
 - Recommend which to fix in this session using batch sizing heuristics:
   - **Simple one-line fixes:** up to ~10 at once
   - **Moderate fixes:** ~6 at a time
   - **Deep or complex fixes:** no more than ~3 at a time
   - Group similar issues together
-- Use `AskUserQuestion` with `multiSelect: true` to let the user select which issues to fix. If there are 4 or fewer findings, list each as a separate option. If there are more than 4 findings, group them by severity as options (e.g., "All critical findings (3)", "All important findings (5)"). The built-in "Other" option allows the user to specify individual issue numbers if they prefer a custom selection.
+- Use `AskUserQuestion` with `multiSelect: true` to let the user select which issues to fix. If there are 4 or fewer findings, list each as a separate option. If there are more than 4 findings, group them by severity as options (e.g., "All critical findings (3)", "All important findings (5)"). The built-in "Other" option allows the user to specify individual finding identifiers (e.g., F1 S3) if they prefer a custom selection.
 
 ## Step 4: Delegate to Feature Dev
 
