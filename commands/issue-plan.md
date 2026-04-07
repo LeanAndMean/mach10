@@ -162,8 +162,19 @@ After the user approves the plan:
    - Example: `feature/issue-55-fix-analytics-url`
    - Push the branch to remote with `-u` flag
 
+3. **Assign the issue** to the current user:
+   - Check existing assignees: `gh issue view <issue-number> --json assignees --jq '[.assignees[].login] | join(",")'`
+   - Check current user: `gh api user --jq .login`
+   - If the current user is already assigned, skip silently.
+   - If there are no assignees, run `gh issue edit <issue-number> --add-assignee @me`.
+   - If other assignees exist (not including the current user), warn the user and use `AskUserQuestion` to ask how to proceed:
+     - **Add me**: "Add yourself as an additional assignee alongside the existing assignee(s)" -- run `gh issue edit <issue-number> --add-assignee @me`
+     - **Skip**: "Leave the current assignee(s) unchanged" -- no-op, continue
+     - **Replace**: "Remove existing assignee(s) and assign only yourself" -- run `gh issue edit <issue-number> --remove-assignee <existing-logins> --add-assignee @me`
+   - If the assignment command fails (e.g., insufficient permissions), warn the user in CLI output and continue -- assignment failure must not block the workflow.
+
 When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-Confirm both actions to the user.
+Confirm all three actions to the user (plan posted, branch created, issue assigned).
 
 **CLI output only (do NOT include in the GitHub comment):** Let the user know the next steps are `/clear` then optionally `/mach10:issue-plan-review <issue-number>` to review the plan, or `/mach10:issue-implement <issue-number> 1` to begin Stage 1 of the implementation in a fresh session.
