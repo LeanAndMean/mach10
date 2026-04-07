@@ -202,7 +202,7 @@ Session 5:  /mach10:issue-implement 55 2
             /mach10:push
 Session 6:  /mach10:pr-create 55
 Session 7:  /mach10:pr-review 108
-Session 8:  /mach10:pr-review-fix 108 1,2,3
+Session 8:  /mach10:pr-review-fix 108 F1 F2 F3
             /mach10:push
 Session 9:  /mach10:pr-review 108
 Session 10: /mach10:pr-ci-fix 108
