@@ -179,7 +179,7 @@ This is an iterative cycle: review in one session, fix in the next, re-review, r
 
 If CI fails after a fix, use `pr-ci-fix` to diagnose and resolve the failure.
 
-**Your role:** Read the assessment after each review. Direct which genuine issues to fix and which deferred items to track as new issues. The assessment does the triage for you, but you make the final call.
+**Your role:** Read the assessment after each review. Direct which genuine issues to fix, which deferred items to track as new issues, and which deferred items to reclassify as genuine for fixing in the current PR. The assessment does the triage for you, but you make the final call.
 
 ### Phase 7: Merge
 
