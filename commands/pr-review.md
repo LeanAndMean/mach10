@@ -142,12 +142,13 @@ After the per-finding list and summary counts, display the staged implementation
 If any findings were classified as **deferred**, use `AskUserQuestion` to ask the user how to handle them:
 
 - **Create issues for all**: "Create a GitHub issue for every deferred finding"
-- **Select which ones**: "Choose which deferred findings to create issues for"
-- **Skip deferred items**: "Do not create issues for deferred findings"
+- **Reclassify all as genuine**: "Mark all deferred items as genuine so they can be fixed in this PR"
+- **Decide per finding**: "Choose what to do with each deferred finding individually"
+- **Skip deferred items**: "Do not create issues or reclassify any deferred findings"
 
-If the user selects "Select which ones", present the deferred findings and use `AskUserQuestion` with `multiSelect: true` to let them choose (group into severity-based options if more than 4 items, with the built-in "Other" option for custom selection).
+### Option 1: Create issues for all
 
-For each approved deferred item, check for existing issues before creating a new one:
+For each deferred item, check for existing issues before creating a new one:
 
 1. Extract 2-3 key terms from the proposed issue title and search:
 
@@ -174,17 +175,72 @@ For each approved deferred item, check for existing issues before creating a new
    - If ambiguous matches exist, append: "Potentially related: <list of matched issue numbers and titles>"
    - Any relevant labels
 
-Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
-
-After processing all deferred items, display a summary block in CLI output listing each item and the action taken:
+After processing, display a summary block in CLI output listing each item and the action taken:
 - **Created**: Issue was created (include the new issue number and URL)
 - **Skipped (duplicate)**: Matched an existing issue (include the existing issue number and the link comment URL)
 - **Created (with overlap note)**: Issue was created with a note about potentially related issues
-- **Skipped (not selected)**: User chose not to create an issue for this finding
+
+Then proceed to **Persist Deferred-Item Decisions** below.
+
+### Option 2: Reclassify all as genuine
+
+Update the assessment comment to change the classification of every deferred item from "Deferred" to "Genuine". Also update the staged implementation plan within the assessment comment to incorporate the reclassified items.
+
+1. Retrieve the current assessment comment body:
+
+   ```
+   gh api repos/:owner/:repo/issues/comments/<assessment-comment-id> --jq .body
+   ```
+
+2. In the comment body, for each deferred item, change its classification from "Deferred" to "Genuine".
+
+3. Update the staged implementation plan to include the reclassified items — add them to the appropriate existing stage if they fit, or create a new stage for them.
+
+4. Write the updated body back:
+
+   ```
+   gh api repos/:owner/:repo/issues/comments/<assessment-comment-id> --method PATCH --raw-field body="<updated-body>"
+   ```
+
+After the update, display a CLI summary block listing each reclassified item by its F/S identifier:
+- **Reclassified as genuine**: Item was marked as genuine and will be included in the fix handoff
+
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
+
+All reclassified items join the genuine findings list for the Step 9 handoff. Skip the decision comment — no deferred items remain to record.
+
+### Option 3: Decide per finding
+
+Present each deferred finding one at a time (in F/S identifier order) via `AskUserQuestion` with three options:
+
+- **Create issue**: "Create a GitHub issue for this finding"
+- **Mark as genuine**: "Reclassify as genuine to fix in this PR"
+- **Skip**: "Do nothing with this finding"
+
+After all items are processed:
+
+1. **Reclassified items**: If any items were marked as genuine, follow the assessment-comment update procedure described in Option 2 (retrieve, update classifications from "Deferred" to "Genuine", update the staged implementation plan, and PATCH) — apply all reclassified items in a single PATCH call.
+
+   Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
+
+2. **Issue creation**: For items marked "Create issue", run the duplicate-detection and issue-creation flow described in Option 1.
+
+3. **Summary block**: Display a CLI summary listing each deferred item and the action taken:
+   - **Reclassified as genuine**: Item was marked as genuine and will be included in the fix handoff
+   - **Created**: Issue was created (include the new issue number and URL)
+   - **Skipped (duplicate)**: Matched an existing issue (include the existing issue number and the link comment URL)
+   - **Created (with overlap note)**: Issue was created with a note about potentially related issues
+   - **Skipped**: User chose to skip this finding
+
+4. If any items remained deferred (created as issue, skipped as duplicate, or skipped), proceed to **Persist Deferred-Item Decisions** below. If all items were reclassified as genuine, skip the decision comment.
+
+### Option 4: Skip deferred items
+
+No issues created, no reclassification. Skip the decision comment entirely.
 
 ### Persist Deferred-Item Decisions
 
-After displaying the summary block, post a decision comment on the PR to record the disposition of each deferred item for future sessions:
+After displaying the summary block (Options 1 and 3 only, and only when at least one item remained deferred), post a decision comment on the PR to record the disposition of each deferred item for future sessions:
 
 ```
 gh pr comment <pr-number> --body "..."
@@ -197,10 +253,9 @@ Comment format:
   - Created as issue (with issue number) — user selected "Create" for this item
   - Created as issue with overlap note (with issue number and related issue numbers) — user selected "Create" but potentially related issues were found
   - Skipped as duplicate (with existing issue number) — matched an existing issue during duplicate check
-  - Skipped (not selected) (with one-sentence rationale if the user provided one) — user chose "Skip deferred items" or did not select this item in "Select which ones"
+  - Skipped (not selected) (with one-sentence rationale if the user provided one) — user chose to skip this item
+  - Reclassified as genuine — item was reclassified and will be addressed in the fix handoff (Option 3 only)
 - Keep the entire comment body under 20 lines
-
-**Guard:** Skip this comment entirely if zero findings were classified as deferred.
 
 Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
@@ -212,8 +267,8 @@ First, display the comment IDs for reference:
 - Review comment ID: `<review-comment-id from Step 4>`
 - Assessment comment ID: `<assessment-comment-id from Step 6>`
 
-Then, based on the assessment:
-- If genuine issues remain: "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <findings>` (e.g., F1 F3 S2 -- only the genuine issues)"
+Then, based on the assessment (including any items reclassified as genuine in Step 8):
+- If genuine issues remain (including reclassified items): "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <findings>` (e.g., F1 F3 S2 -- all genuine issues, interleaved in F/S identifier order)"
 - If all findings are nitpicks/false positives (with or without deferred items): "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
 
 ## Important
