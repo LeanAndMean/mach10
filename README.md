@@ -219,9 +219,9 @@ Session 14: /mach10:pr-merge 108
 
 **Requirements:**
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
-- [feature-dev](https://github.com/anthropics/claude-code-plugins) plugin (required by `/issue-plan`, `/issue-implement`, `/pr-review-fix`, `/pr-ci-fix`)
-- [pr-review-toolkit](https://github.com/anthropics/claude-code-plugins) plugin (required by `/pr-review`)
+- [Claude Code CLI](https://code.claude.com/docs)
+- `feature-dev` plugin (install: `/plugin install feature-dev@claude-plugins-official`) -- required by `/issue-plan`, `/issue-implement`, `/pr-review-fix`, `/pr-ci-fix`
+- `pr-review-toolkit` plugin (install: `/plugin install pr-review-toolkit@claude-plugins-official`) -- required by `/pr-review`
 - `gh` CLI authenticated with your GitHub account
 
 **From the CLI:**
