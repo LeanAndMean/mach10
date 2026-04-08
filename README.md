@@ -12,7 +12,7 @@ In agentic coding, the AI is not an autocomplete engine -- it is an active colla
 
 This changes the failure mode. The bottleneck is no longer typing speed or syntax recall -- it is context management. LLM context windows are finite. A deep code review can consume most of the available context, leaving little room for implementation. Multi-session feature development requires persistent memory across sessions. And without a structured workflow, agentic coding produces inconsistent results: missed edge cases, orphaned TODOs, reviews that never converge.
 
-Mach 10 is a methodology that addresses these constraints directly: fresh sessions for each step, GitHub as persistent memory, staged implementation, and iterative review-fix cycles. This repository contains a Claude Code plugin that codifies the methodology into 15 slash commands, but the methodology stands on its own -- you can follow it manually with any agentic coding tool.
+Mach 10 is a methodology that addresses these constraints directly: fresh sessions for each step, GitHub as persistent memory, staged implementation, and iterative review-fix cycles. This repository contains a Claude Code plugin that codifies the methodology into 14 slash commands, but the methodology stands on its own -- you can follow it manually with any agentic coding tool.
 
 Because the methodology builds entirely on standard developer practices -- issues, PRs, comments, feature branches, frequent commits -- there is no vendor lock-in. Every artifact Mach 10 produces is a normal GitHub artifact. If you stop using the plugin, you're left with well-documented issues, structured PRs, and a clean commit history. Nothing is stored in a proprietary format or locked behind a tool-specific layer.
 
@@ -258,7 +258,6 @@ claude --plugin-dir /path/to/mach10
 | `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
 | `/mach10:pr-review-fix <pr> [findings]` | Fix specific review findings via feature-dev |
 | `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
-| `/mach10:pr-review-validate <pr>` | Standalone: independently assess review findings without re-running the review |
 | `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
 | `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests) |
 | `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
