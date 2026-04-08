@@ -202,6 +202,8 @@ Update the assessment comment to change the classification of every deferred ite
    gh api repos/:owner/:repo/issues/comments/<assessment-comment-id> --method PATCH --raw-field body="<updated-body>"
    ```
 
+Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
+
 All reclassified items join the genuine findings list for the Step 9 handoff. Skip the decision comment — no deferred items remain to record.
 
 ### Option 3: Decide per finding
@@ -215,6 +217,8 @@ Present each deferred finding one at a time (in F/S identifier order) via `AskUs
 After all items are processed:
 
 1. **Reclassified items**: If any items were marked as genuine, update the assessment comment in a single PATCH — change classifications from "Deferred" to "Genuine" and update the staged implementation plan to incorporate them.
+
+   Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 2. **Issue creation**: For items marked "Create issue", run the duplicate-detection and issue-creation flow described in Option 1.
 
