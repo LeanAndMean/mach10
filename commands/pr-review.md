@@ -247,6 +247,7 @@ Comment format:
   - Created as issue with overlap note (with issue number and related issue numbers) — user selected "Create" but potentially related issues were found
   - Skipped as duplicate (with existing issue number) — matched an existing issue during duplicate check
   - Skipped (not selected) (with one-sentence rationale if the user provided one) — user chose to skip this item
+  - Reclassified as genuine — item was reclassified and will be addressed in the fix handoff (Option 3 only)
 - Keep the entire comment body under 20 lines
 
 Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
