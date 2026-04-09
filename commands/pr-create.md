@@ -60,7 +60,12 @@ For complex changes, use your Read and Grep tools to examine specific modified f
    gh issue view <issue-number>
    ```
    If this fails (issue not found, permission denied, etc.), report the error to the user. Do NOT proceed without the issue when the user explicitly provided an issue number.
-2. If no issue number was provided, try to infer one from the branch name (e.g., `feature/issue-55-*`, `fix/issue-23-*`, or `55-some-description`). If found, read that issue.
+   Then read all comments (`--comments` returns only comments and silently drops the title and body, so both calls are required):
+   ```
+   gh issue view <issue-number> --comments
+   ```
+   Comment content (implementation plans, decisions, assessment findings, progress notes) should inform the Summary bullets and Test plan when drafting the PR, but should not be copy-pasted verbatim into the PR body.
+2. If no issue number was provided, try to infer one from the branch name (e.g., `feature/issue-55-*`, `fix/issue-23-*`, or `55-some-description`). If found, read that issue and its comments using the same two-call approach as above.
 3. If no issue can be identified, proceed without one.
 
 **Sub-issue detection:**
@@ -70,13 +75,13 @@ If an issue was identified, detect any sub-issues so closing keywords can be inc
 1. **Strategy A (API):** First resolve the repository identifier, then query the GitHub sub-issues API:
    ```
    REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
-   gh api repos/$REPO/issues/<issue-number>/sub_issues --jq '.[].number'
+   gh api --paginate repos/$REPO/issues/<issue-number>/sub_issues --jq '.[] | {number, state}'
    ```
-   - If the API call **succeeds and returns one or more numbers**, use them as the confirmed sub-issue list.
+   - If the API call **succeeds and returns one or more results**, use them as the confirmed sub-issue list (each entry includes both the issue number and its state).
    - If the API call **succeeds but returns no results** (empty array), the issue has no sub-issues. Do NOT fall through to Strategy B -- treat the sub-issue list as empty.
    - If the API call **fails** (e.g., 404, permission error, network timeout), proceed to Strategy B.
 
-2. **Strategy B (body-parse fallback):** This strategy runs only when the API call in Strategy A failed. Scan the issue body for sub-issue references. Match `#<number>` references that appear on GitHub task list lines -- lines beginning with optional whitespace followed by a list marker (`-`, `*`, or `+`) and a checkbox (`[ ]`, `[x]`, or `[X]`). Exclude any `#<number>` preceded by relational keywords: "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself. Use these as candidate sub-issues. Note: this fallback is less reliable than the API -- flag these as candidates when presenting the draft (see Step 3).
+2. **Strategy B (body-parse fallback):** This strategy runs only when the API call in Strategy A failed. Scan the issue body for sub-issue references. Match `#<number>` references that appear on GitHub task list lines -- lines beginning with optional whitespace followed by a list marker (`-`, `*`, or `+`) and a checkbox (`[ ]`, `[x]`, or `[X]`). Exclude any `#<number>` preceded by relational keywords: "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself. Use these as candidate sub-issues. Note: this fallback is less reliable than the API -- flag these as candidates when presenting the draft (see Step 3). After collecting the candidate list, query each sub-issue's state individually: `gh issue view <N> --json state --jq .state`. If the state query fails for a sub-issue, treat it as open.
 
 3. If Strategy A returned an empty result or Strategy B yielded no matches, the sub-issue list is empty.
 
@@ -106,7 +111,7 @@ Generated with [Claude Code](https://claude.com/claude-code)
 **Closing keywords inclusion rule:**
 - **No issue identified:** Omit all closing keywords.
 - **Issue without sub-issues:** Include only `Fixes #<issue-number>`.
-- **Issue with sub-issues:** Include `Fixes #<issue-number>` for the parent, followed by one `Fixes #<N>` line for each sub-issue. When presenting the draft, tell the user they can remove unwanted closing keywords via the "Modify" option (e.g., if this PR only addresses some of the sub-issues). If the sub-issues were detected via Strategy B (body-parse fallback), note this to the user so they can verify the list is correct.
+- **Issue with sub-issues:** Include `Fixes #<issue-number>` for the parent, followed by one `Fixes #<N>` line for each sub-issue. If any sub-issues are already closed, present a note above the `Fixes` lines listing those sub-issues and their closed state (adding `Fixes` for an already-closed issue is harmless but adds noise). When presenting the draft, tell the user they can remove unwanted closing keywords via the "Modify" option (e.g., for already-closed sub-issues, or if this PR only addresses some of the sub-issues). If the sub-issues were detected via Strategy B (body-parse fallback), note this to the user so they can verify the list is correct.
 
 - When referring to numbered items (findings, suggestions, stages) in the body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs. (`Fixes #<issue-number>` is an intentional GitHub reference and should be kept as-is.)
 - If the user provided additional context in $ARGUMENTS, incorporate it into the summary or test plan as appropriate.

@@ -40,7 +40,7 @@ Build a picture of what changed in the PR:
    ```
    gh pr view <pr-number>
    ```
-   Then read all comments (`--comments` returns only comments and silently drops the title and description, so both calls are required):
+   Then read all comments (`--comments` returns only comments and silently drops the title and body, so both calls are required):
    ```
    gh pr view <pr-number> --comments
    ```

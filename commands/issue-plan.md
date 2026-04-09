@@ -180,7 +180,7 @@ After the user approves the plan:
    - **Strategy A (API):** First resolve the repository identifier, then query the GitHub sub-issues API:
      ```
      REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
-     gh api repos/$REPO/issues/<issue-number>/sub_issues --jq '.[].number'
+     gh api --paginate repos/$REPO/issues/<issue-number>/sub_issues --jq '.[].number'
      ```
      - If the API call **succeeds and returns one or more numbers**, use them as the confirmed sub-issue list.
      - If the API call **succeeds but returns no results** (empty array), the issue has no sub-issues. Do NOT fall through to Strategy B -- treat the sub-issue list as empty.
