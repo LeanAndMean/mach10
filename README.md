@@ -173,7 +173,7 @@ Create a PR linking back to the issue with a structured description summarizing 
 
 ### Phase 6: Review-fix cycle
 
-**Commands:** `/mach10:pr-review <pr>`, `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings]`, `/mach10:pr-ci-fix <pr>`
+**Commands:** `/mach10:pr-review <pr>`, `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]`, `/mach10:pr-ci-fix <pr>`
 
 This is an iterative cycle: review in one session, fix in the next, re-review, repeat. Each review posts its findings as a PR comment, then independently assesses every finding to classify it as genuine, nitpick, false positive, or deferred. The assessment includes a staged implementation plan that groups genuine issues into required stages and nitpicks into optional stages, giving you a ready-made fix list for the next session. The assessment serves as the convergence signal -- when all remaining findings are nitpicks or false positives, the PR is ready to merge.
 
