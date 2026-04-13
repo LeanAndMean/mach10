@@ -1,7 +1,7 @@
 ---
 description: Run a comprehensive PR review, post results, then independently assess each finding
 argument-hint: <pr-number> [aspects] [context]
-allowed-tools: Bash, Read, Grep, Glob, Task, Skill, AskUserQuestion
+allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Skill, AskUserQuestion
 model: opus
 ---
 
@@ -34,7 +34,21 @@ gh pr checkout <pr-number>
 git pull
 ```
 
+## Task Setup
+
+Create all 5 progress-tracking tasks upfront using `TaskCreate`. All tasks start as `pending`. Store each returned task ID for use in later `TaskUpdate` calls -- do not assume IDs are sequential.
+
+| Task | Subject | activeForm |
+|------|---------|------------|
+| T1 | Run PR review via pr-review-toolkit | Running PR review |
+| T2 | Post review comment | Posting review comment |
+| T3 | Run independent assessment | Running independent assessment |
+| T4 | Post assessment and present summary | Posting assessment |
+| T5 | Handle deferred items and recommend next steps | Handling deferred items |
+
 ## Step 3: Run Review
+
+Mark T1 as `in_progress` using `TaskUpdate`.
 
 Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate context:
 
@@ -47,7 +61,11 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 
 Let the review complete fully. Do NOT attempt to fix any issues — this session is for review only.
 
+Mark T1 as `completed` using `TaskUpdate`.
+
 ## Step 4: Post Review
+
+Mark T2 as `in_progress` using `TaskUpdate`.
 
 After the review completes, post the full review results as a reply comment on the PR:
 
@@ -74,7 +92,11 @@ gh pr view <pr-number> --json comments --jq '.comments[-1].url'
 
 Note the full URL (you will need it in Step 6) and extract the numeric comment ID from it — the number after `issuecomment-` in the URL (e.g., if the URL ends with `#issuecomment-1234567890`, the comment ID is `1234567890`). You will need this numeric ID in Step 9.
 
+Mark T2 as `completed` using `TaskUpdate`.
+
 ## Step 5: Independent Assessment
+
+Mark T3 as `in_progress` using `TaskUpdate`.
 
 First, fetch the PR context so the assessment can account for prior discussion:
 
@@ -101,7 +123,11 @@ The subagent prompt should instruct it to:
    - Each stage should list the specific findings it addresses and which files are affected.
 5. Return all classifications (each with the original finding summary and 1-2 sentence reasoning referencing specific code), followed by the staged implementation plan produced in instruction (4) above.
 
+Mark T3 as `completed` using `TaskUpdate`.
+
 ## Step 6: Post Assessment
+
+Mark T4 as `in_progress` using `TaskUpdate`.
 
 Post the assessment immediately as a reply comment on the PR — do not ask the user for approval first. The comment must include:
 - `<!-- mach10-assessment -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
@@ -137,7 +163,11 @@ Summary counts: how many genuine, how many nitpicks, how many false positives, h
 
 After the per-finding list and summary counts, display the staged implementation plan so the user can identify which issues to address next without switching to GitHub.
 
+Mark T4 as `completed` using `TaskUpdate`.
+
 ## Step 8: Handle Deferred Items
+
+Mark T5 as `in_progress` using `TaskUpdate`.
 
 If any findings were classified as **deferred**, use `AskUserQuestion` to ask the user how to handle them:
 
@@ -270,6 +300,8 @@ First, display the comment IDs for reference:
 Then, based on the assessment (including any items reclassified as genuine in Step 8):
 - If genuine issues remain (including reclassified items): "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <findings>` (e.g., F1 F3 S2 -- all genuine issues, interleaved in F/S identifier order)"
 - If all findings are nitpicks/false positives (with or without deferred items): "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
+
+Mark T5 as `completed` using `TaskUpdate`.
 
 ## Important
 
