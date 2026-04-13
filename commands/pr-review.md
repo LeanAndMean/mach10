@@ -1,7 +1,7 @@
 ---
 description: Run a comprehensive PR review, post results, then independently assess each finding
 argument-hint: <pr-number> [aspects] [context]
-allowed-tools: Bash, Read, Grep, Glob, Task, Skill, AskUserQuestion
+allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Skill, AskUserQuestion
 model: opus
 ---
 
@@ -11,7 +11,7 @@ You are running a comprehensive review of a pull request, posting the results, t
 
 **User input:** $ARGUMENTS
 
-## Step 1: Parse Input
+## Step 0: Parse input and create task list
 
 The user's input typically contains:
 - A **PR number** (required)
@@ -23,9 +23,27 @@ Example inputs:
 - `108 error handling and test coverage`
 - `108 focus on the new API endpoints`
 
-Extract the PR number. If specific review aspects are mentioned, note them for Step 3. If the input is ambiguous, ask the user to clarify.
+Extract the PR number. If specific review aspects are mentioned, note them for Step 2. If the input is ambiguous, ask the user to clarify.
 
-## Step 2: Prepare
+After parsing input, create the progress-tracking task list. First, create the Step 0 task using `TaskCreate` and immediately mark it as `in_progress` using `TaskUpdate`. Then create the remaining 8 tasks, all starting as `pending`. Store each returned task ID for use in later `TaskUpdate` calls -- do not assume IDs are sequential.
+
+| Task | Subject | activeForm |
+|------|---------|------------|
+| Step 0 | Step 0: Parse input and create task list | Parsing input |
+| Step 1 | Step 1: Check out PR branch | Checking out PR branch |
+| Step 2 | Step 2: Run PR review | Running PR review |
+| Step 3 | Step 3: Post review comment | Posting review comment |
+| Step 4 | Step 4: Run independent assessment | Running independent assessment |
+| Step 5 | Step 5: Post assessment comment | Posting assessment |
+| Step 6 | Step 6: Present CLI summary | Presenting summary |
+| Step 7 | Step 7: Handle deferred items | Handling deferred items |
+| Step 8 | Step 8: Recommend next steps | Recommending next steps |
+
+Mark Step 0 as `completed` using `TaskUpdate`.
+
+## Step 1: Check out PR branch
+
+Mark Step 1 as `in_progress` using `TaskUpdate`.
 
 Ensure you are on the correct branch:
 
@@ -34,7 +52,11 @@ gh pr checkout <pr-number>
 git pull
 ```
 
-## Step 3: Run Review
+Mark Step 1 as `completed` using `TaskUpdate`.
+
+## Step 2: Run PR review
+
+Mark Step 2 as `in_progress` using `TaskUpdate`.
 
 Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate context:
 
@@ -47,7 +69,11 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 
 Let the review complete fully. Do NOT attempt to fix any issues — this session is for review only.
 
-## Step 4: Post Review
+Mark Step 2 as `completed` using `TaskUpdate`.
+
+## Step 3: Post review comment
+
+Mark Step 3 as `in_progress` using `TaskUpdate`.
 
 After the review completes, post the full review results as a reply comment on the PR:
 
@@ -72,9 +98,13 @@ After posting, retrieve the URL of the review comment:
 gh pr view <pr-number> --json comments --jq '.comments[-1].url'
 ```
 
-Note the full URL (you will need it in Step 6) and extract the numeric comment ID from it — the number after `issuecomment-` in the URL (e.g., if the URL ends with `#issuecomment-1234567890`, the comment ID is `1234567890`). You will need this numeric ID in Step 9.
+Note the full URL (you will need it in Step 5) and extract the numeric comment ID from it — the number after `issuecomment-` in the URL (e.g., if the URL ends with `#issuecomment-1234567890`, the comment ID is `1234567890`). You will need this numeric ID in Step 8.
 
-## Step 5: Independent Assessment
+Mark Step 3 as `completed` using `TaskUpdate`.
+
+## Step 4: Run independent assessment
+
+Mark Step 4 as `in_progress` using `TaskUpdate`.
 
 First, fetch the PR context so the assessment can account for prior discussion:
 
@@ -101,11 +131,15 @@ The subagent prompt should instruct it to:
    - Each stage should list the specific findings it addresses and which files are affected.
 5. Return all classifications (each with the original finding summary and 1-2 sentence reasoning referencing specific code), followed by the staged implementation plan produced in instruction (4) above.
 
-## Step 6: Post Assessment
+Mark Step 4 as `completed` using `TaskUpdate`.
+
+## Step 5: Post assessment comment
+
+Mark Step 5 as `in_progress` using `TaskUpdate`.
 
 Post the assessment immediately as a reply comment on the PR — do not ask the user for approval first. The comment must include:
 - `<!-- mach10-assessment -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
-- Reference the review comment it is assessing (link to the specific comment URL from Step 4)
+- Reference the review comment it is assessing (link to the specific comment URL from Step 3)
 - List each finding with its classification and reasoning
 - End with the staged implementation plan
 - Include model attribution at the bottom
@@ -120,11 +154,15 @@ After posting, retrieve the URL of the assessment comment:
 gh pr view <pr-number> --json comments --jq '.comments[-1].url'
 ```
 
-Extract the numeric comment ID from the URL (the number after `issuecomment-`). You will need this numeric ID in Step 9.
+Extract the numeric comment ID from the URL (the number after `issuecomment-`). You will need this numeric ID in Step 8.
 
 Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-## Step 7: Present CLI Summary
+Mark Step 5 as `completed` using `TaskUpdate`.
+
+## Step 6: Present CLI summary
+
+Mark Step 6 as `in_progress` using `TaskUpdate`.
 
 After posting, present the assessment to the user in CLI output:
 
@@ -137,7 +175,13 @@ Summary counts: how many genuine, how many nitpicks, how many false positives, h
 
 After the per-finding list and summary counts, display the staged implementation plan so the user can identify which issues to address next without switching to GitHub.
 
-## Step 8: Handle Deferred Items
+Mark Step 6 as `completed` using `TaskUpdate`.
+
+## Step 7: Handle deferred items
+
+Mark Step 7 as `in_progress` using `TaskUpdate`.
+
+If no findings were classified as deferred, mark Step 7 as `completed` and proceed directly to Step 8.
 
 If any findings were classified as **deferred**, use `AskUserQuestion` to ask the user how to handle them:
 
@@ -207,7 +251,7 @@ After the update, display a CLI summary block listing each reclassified item by 
 
 Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-All reclassified items join the genuine findings list for the Step 9 handoff. Skip the decision comment — no deferred items remain to record.
+All reclassified items join the genuine findings list for the Step 8 handoff. Skip the decision comment — no deferred items remain to record.
 
 ### Option 3: Decide per finding
 
@@ -259,17 +303,25 @@ Comment format:
 
 Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-## Step 9: Recommend Next Steps
+If any operation in Step 7 fails or is interrupted, proceed to Step 8 anyway to ensure the user receives the next-step recommendation.
+
+Mark Step 7 as `completed` using `TaskUpdate`.
+
+## Step 8: Recommend next steps
+
+Mark Step 8 as `in_progress` using `TaskUpdate`.
 
 **CLI output only (do NOT include in any GitHub comment).**
 
 First, display the comment IDs for reference:
-- Review comment ID: `<review-comment-id from Step 4>`
-- Assessment comment ID: `<assessment-comment-id from Step 6>`
+- Review comment ID: `<review-comment-id from Step 3>`
+- Assessment comment ID: `<assessment-comment-id from Step 5>`
 
-Then, based on the assessment (including any items reclassified as genuine in Step 8):
+Then, based on the assessment (including any items reclassified as genuine in Step 7):
 - If genuine issues remain (including reclassified items): "`/clear` then `/mach10:pr-review-fix <pr-number> --review-comment <review-comment-id> --assessment-comment <assessment-comment-id> <findings>` (e.g., F1 F3 S2 -- all genuine issues, interleaved in F/S identifier order)"
 - If all findings are nitpicks/false positives (with or without deferred items): "`/clear` then `/mach10:pr-pre-merge <pr-number>`"
+
+Mark Step 8 as `completed` using `TaskUpdate`.
 
 ## Important
 
