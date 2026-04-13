@@ -78,7 +78,7 @@ gh api repos/:owner/:repo/issues/comments/<assessment-comment-id>
 
 **If not provided:** This is optional context. Do not attempt to locate the assessment heuristically — proceed without it.
 
-Save the review comment content for use in **Step 3**.
+Save the review comment content for use in Step 3.
 
 Mark Step 1 as `completed` using `TaskUpdate`.
 
@@ -119,6 +119,10 @@ If an assessment comment was also retrieved in Step 1, append it:
 
 > **Assessment comment:**
 > <paste the full assessment comment content>
+
+If the user provided additional context or constraints in their input (parsed in Step 0), append it:
+
+> **User context:** <the additional context or constraints from the user's input>
 
 Mark Step 3 as `completed` using `TaskUpdate`.
 
