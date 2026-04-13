@@ -25,7 +25,21 @@ Example inputs:
 
 Extract the PR number. If specific review aspects are mentioned, note them for Step 3. If the input is ambiguous, ask the user to clarify.
 
+## Task Setup
+
+Create all 5 progress-tracking tasks upfront using `TaskCreate`. All tasks start as `pending`. Store each returned task ID for use in later `TaskUpdate` calls -- do not assume IDs are sequential.
+
+| Task | Subject | activeForm |
+|------|---------|------------|
+| T1 | Prepare and run PR review | Preparing and running PR review |
+| T2 | Post review comment | Posting review comment |
+| T3 | Run independent assessment | Running independent assessment |
+| T4 | Post assessment and present summary | Posting assessment |
+| T5 | Handle deferred items and recommend next steps | Handling deferred items |
+
 ## Step 2: Prepare
+
+Mark T1 as `in_progress` using `TaskUpdate`.
 
 Ensure you are on the correct branch:
 
@@ -34,21 +48,7 @@ gh pr checkout <pr-number>
 git pull
 ```
 
-## Task Setup
-
-Create all 5 progress-tracking tasks upfront using `TaskCreate`. All tasks start as `pending`. Store each returned task ID for use in later `TaskUpdate` calls -- do not assume IDs are sequential.
-
-| Task | Subject | activeForm |
-|------|---------|------------|
-| T1 | Run PR review via pr-review-toolkit | Running PR review |
-| T2 | Post review comment | Posting review comment |
-| T3 | Run independent assessment | Running independent assessment |
-| T4 | Post assessment and present summary | Posting assessment |
-| T5 | Handle deferred items and recommend next steps | Handling deferred items |
-
 ## Step 3: Run Review
-
-Mark T1 as `in_progress` using `TaskUpdate`.
 
 Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate context:
 
@@ -169,6 +169,8 @@ Mark T4 as `completed` using `TaskUpdate`.
 
 Mark T5 as `in_progress` using `TaskUpdate`.
 
+If no findings were classified as deferred, skip Step 8 and proceed directly to Step 9 (still mark T5 as `in_progress` before and `completed` after Step 9).
+
 If any findings were classified as **deferred**, use `AskUserQuestion` to ask the user how to handle them:
 
 - **Create issues for all**: "Create a GitHub issue for every deferred finding"
@@ -288,6 +290,8 @@ Comment format:
 - Keep the entire comment body under 20 lines
 
 Use F/S identifiers (e.g., F1, S2) or plain words (e.g., finding 1, suggestion 2) when referring to findings. Do not use bare `#<number>` notation, which GitHub auto-links to issues/PRs.
+
+If any operation in Step 8 fails or is interrupted, proceed to Step 9 anyway to ensure the user receives the next-step recommendation.
 
 ## Step 9: Recommend Next Steps
 
