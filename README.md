@@ -173,7 +173,7 @@ Create a PR linking back to the issue with a structured description summarizing 
 
 ### Phase 6: Review-fix cycle
 
-**Commands:** `/mach10:pr-review <pr>`, `/mach10:pr-review-fix <pr> [findings]`, `/mach10:pr-ci-fix <pr>`
+**Commands:** `/mach10:pr-review <pr>`, `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings]`, `/mach10:pr-ci-fix <pr>`
 
 This is an iterative cycle: review in one session, fix in the next, re-review, repeat. Each review posts its findings as a PR comment, then independently assesses every finding to classify it as genuine, nitpick, false positive, or deferred. The assessment includes a staged implementation plan that groups genuine issues into required stages and nitpicks into optional stages, giving you a ready-made fix list for the next session. The assessment serves as the convergence signal -- when all remaining findings are nitpicks or false positives, the PR is ready to merge.
 
@@ -202,7 +202,7 @@ Session 5:  /mach10:issue-implement 55 2
             /mach10:push
 Session 6:  /mach10:pr-create 55
 Session 7:  /mach10:pr-review 108
-Session 8:  /mach10:pr-review-fix 108 F1 F2 F3
+Session 8:  /mach10:pr-review-fix 108 --review-comment <id> --assessment-comment <id> F1 F2 F3
             /mach10:push
 Session 9:  /mach10:pr-review 108
 Session 10: /mach10:pr-ci-fix 108
@@ -256,7 +256,7 @@ claude --plugin-dir /path/to/mach10
 |---------|-------------|
 | `/mach10:pr-create [issue] [context]` | Create a PR for the current branch with structured description |
 | `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
-| `/mach10:pr-review-fix <pr> [findings]` | Fix specific review findings via feature-dev |
+| `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]` | Fix specific review findings via feature-dev |
 | `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
 | `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
 | `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests) |

@@ -108,6 +108,10 @@ Use the Skill tool to invoke `/feature-dev:feature-dev` with the following conte
 
 > Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: Use `TaskCreate` to create a task for each phase of the 7-phase development plan before starting work. Use `"Phase N: <action>"` as the subject format (e.g., `"Phase 1: Understand the codebase"`). Mark each phase `in_progress` via `TaskUpdate` when starting and `completed` when finishing. Do not skip any phases.
 >
+> **Findings to fix (from Step 2):** <list the resolved finding identifiers and their one-line descriptions>
+>
+> Fix only the findings listed above. Do not fix other findings in the review comment.
+>
 > **Review comment:**
 > <paste the full review comment content retrieved in Step 1>
 
