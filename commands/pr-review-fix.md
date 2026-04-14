@@ -28,7 +28,7 @@ Example inputs:
 
 Extract the PR number. Parse `--review-comment` and `--assessment-comment` flags if present (each followed by a numeric ID). If finding identifiers are provided (F/S prefixed or bare numbers), note them. If the input is ambiguous, ask the user to clarify.
 
-After parsing input, create the progress-tracking task list. First, create the Step 0 task using `TaskCreate` and immediately mark it as `in_progress` using `TaskUpdate`. Then create the remaining 4 tasks, all starting as `pending`. Store each returned task ID for use in later `TaskUpdate` calls -- do not assume IDs are sequential.
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 4 steps, all starting as pending. Store each returned task ID for later use -- do not assume IDs are sequential.
 
 | Task | Subject | activeForm |
 |------|---------|------------|
@@ -38,11 +38,11 @@ After parsing input, create the progress-tracking task list. First, create the S
 | Step 3 | Step 3: Fix review findings via feature-dev | Fixing findings |
 | Step 4 | Step 4: Recommend next steps | Recommending next steps |
 
-Mark Step 0 as `completed` using `TaskUpdate`.
+Mark Step 0 complete.
 
 ## Step 1: Gather PR and review context
 
-Mark Step 1 as `in_progress` using `TaskUpdate`.
+Mark Step 1 in progress.
 
 Read the PR title and description:
 
@@ -80,11 +80,11 @@ gh api repos/:owner/:repo/issues/comments/<assessment-comment-id>
 
 Save the review comment content for use in Step 3.
 
-Mark Step 1 as `completed` using `TaskUpdate`.
+Mark Step 1 complete.
 
 ## Step 2: Identify issues to fix
 
-Mark Step 2 as `in_progress` using `TaskUpdate`.
+Mark Step 2 in progress.
 
 **If finding identifiers were provided in the input:**
 - Match identifiers against the F/S labels in the review comment (e.g., `F1` matches `**F1:**`). If bare numbers were given, match by sequential position across Critical and Important sections. If the review comment lacks F/S labels (e.g., older reviews), fall back to matching by ordinal position within each severity section. Extract the full finding descriptions.
@@ -98,15 +98,15 @@ Mark Step 2 as `in_progress` using `TaskUpdate`.
   - Group similar issues together
 - Use `AskUserQuestion` with `multiSelect: true` to let the user select which issues to fix. If there are 4 or fewer findings, list each as a separate option. If there are more than 4 findings, group them by severity as options (e.g., "All critical findings (3)", "All important findings (5)"). The built-in "Other" option allows the user to specify individual finding identifiers (e.g., F1 S3) if they prefer a custom selection.
 
-Mark Step 2 as `completed` using `TaskUpdate`.
+Mark Step 2 complete.
 
 ## Step 3: Fix review findings via feature-dev
 
-Mark Step 3 as `in_progress` using `TaskUpdate`.
+Mark Step 3 in progress.
 
 Use the Skill tool to invoke `/feature-dev:feature-dev` with the following context:
 
-> Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: Use `TaskCreate` to create a task for each phase of the 7-phase development plan before starting work. Use `"Phase N: <action>"` as the subject format (e.g., `"Phase 1: Understand the codebase"`). Mark each phase `in_progress` via `TaskUpdate` when starting and `completed` when finishing. Do not skip any phases.
+> Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: Create a task for each phase of the 7-phase development plan before starting work. Use `"Phase N: <action>"` as the subject format (e.g., `"Phase 1: Understand the codebase"`). Mark each phase in progress when starting and complete when finishing. Do not skip any phases.
 >
 > **Findings to fix (from Step 2):** <list the resolved finding identifiers and their one-line descriptions>
 >
@@ -124,15 +124,15 @@ If the user provided additional context or constraints in their input (parsed in
 
 > **User context:** <the additional context or constraints from the user's input>
 
-Mark Step 3 as `completed` using `TaskUpdate`.
+Mark Step 3 complete.
 
 ## Step 4: Recommend next steps
 
-Mark Step 4 as `in_progress` using `TaskUpdate`.
+Mark Step 4 in progress.
 
 Once fixes are complete, suggest: "Next: `/mach10:push` to commit, push, and document the fixes on the PR."
 
-Mark Step 4 as `completed` using `TaskUpdate`.
+Mark Step 4 complete.
 
 ## Important Notes
 

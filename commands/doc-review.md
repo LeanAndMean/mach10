@@ -24,7 +24,7 @@ Example inputs:
 
 Extract the PR number. If a scope is provided, note it for filtering in Step 3 onward. If the input is ambiguous, ask the user to clarify.
 
-After parsing input, create the progress-tracking task list. First, create the Step 0 task using `TaskCreate` and immediately mark it as `in_progress` using `TaskUpdate`. Then create the remaining 8 tasks, all starting as `pending`. Store each returned task ID for use in later `TaskUpdate` calls -- do not assume IDs are sequential.
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 8 steps, all starting as pending. Store each returned task ID for later use -- do not assume IDs are sequential.
 
 | Task | Subject | activeForm |
 |------|---------|------------|
@@ -38,11 +38,11 @@ After parsing input, create the progress-tracking task list. First, create the S
 | Step 7 | Step 7: Verify changes | Verifying changes |
 | Step 8 | Step 8: Commit and report | Committing and reporting |
 
-Mark Step 0 as `completed` using `TaskUpdate`.
+Mark Step 0 complete.
 
 ## Step 1: Check out PR branch
 
-Mark Step 1 as `in_progress` using `TaskUpdate`.
+Mark Step 1 in progress.
 
 Ensure you are on the PR's branch with the latest changes:
 
@@ -53,11 +53,11 @@ git pull
 
 If either command fails (PR not found, authentication error, merge conflicts during pull), report the error to the user and stop -- the review cannot proceed without a clean, up-to-date working copy of the PR branch. Leave Step 1 as `in_progress`.
 
-Mark Step 1 as `completed` using `TaskUpdate`.
+Mark Step 1 complete.
 
 ## Step 2: Gather PR context
 
-Mark Step 2 as `in_progress` using `TaskUpdate`.
+Mark Step 2 in progress.
 
 Build a picture of what changed in the PR:
 
@@ -73,11 +73,11 @@ Build a picture of what changed in the PR:
 
 From these, identify what features, APIs, behaviors, or configurations were added, changed, or removed. This summary is critical context for the review agents in Step 4.
 
-Mark Step 2 as `completed` using `TaskUpdate`.
+Mark Step 2 complete.
 
 ## Step 3: Discover documentation
 
-Mark Step 3 as `in_progress` using `TaskUpdate`.
+Mark Step 3 in progress.
 
 Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore). Each agent should target a different documentation surface:
 
@@ -91,11 +91,11 @@ If a scope was provided, filter to only categories and files matching that scope
 
 Present the discovered documentation as a summary table (category, file path, brief description) before proceeding.
 
-Mark Step 3 as `completed` using `TaskUpdate`.
+Mark Step 3 complete.
 
 ## Step 4: Fan out review agents
 
-Mark Step 4 as `in_progress` using `TaskUpdate`.
+Mark Step 4 in progress.
 
 For each documentation category, launch a subagent using the Task tool (subagent_type: general-purpose) to review that category's files. Batch small categories together to keep the total agent count between 3 and 6.
 
@@ -121,11 +121,11 @@ Each agent returns structured findings as a list:
 
 Launch agents in parallel where possible.
 
-Mark Step 4 as `completed` using `TaskUpdate`.
+Mark Step 4 complete.
 
 ## Step 5: Present findings and get user decisions
 
-Mark Step 5 as `in_progress` using `TaskUpdate`.
+Mark Step 5 in progress.
 
 After all agents complete, combine findings into a single report:
 
@@ -143,11 +143,11 @@ Process findings one at a time. For each finding, use `AskUserQuestion` to ask t
 
 If the user selects "Modify", ask what they want to change (free-text), then apply the adjusted version.
 
-Mark Step 5 as `completed` using `TaskUpdate`.
+Mark Step 5 complete.
 
 ## Step 6: Apply documentation changes
 
-Mark Step 6 as `in_progress` using `TaskUpdate`.
+Mark Step 6 in progress.
 
 Apply all accepted and modified changes:
 
@@ -156,11 +156,11 @@ Apply all accepted and modified changes:
 - Do NOT delete entire files without explicit user confirmation
 - Do NOT commit yet -- verification comes first
 
-Mark Step 6 as `completed` using `TaskUpdate`.
+Mark Step 6 complete.
 
 ## Step 7: Verify changes
 
-Mark Step 7 as `in_progress` using `TaskUpdate`.
+Mark Step 7 in progress.
 
 Launch 1-2 verification agents using the Task tool (subagent_type: general-purpose) on the modified files only. Each agent checks:
 
@@ -171,11 +171,11 @@ Launch 1-2 verification agents using the Task tool (subagent_type: general-purpo
 
 Present any verification issues to the user. Apply approved corrections.
 
-Mark Step 7 as `completed` using `TaskUpdate`.
+Mark Step 7 complete.
 
 ## Step 8: Commit and report
 
-Mark Step 8 as `in_progress` using `TaskUpdate`.
+Mark Step 8 in progress.
 
 Stage modified documentation files by name (do NOT use `git add -A`). Commit and push:
 
@@ -198,7 +198,7 @@ The comment should include:
 
 When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-Mark Step 8 as `completed` using `TaskUpdate`.
+Mark Step 8 complete.
 
 **CLI output only (do NOT include in the GitHub comment above):** Recommend next step to the user:
 - If this was run before code review: "Next: `/clear` then `/mach10:pr-review <pr-number>`"

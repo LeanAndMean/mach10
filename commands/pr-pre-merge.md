@@ -17,7 +17,7 @@ The user's input contains:
 
 Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
 
-After parsing input, create the progress-tracking task list. First, create the Step 0 task using `TaskCreate` and immediately mark it as `in_progress` using `TaskUpdate`. Then create the remaining 6 tasks, all starting as `pending`. Store each returned task ID for use in later `TaskUpdate` calls -- do not assume IDs are sequential.
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 6 steps, all starting as pending. Store each returned task ID for later use -- do not assume IDs are sequential.
 
 | Task | Subject | activeForm |
 |------|---------|------------|
@@ -29,11 +29,11 @@ After parsing input, create the progress-tracking task list. First, create the S
 | Step 5 | Step 5: Commit checklist changes | Committing checklist changes |
 | Step 6 | Step 6: Present pre-merge report | Presenting report |
 
-Mark Step 0 as `completed` using `TaskUpdate`.
+Mark Step 0 complete.
 
 ## Step 1: Read contributing guidelines
 
-Mark Step 1 as `in_progress` using `TaskUpdate`.
+Mark Step 1 in progress.
 
 Look for project contribution guidelines in order of precedence:
 
@@ -49,11 +49,11 @@ If found, read the file and extract any pre-merge requirements (version bumps, c
 
 If no contributing guide exists, use the standard checklist below.
 
-Mark Step 1 as `completed` using `TaskUpdate`.
+Mark Step 1 complete.
 
 ## Step 2: Check out and prepare
 
-Mark Step 2 as `in_progress` using `TaskUpdate`.
+Mark Step 2 in progress.
 
 Ensure you are on the PR's branch with latest changes:
 
@@ -64,11 +64,11 @@ git pull
 
 If either command fails (PR not found, authentication error, merge conflicts during pull), report the error to the user and stop -- the checklist cannot proceed without a clean, up-to-date working copy of the PR branch. Leave Step 2 as `in_progress`.
 
-Mark Step 2 as `completed` using `TaskUpdate`.
+Mark Step 2 complete.
 
 ## Step 3: Check branch freshness
 
-Mark Step 3 as `in_progress` using `TaskUpdate`.
+Mark Step 3 in progress.
 
 Ensure the feature branch is up to date with the default branch before running the checklist.
 
@@ -114,11 +114,11 @@ git merge origin/<default-branch>
 
 **If the merge fails for any reason other than conflicts** (invalid ref, dirty working tree, internal error), report the full error output to the user and stop. Leave Step 3 as `in_progress`.
 
-Mark Step 3 as `completed` using `TaskUpdate`.
+Mark Step 3 complete.
 
 ## Step 4: Run pre-merge checklist
 
-Mark Step 4 as `in_progress` using `TaskUpdate`.
+Mark Step 4 in progress.
 
 Work through each item. For each, report whether action is needed and perform it if so.
 
@@ -158,13 +158,13 @@ Run the project's test suite:
 
 Report results. If tests fail, investigate and report — do NOT silently ignore failures.
 
-Mark Step 4 as `completed` using `TaskUpdate`.
+Mark Step 4 complete.
 
 ## Step 5: Commit checklist changes
 
-Mark Step 5 as `in_progress` using `TaskUpdate`.
+Mark Step 5 in progress.
 
-Check whether the checklist produced any uncommitted changes by running `git status --porcelain`. If the output is empty, no changes were made — mark Step 5 as `completed` and proceed to Step 6.
+Check whether the checklist produced any uncommitted changes by running `git status --porcelain`. If the output is empty, no changes were made — mark Step 5 complete and proceed to Step 6.
 
 If there are changes, commit and push them:
 
@@ -172,11 +172,11 @@ If there are changes, commit and push them:
 2. **Commit** with message: "Pre-merge checklist: [brief summary of what was updated]". If the commit fails (pre-commit hook, empty commit, permissions), report the error to the user, leave Step 5 as `in_progress`, and proceed to Step 6.
 3. **Push** to remote (`git push`). If the push fails, report the error to the user and advise them to retry manually with `git push`. Leave Step 5 as `in_progress` and proceed to Step 6.
 
-If all three operations succeeded, mark Step 5 as `completed` using `TaskUpdate`.
+If all three operations succeeded, mark Step 5 complete.
 
 ## Step 6: Present pre-merge report
 
-Mark Step 6 as `in_progress` using `TaskUpdate`.
+Mark Step 6 in progress.
 
 Present a summary of what was done:
 - [ ] Branch freshness: [current with <default-branch> / merged N commits from <default-branch> / auto-resolved conflicts in: <files> / behind <default-branch> (user skipped merge)]
@@ -187,4 +187,4 @@ Present a summary of what was done:
 
 Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`
 
-Mark Step 6 as `completed` using `TaskUpdate`.
+Mark Step 6 complete.
