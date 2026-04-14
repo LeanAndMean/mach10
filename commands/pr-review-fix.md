@@ -124,9 +124,13 @@ If the user provided additional context or constraints in their input (parsed in
 
 > **User context:** <the additional context or constraints from the user's input>
 
+Let the feature-dev workflow complete fully. When it finishes, all code changes for the selected findings should be in place.
+
 Mark Step 3 complete.
 
 ## Step 4: Recommend next steps
+
+The feature-dev delegation from Step 3 is now complete. This is the final step of the pr-review-fix command.
 
 Mark Step 4 in progress.
 
