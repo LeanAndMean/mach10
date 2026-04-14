@@ -164,14 +164,15 @@ Mark Step 4 as `completed` using `TaskUpdate`.
 
 Mark Step 5 as `in_progress` using `TaskUpdate`.
 
-If any changes were made during the checklist, commit them:
+Check whether the checklist produced any uncommitted changes by running `git status --porcelain`. If the output is empty, no changes were made — mark Step 5 as `completed` and proceed to Step 6.
 
-- Stage only the files modified during this checklist
-- Commit message: "Pre-merge checklist: [brief summary of what was updated]"
+If there are changes, commit and push them:
 
-Push to remote. If the push fails, report the error to the user and advise them to retry manually with `git push`. Leave Step 5 as `in_progress` but proceed to Step 6 so the user receives the summary.
+1. **Stage** only the files modified during this checklist (`git add <file>...`). If staging fails, report the error to the user, leave Step 5 as `in_progress`, and proceed to Step 6.
+2. **Commit** with message: "Pre-merge checklist: [brief summary of what was updated]". If the commit fails (pre-commit hook, empty commit, permissions), report the error to the user, leave Step 5 as `in_progress`, and proceed to Step 6.
+3. **Push** to remote (`git push`). If the push fails, report the error to the user and advise them to retry manually with `git push`. Leave Step 5 as `in_progress` and proceed to Step 6.
 
-Mark Step 5 as `completed` using `TaskUpdate`.
+If all three operations succeeded, mark Step 5 as `completed` using `TaskUpdate`.
 
 ## Step 6: Present pre-merge report
 
