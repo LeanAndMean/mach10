@@ -25,7 +25,7 @@ Example inputs:
 
 Extract the PR number. If specific review aspects are mentioned, note them for Step 2. If the input is ambiguous, ask the user to clarify.
 
-After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 8 steps one at a time, in step order, waiting for each to complete before creating the next, all starting as pending. Store each returned task ID for later use -- do not assume IDs are sequential.
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 8 steps one at a time, in step order, waiting for each creation to return before creating the next, all starting as pending. Store each returned task ID for later use -- do not assume IDs are sequential.
 
 | Task | Subject | activeForm |
 |------|---------|------------|
