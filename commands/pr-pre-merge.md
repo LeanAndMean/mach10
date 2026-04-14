@@ -17,7 +17,7 @@ The user's input contains:
 
 Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
 
-After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 6 steps, all starting as pending. Store each returned task ID for later use -- do not assume IDs are sequential.
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 6 steps one at a time, in step order, waiting for each to complete before creating the next, all starting as pending. Store each returned task ID for later use -- do not assume IDs are sequential.
 
 | Task | Subject | activeForm |
 |------|---------|------------|
