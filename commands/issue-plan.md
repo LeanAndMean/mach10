@@ -104,7 +104,7 @@ Present a comprehensive summary of findings and patterns discovered.
 
 Mark Step 2 complete.
 
-## Step 3: Clarifying Questions
+## Step 3: Ask clarifying questions
 
 Mark Step 3 in progress.
 
@@ -121,7 +121,7 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 Mark Step 3 complete.
 
-## Step 4: Architecture Design
+## Step 4: Design architecture
 
 Mark Step 4 in progress.
 
@@ -141,7 +141,7 @@ Present to the user: brief summary of each approach, trade-offs comparison, **yo
 
 Mark Step 4 complete.
 
-## Step 5: Plan Drafting
+## Step 5: Draft the plan
 
 Mark Step 5 in progress.
 
@@ -168,7 +168,7 @@ Before finalizing the plan, verify it satisfies the following:
 
 Mark Step 5 complete.
 
-## Step 6: Post and Branch
+## Step 6: Post plan and create branch
 
 Mark Step 6 in progress.
 
