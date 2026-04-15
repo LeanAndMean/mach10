@@ -42,7 +42,7 @@ After parsing input, create the progress-tracking task list. Create a task for S
 
 Mark Step 0 complete.
 
-## Step 1: Read the Issue
+## Step 1: Read the issue
 
 Mark Step 1 in progress.
 
@@ -66,7 +66,7 @@ Parse and understand:
 
 Mark Step 1 complete.
 
-## Step 2: Explore the Codebase
+## Step 2: Explore the codebase
 
 Mark Step 2 in progress.
 
