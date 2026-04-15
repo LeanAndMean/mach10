@@ -1,7 +1,7 @@
 ---
 description: Read a GitHub issue, analyze the codebase, and create a staged implementation plan
 argument-hint: <issue-number>
-allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
+allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
 model: opus
 ---
 
@@ -21,14 +21,30 @@ This command is strictly for **planning**. Do NOT:
 
 Implementation happens in separate sessions via `/mach10:issue-implement`.
 
-## Step 1: Parse Input
+## Step 0: Parse input and create task list
 
 The user's input contains:
 - An **issue number** (required)
 
 Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
 
-## Step 2: Read the Issue
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 6 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
+
+| Task | Subject | activeForm |
+|------|---------|------------|
+| Step 0 | Step 0: Parse input and create task list | Parsing input |
+| Step 1 | Step 1: Read the issue | Reading the issue |
+| Step 2 | Step 2: Explore the codebase | Exploring the codebase |
+| Step 3 | Step 3: Ask clarifying questions | Asking clarifying questions |
+| Step 4 | Step 4: Design architecture | Designing architecture |
+| Step 5 | Step 5: Draft the plan | Drafting the plan |
+| Step 6 | Step 6: Post plan and create branch | Posting plan and creating branch |
+
+Mark Step 0 complete.
+
+## Step 1: Read the issue
+
+Mark Step 1 in progress.
 
 Read the issue title and body:
 
@@ -48,9 +64,13 @@ Parse and understand:
 - Prior discussion or decisions in the comments
 - Acceptance criteria (if specified)
 
-## Step 3: Explore the Codebase
+Mark Step 1 complete.
 
-### 3a. Read Contributing Guidelines
+## Step 2: Explore the codebase
+
+Mark Step 2 in progress.
+
+### 2a. Read Contributing Guidelines
 
 Before launching exploration agents, look for project contribution guidelines in order of precedence:
 
@@ -64,11 +84,11 @@ Read only the first file found; skip the rest.
 
 If found, read the file and extract any planning-relevant guidance: expected project layers (e.g., models, migrations, API routes, services, UI, documentation), testing expectations (test frameworks, coverage requirements, test types), and any other requirements that should inform the implementation plan.
 
-Record these as **project planning requirements** -- they will inform both the exploration focus and the plan drafting in Step 6.
+Record these as **project planning requirements** -- they will inform both the exploration focus and the plan drafting in Step 5.
 
 If no contributing guide exists, proceed without project-specific requirements.
 
-### 3b. Explore
+### 2b. Explore
 
 Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
 
@@ -76,17 +96,21 @@ Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: "f
 - **Architecture**: Map the architecture and abstractions for the relevant area, tracing through the code comprehensively to understand the layers, data flow, and design decisions.
 - **Integration points**: Identify where new code would connect to existing systems, including extension surfaces, testing infrastructure, and cross-cutting concerns.
 
-If project planning requirements were identified in Step 3a, include them in each agent's context so exploration covers the relevant project layers and testing infrastructure.
+If project planning requirements were identified in Step 2a, include them in each agent's context so exploration covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
 Present a comprehensive summary of findings and patterns discovered.
 
-## Step 4: Clarifying Questions
+Mark Step 2 complete.
+
+## Step 3: Ask clarifying questions
+
+Mark Step 3 in progress.
 
 **CRITICAL**: This is one of the most important steps. DO NOT SKIP.
 
-Review the codebase findings from Step 3 against the issue requirements. Identify all underspecified aspects:
+Review the codebase findings from Step 2 against the issue requirements. Identify all underspecified aspects:
 
 1. Present a clear analysis of the problem based on what you found in the codebase.
 2. Identify ambiguities, underspecified scope, unstated constraints, edge cases, integration concerns, and design preferences that will affect the implementation plan.
@@ -95,7 +119,11 @@ Review the codebase findings from Step 3 against the issue requirements. Identif
 
 If the user says "whatever you think is best", provide your recommendation and get explicit confirmation.
 
-## Step 5: Architecture Design
+Mark Step 3 complete.
+
+## Step 4: Design architecture
+
+Mark Step 4 in progress.
 
 Based on the codebase findings and clarified requirements, launch 2-3 architecture agents in parallel using the Task tool (subagent_type: "feature-dev:code-architect"). Assign each agent a different architectural lens:
 
@@ -111,9 +139,13 @@ Present to the user: brief summary of each approach, trade-offs comparison, **yo
 
 **Ask user which approach they prefer.**
 
-## Step 6: Plan Drafting
+Mark Step 4 complete.
 
-Using the architecture selected in Step 5 as the structural foundation, draft a **staged implementation plan** with:
+## Step 5: Draft the plan
+
+Mark Step 5 in progress.
+
+Using the architecture selected in Step 4 as the structural foundation, draft a **staged implementation plan** with:
 - Clear stages (numbered, with descriptive names)
 - What each stage accomplishes
 - Which files will be created or modified
@@ -124,7 +156,7 @@ Using the architecture selected in Step 5 as the structural foundation, draft a 
 
 Before finalizing the plan, verify it satisfies the following:
 
-**Project-layer coverage:** Cross-check the plan against the project layers discovered during codebase exploration and any layers specified in the project planning requirements recorded in Step 3a. Every affected layer should be addressed by at least one stage. If a discovered layer is not affected by this change, it may be omitted -- but if a layer is affected and no stage addresses it, add the missing work to the appropriate stage or create a new one.
+**Project-layer coverage:** Cross-check the plan against the project layers discovered during codebase exploration and any layers specified in the project planning requirements recorded in Step 2a. Every affected layer should be addressed by at least one stage. If a discovered layer is not affected by this change, it may be omitted -- but if a layer is affected and no stage addresses it, add the missing work to the appropriate stage or create a new one.
 
 **Test coverage planning:** Identify what testing is appropriate for this project and codebase. If the project has an existing test suite or the project planning requirements specify testing expectations, each stage that introduces or modifies behavior must specify: what tests to add or modify, what test types are needed (unit, integration, end-to-end, etc.), and what behaviors or interfaces to cover. If the project has no testable runtime code (e.g., plugin definitions, documentation, configuration), note this in the plan and skip test planning.
 
@@ -134,7 +166,11 @@ Before finalizing the plan, verify it satisfies the following:
 - The complexity of the logic involved
 - The testing surface area
 
-## Step 7: Post and Branch
+Mark Step 5 complete.
+
+## Step 6: Post plan and create branch
+
+Mark Step 6 in progress.
 
 Present the plan to the user, then use `AskUserQuestion` to ask for approval with these options:
 
@@ -142,7 +178,7 @@ Present the plan to the user, then use `AskUserQuestion` to ask for approval wit
 - **Request changes**: "Suggest changes to the plan before posting"
 - **Cancel**: "Abort without posting the plan or creating a branch"
 
-If the user selects "Request changes", discuss their feedback, revise the plan, and present it for approval again. If the user selects "Cancel", stop and confirm that the plan was not posted and no branch was created.
+If the user selects "Request changes", discuss their feedback, revise the plan, and present it for approval again. If the user selects "Cancel", stop and confirm that the plan was not posted and no branch was created. Leave Step 6 as `in_progress`.
 
 After the user approves the plan:
 
@@ -151,9 +187,9 @@ After the user approves the plan:
    - The full implementation plan
    - The staged breakdown
    - A `## Decision Log` section appended after the staged breakdown. This section captures the reasoning behind key decisions made during planning:
-     - **Clarifying Questions (Step 4):** For each question asked and answered, include the question and a synthesized answer. Only include exchanges where the answer changed or constrained the plan. Omit exchanges where the user confirmed a default or said "whatever you think is best."
-     - **Architecture Choice (Step 5):** The selected approach, the rationale for choosing it, and the alternatives considered with brief reasons for rejection.
-     - **Omission condition:** Skip the Decision Log section entirely if Step 4 produced no questions AND Step 5 had no meaningful differentiation between approaches (e.g., only one viable approach existed).
+     - **Clarifying Questions (Step 3):** For each question asked and answered, include the question and a synthesized answer. Only include exchanges where the answer changed or constrained the plan. Omit exchanges where the user confirmed a default or said "whatever you think is best."
+     - **Architecture Choice (Step 4):** The selected approach, the rationale for choosing it, and the alternatives considered with brief reasons for rejection.
+     - **Omission condition:** Skip the Decision Log section entirely if Step 3 produced no questions AND Step 4 had no meaningful differentiation between approaches (e.g., only one viable approach existed).
    - A note that this comment will guide staged implementation
 
 2. **Create a feature branch**:
@@ -203,5 +239,7 @@ After the user approves the plan:
 When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
 Confirm all actions to the user (plan posted, branch created, issue assigned, and sub-issues assigned if applicable).
+
+Mark Step 6 complete.
 
 **CLI output only (do NOT include in the GitHub comment):** Let the user know the next step is `/clear` then `/mach10:issue-plan-review <issue-number>` to review the plan. After review, use `/mach10:issue-implement <issue-number> 1` to begin Stage 1 of the implementation in a fresh session.
