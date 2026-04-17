@@ -126,6 +126,8 @@ If the user provided additional context or constraints in their input (parsed in
 
 > **User context:** <the additional context or constraints from the user's input>
 
+After the delegation returns, proceed to Step 4.
+
 ## Step 4: Recommend next steps
 
 Mark Step 4 in progress.

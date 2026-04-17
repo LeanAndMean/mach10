@@ -72,6 +72,8 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 
 Do NOT attempt to fix any issues -- this session is for review only.
 
+After the delegation returns, proceed to Step 3.
+
 ## Step 3: Post review comment
 
 Mark Step 3 in progress.
