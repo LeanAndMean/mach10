@@ -104,7 +104,7 @@ Mark Step 2 complete.
 
 Mark Step 3 in progress.
 
-Mark Step 3 complete. Step 3's responsibility is preparing and launching the delegation -- completion indicates the handoff happened, not that the fixes are done. The task list state (Step 3 complete, Step 4 pending) is the re-anchoring signal for when the Skill returns.
+Mark Step 3 complete.
 
 Use the Skill tool to invoke `/feature-dev:feature-dev` with the following context:
 
