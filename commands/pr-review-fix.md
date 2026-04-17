@@ -35,7 +35,7 @@ After parsing input, create the progress-tracking task list. Create a task for S
 | Step 0 | Step 0: Parse input and create task list | Parsing input |
 | Step 1 | Step 1: Gather PR and review context | Gathering context |
 | Step 2 | Step 2: Identify issues to fix | Identifying issues |
-| Step 3 | Step 3: Fix review findings via feature-dev | Fixing findings |
+| Step 3 | Step 3: Delegate review fixes to feature-dev | Delegating review fixes to feature-dev |
 | Step 4 | Step 4: Recommend next steps | Recommending next steps |
 
 Mark Step 0 complete.
@@ -100,13 +100,15 @@ Mark Step 2 in progress.
 
 Mark Step 2 complete.
 
-## Step 3: Fix review findings via feature-dev
+## Step 3: Delegate review fixes to feature-dev
 
 Mark Step 3 in progress.
 
+Mark Step 3 complete.
+
 Use the Skill tool to invoke `/feature-dev:feature-dev` with the following context:
 
-> Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: Create a task for each phase of the 7-phase development plan before starting work. Use `"Phase N: <action>"` as the subject format (e.g., `"Phase 1: Understand the codebase"`). Mark each phase in progress when starting and complete when finishing. Do not skip any phases.
+> Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: Create a task for each phase of the 7-phase development plan before starting work. Use `"Step 3.N: <action>"` as the subject format (e.g., `"Step 3.1: Understand the codebase"`). Mark each phase in progress when starting and complete when finishing. Do not skip any phases.
 >
 > **Findings to fix (from Step 2):** <list the resolved finding identifiers and their one-line descriptions>
 >
@@ -124,13 +126,9 @@ If the user provided additional context or constraints in their input (parsed in
 
 > **User context:** <the additional context or constraints from the user's input>
 
-Let the feature-dev workflow complete fully. When it finishes, all code changes for the selected findings should be in place.
-
-Mark Step 3 complete.
+After the delegation returns, proceed to Step 4.
 
 ## Step 4: Recommend next steps
-
-The feature-dev delegation from Step 3 is now complete. This is the final step of the pr-review-fix command.
 
 Mark Step 4 in progress.
 

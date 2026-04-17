@@ -31,7 +31,7 @@ After parsing input, create the progress-tracking task list. Create a task for S
 |------|---------|------------|
 | Step 0 | Step 0: Parse input and create task list | Parsing input |
 | Step 1 | Step 1: Check out PR branch | Checking out PR branch |
-| Step 2 | Step 2: Run PR review | Running PR review |
+| Step 2 | Step 2: Delegate PR review to pr-review-toolkit | Delegating PR review |
 | Step 3 | Step 3: Post review comment | Posting review comment |
 | Step 4 | Step 4: Run independent assessment | Running independent assessment |
 | Step 5 | Step 5: Post assessment comment | Posting assessment |
@@ -54,9 +54,11 @@ git pull
 
 Mark Step 1 complete.
 
-## Step 2: Run PR review
+## Step 2: Delegate PR review to pr-review-toolkit
 
 Mark Step 2 in progress.
+
+Mark Step 2 complete.
 
 Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate context:
 
@@ -66,10 +68,11 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 - **Always** include this instruction in the Skill invocation: "You are authorized to use review-relevant agents from any installed plugin, not just the agents bundled with pr-review-toolkit. When launching review agents in parallel, also include any domain-relevant agents from other installed plugins that would provide useful analysis for the PR content (e.g., plugin-dev:skill-reviewer when reviewing skill definitions, plugin-dev:plugin-validator when reviewing plugin code). Only include supplementary agents when they are relevant to the content being reviewed."
 - **Always** include this instruction in the Skill invocation: "If the PR has a linked issue (look for issue references like 'Fixes #N', 'Closes #N', 'Resolves #N', 'Part of #N', 'Issue #N', or a bare '#N' in the PR description), include the `feature-completeness-checker` agent alongside the other review agents. This agent verifies that the PR fully implements the requirements from the linked issue's acceptance criteria and implementation plan. Do not launch this agent if no linked issue is detected."
 - **Always** include this instruction in the Skill invocation: "Label each Critical and Important finding with a sequential F-prefixed identifier (F1, F2, F3, ...) numbered continuously across both sections. Label each Suggestion with a sequential S-prefixed identifier (S1, S2, S3, ...) using a separate counter. Use bold prefixes in the output (e.g., `**F1:** Missing null check`, `**S1:** Consider extracting helper`)."
+- **Always** include this instruction in the Skill invocation: "IMPORTANT: Create at least one sub-task to track your progress. Use `"Step 2.M: <action>"` as the subject format where M is the sequence number. Use best judgment on granularity based on the review scope."
 
-Let the review complete fully. Do NOT attempt to fix any issues — this session is for review only.
+Do NOT attempt to fix any issues -- this session is for review only.
 
-Mark Step 2 complete.
+After the delegation returns, proceed to Step 3.
 
 ## Step 3: Post review comment
 
