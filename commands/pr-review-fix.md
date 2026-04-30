@@ -104,11 +104,11 @@ Mark Step 2 complete.
 
 Mark Step 3 in progress.
 
-Mark Step 3 complete.
+Mark Step 3 complete when all sub-tasks of the delegation below are completed.
 
 Use the Skill tool to invoke `/feature-dev:feature-dev` with the following context:
 
-> Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: Create a task for each phase of the 7-phase development plan before starting work. Use `"Step 3.N: <action>"` as the subject format (e.g., `"Step 3.1: Understand the codebase"`). Mark each phase in progress when starting and complete when finishing. Do not skip any phases.
+> Read PR #<pr-number> (title and description only -- do not fetch all comments). The review comment content is provided below. Implement fixes for the identified issues using the 7-phase development plan. IMPORTANT: Create a task for each phase of the 7-phase development plan before starting work. Use `"Step 3.M: <action>"` as the subject format (e.g., `"Step 3.1: Understand the codebase"`). Mark each phase in progress when starting and complete when finishing. Do not skip any phases.
 >
 > **Findings to fix (from Step 2):** <list the resolved finding identifiers and their one-line descriptions>
 >
@@ -126,7 +126,7 @@ If the user provided additional context or constraints in their input (parsed in
 
 > **User context:** <the additional context or constraints from the user's input>
 
-After the delegation returns, proceed to Step 4.
+Mark Step 3 complete. Do not stop here -- continue to Step 4.
 
 ## Step 4: Recommend next steps
 

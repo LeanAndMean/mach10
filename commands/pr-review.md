@@ -58,7 +58,7 @@ Mark Step 1 complete.
 
 Mark Step 2 in progress.
 
-Mark Step 2 complete.
+Mark Step 2 complete when all sub-tasks of the delegation below are completed.
 
 Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate context:
 
@@ -72,7 +72,7 @@ Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate
 
 Do NOT attempt to fix any issues -- this session is for review only.
 
-After the delegation returns, proceed to Step 3.
+Mark Step 2 complete. Do not stop here -- continue to Step 3.
 
 ## Step 3: Post review comment
 
