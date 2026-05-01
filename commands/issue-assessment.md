@@ -41,7 +41,7 @@ Parse and understand:
 
 ## Step 3: Explore the Codebase
 
-Launch 3-4 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
+Launch 4 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
 
 - **Relevant code**: Find existing code related to the issue. Trace through their implementation comprehensively, identifying patterns, conventions, and the design decisions that shaped them.
 - **Architecture**: Map the relevant architecture layers, abstractions, and data flow, tracing through the code comprehensively to understand how components interact and where boundaries lie.
@@ -60,7 +60,7 @@ Based on your understanding of the issue and codebase, present your assessment t
 4. **Ambiguities**: Any underspecified aspects, contradictions, or open questions in the issue.
 5. **Scope**: Your assessment of the size and complexity of the work.
 6. **Risks**: Potential pitfalls, edge cases, or architectural concerns.
-7. **Critical evaluation**: Evaluate the issue's premise and proposed approach against codebase evidence and established engineering principles. This category challenges whether the issue is asking for the right thing -- distinct from Ambiguities (underspecified aspects of the issue) and Risks (pitfalls assuming the issue is valid). Challenge only when grounded in evidence or principle -- do not speculate. All claims must be backed by specific references: cite files or patterns for codebase-based challenges; cite source code or documentation for claims about how established projects or codebases approach problems.
+7. **Critical evaluation**: Evaluate the issue's premise and proposed approach against codebase evidence and established engineering principles. This category challenges whether the issue is asking for the right thing -- distinct from Ambiguities (underspecified aspects of the issue) and Risks (pitfalls assuming the issue is valid). Challenge only when grounded in evidence or principle -- do not speculate. All claims must be backed by specific references: cite files or patterns for codebase-based challenges; cite established engineering principles or widely-known patterns for principle-based challenges.
    - Whether the codebase suggests a different or better approach than what the issue proposes
    - Whether the proposed change creates redundancy, conflicts, or maintenance burden given existing code
    - Whether the issue addresses symptoms rather than the root cause
