@@ -125,6 +125,7 @@ Build a picture of what the PR changed so the checklist in Step 5 can make infor
 
 1. **Changed files**: `gh pr diff <pr-number> --name-only` and `git diff origin/<default-branch>...HEAD --stat`
 2. **PR description**: `gh pr view <pr-number>`
+3. **Commit history**: `git log origin/<default-branch>..HEAD --oneline`
 
 From these, identify what features, APIs, behaviors, or configurations were added, changed, or removed. Produce a brief change summary covering:
 - The nature of the changes (new feature, bug fix, refactor, configuration change, etc.)
