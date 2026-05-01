@@ -61,11 +61,14 @@ If no contributing guide exists, proceed without project-specific requirements.
 
 ### 3b. Explore
 
-Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification:
+Launch 3-6 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification:
 
 - **Files referenced in the plan**: Trace through each file referenced in the plan comprehensively, confirming they exist, checking their current state, and verifying the plan's characterization of their structure, responsibilities, and integration points is accurate.
 - **Architecture and patterns**: Trace through the relevant architecture comprehensively, validating that the plan aligns with existing codebase conventions, abstractions, data flow, and design decisions.
 - **Gaps**: Trace through code adjacent to the plan's scope comprehensively, looking for constraints, dependencies, cross-cutting concerns, or affected areas the plan may have missed.
+- **Risks and pitfalls**: Investigate what could go wrong with the plan's proposed approach. Look for failure modes, boundary conditions, implicit assumptions, or architectural concerns in the areas the plan modifies.
+- **Alternative approaches**: Look for codebase evidence that a different approach could achieve the same goals. Identify existing patterns, abstractions, or design decisions that suggest a simpler, more idiomatic, or more robust solution than what the plan proposes.
+- **Test infrastructure**: Examine the project's test suite -- frameworks, patterns, test organization, coverage approach, and any test utilities or fixtures relevant to the areas the plan modifies.
 
 If project review criteria were recorded in Step 3a, include them in each agent's context so exploration can verify whether the plan covers the relevant project layers and testing infrastructure.
 

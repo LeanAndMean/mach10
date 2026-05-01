@@ -41,12 +41,13 @@ Parse and understand:
 
 ## Step 3: Explore the Codebase
 
-Launch 4 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
+Launch 5 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
 
 - **Relevant code**: Find existing code related to the issue. Trace through their implementation comprehensively, identifying patterns, conventions, and the design decisions that shaped them.
 - **Architecture**: Map the relevant architecture layers, abstractions, and data flow, tracing through the code comprehensively to understand how components interact and where boundaries lie.
 - **Prior work**: Check for related branches, PRs, or commits that may already address part of the issue. Trace through any partial implementations to assess their completeness and approach.
 - **Counter-evidence**: Look for codebase evidence that challenges the issue's premise or proposed approach. Identify existing patterns, design decisions, or prior solutions that suggest a different approach, reveal the issue may be addressing symptoms rather than root causes, or indicate the problem is a special case of something more general.
+- **Constraints and edge cases**: Investigate what could go wrong with the proposed approach. Look for failure modes, boundary conditions, implicit assumptions, and pitfalls in the affected code areas.
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
@@ -59,7 +60,7 @@ Based on your understanding of the issue and codebase, present your assessment t
 3. **Gaps**: What is missing, broken, or unclear.
 4. **Ambiguities**: Any underspecified aspects, contradictions, or open questions in the issue.
 5. **Scope**: Your assessment of the size and complexity of the work.
-6. **Risks**: Potential pitfalls, edge cases, or architectural concerns.
+6. **Risks**: Potential pitfalls, edge cases, or architectural concerns. If exploration did not surface risk-relevant evidence, state that no significant risks were identified rather than manufacturing concerns.
 7. **Critical evaluation**: Evaluate the issue's premise and proposed approach against codebase evidence and established engineering principles. This category challenges whether the issue is asking for the right thing -- distinct from Ambiguities (underspecified aspects of the issue) and Risks (pitfalls assuming the issue is valid). Challenge only when grounded in evidence or principle -- do not speculate. All claims must be backed by specific references: cite files or patterns for codebase-based challenges; cite established engineering principles or widely-known patterns for principle-based challenges.
    - Whether the codebase suggests a different or better approach than what the issue proposes
    - Whether the proposed change creates redundancy, conflicts, or maintenance burden given existing code
