@@ -90,7 +90,7 @@ If no contributing guide exists, proceed without project-specific requirements.
 
 ### 2b. Explore
 
-Launch 4 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Steps 3 and 4 always evaluate constraints and edge cases, so their corresponding evidence-gathering lens must always run:
+Launch 4 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Step 3 always evaluates constraints and edge cases, and Step 4 requires constraint awareness for sound architecture design, so their corresponding evidence-gathering lens must always run:
 
 - **Similar features**: Find existing code that solves related problems. Trace through their implementation comprehensively, identifying patterns and conventions the new work should follow.
 - **Architecture**: Map the architecture and abstractions for the relevant area, tracing through the code comprehensively to understand the layers, data flow, and design decisions.

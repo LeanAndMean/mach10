@@ -41,7 +41,7 @@ Parse and understand:
 
 ## Step 3: Explore the Codebase
 
-Launch 5 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
+Launch 5 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Step 4 always evaluates risks and critical premises, so their corresponding evidence-gathering lenses must always run:
 
 - **Relevant code**: Find existing code related to the issue. Trace through their implementation comprehensively, identifying patterns, conventions, and the design decisions that shaped them.
 - **Architecture**: Map the relevant architecture layers, abstractions, and data flow, tracing through the code comprehensively to understand how components interact and where boundaries lie.
