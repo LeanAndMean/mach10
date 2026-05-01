@@ -1,7 +1,7 @@
 ---
 description: Create a pull request for the current branch with structured description
 argument-hint: [issue-number] [context]
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskUpdate
 ---
 
 # Create Pull Request
@@ -10,7 +10,7 @@ You are creating a pull request for the current branch, with a structured descri
 
 **Context (optional):** $ARGUMENTS
 
-## Step 1: Parse Input
+## Step 0: Parse input and create task list
 
 The user may provide:
 - An **issue number** to link (e.g., `55`)
@@ -19,7 +19,21 @@ The user may provide:
 
 Extract the issue number if provided. Note any additional context for use when drafting the PR body. If the input is ambiguous (e.g., it's unclear whether a token is an issue number or context), use free-text to ask the user to clarify.
 
-## Step 2: Gather Context
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 4 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
+
+| Task | Subject | activeForm |
+|------|---------|------------|
+| Step 0 | Step 0: Parse input and create task list | Parsing input |
+| Step 1 | Step 1: Gather context | Gathering context |
+| Step 2 | Step 2: Draft PR and get approval | Drafting PR |
+| Step 3 | Step 3: Create pull request | Creating pull request |
+| Step 4 | Step 4: Confirm PR and suggest next steps | Confirming PR |
+
+Mark Step 0 complete.
+
+## Step 1: Gather Context
+
+Mark Step 1 in progress.
 
 Determine the current branch:
 
@@ -27,7 +41,7 @@ Determine the current branch:
 git branch --show-current
 ```
 
-If the output is empty (detached HEAD state), stop and tell the user to create or checkout a branch first.
+If the output is empty (detached HEAD state), stop and tell the user to create or checkout a branch first. Leave Step 1 as `in_progress`.
 
 Determine the default branch of the repository:
 
@@ -35,7 +49,7 @@ Determine the default branch of the repository:
 gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
 ```
 
-If the current branch is the default branch, stop and tell the user to create a feature branch first.
+If the current branch is the default branch, stop and tell the user to create a feature branch first. Leave Step 1 as `in_progress`.
 
 Read recent commits on this branch vs the default branch:
 
@@ -49,7 +63,7 @@ Read the diff summary to understand the scope of changes:
 git diff <default-branch>...HEAD --stat
 ```
 
-If both the commit log and diff are empty, stop and tell the user there are no changes on this branch relative to the default branch. Suggest checking `git status` for uncommitted work.
+If both the commit log and diff are empty, stop and tell the user there are no changes on this branch relative to the default branch. Suggest checking `git status` for uncommitted work. Leave Step 1 as `in_progress`.
 
 For complex changes, use your Read and Grep tools to examine specific modified files and understand the changes in enough detail to write an accurate summary.
 
@@ -81,11 +95,15 @@ If an issue was identified, detect any sub-issues so closing keywords can be inc
    - If the API call **succeeds but returns no results** (empty array), the issue has no sub-issues. Do NOT fall through to Strategy B -- treat the sub-issue list as empty.
    - If the API call **fails** (e.g., 404, permission error, network timeout), proceed to Strategy B.
 
-2. **Strategy B (body-parse fallback):** This strategy runs only when the API call in Strategy A failed. Scan the issue body for sub-issue references. Match `#<number>` references that appear on GitHub task list lines -- lines beginning with optional whitespace followed by a list marker (`-`, `*`, or `+`) and a checkbox (`[ ]`, `[x]`, or `[X]`). Exclude any `#<number>` preceded by relational keywords: "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself. Use these as candidate sub-issues. Note: this fallback is less reliable than the API -- flag these as candidates when presenting the draft (see Step 3). After collecting the candidate list, query each sub-issue's state individually: `gh issue view <N> --json state --jq .state`. If the state query fails for a sub-issue, treat it as open.
+2. **Strategy B (body-parse fallback):** This strategy runs only when the API call in Strategy A failed. Scan the issue body for sub-issue references. Match `#<number>` references that appear on GitHub task list lines -- lines beginning with optional whitespace followed by a list marker (`-`, `*`, or `+`) and a checkbox (`[ ]`, `[x]`, or `[X]`). Exclude any `#<number>` preceded by relational keywords: "Related to", "Blocked by", "See also", or "Depends on". Collect the matched issue numbers, excluding the parent issue number itself. Use these as candidate sub-issues. Note: this fallback is less reliable than the API -- flag these as candidates when presenting the draft (see Step 2). After collecting the candidate list, query each sub-issue's state individually: `gh issue view <N> --json state --jq .state`. If the state query fails for a sub-issue, treat it as open.
 
 3. If Strategy A returned an empty result or Strategy B yielded no matches, the sub-issue list is empty.
 
-## Step 3: Draft PR
+Mark Step 1 complete.
+
+## Step 2: Draft PR and Get Approval
+
+Mark Step 2 in progress.
 
 Compose a PR title and body based on the gathered context.
 
@@ -122,9 +140,13 @@ Present the draft title and body to the user, then use `AskUserQuestion` to ask 
 - **Modify**: "Edit the PR title or body"
 - **Cancel**: "Abort without creating a PR"
 
-If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again. If the user selects "Cancel", stop and confirm that no PR was created.
+If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again. If the user selects "Cancel", stop and confirm that no PR was created. Leave Step 2 as `in_progress`.
 
-## Step 4: Create PR
+Mark Step 2 complete.
+
+## Step 3: Create Pull Request
+
+Mark Step 3 in progress.
 
 After user approval, ensure the branch has been pushed to the remote. Check if the branch exists on the remote:
 
@@ -138,7 +160,7 @@ If the branch does not exist on the remote, push it:
 git push -u origin <branch-name>
 ```
 
-If the push fails, report the error and stop.
+If the push fails, report the error and stop. Leave Step 3 as `in_progress`.
 
 Then create the PR using `gh`. Use a HEREDOC for the body to ensure correct formatting:
 
@@ -154,11 +176,17 @@ If `gh pr create` fails:
 - **Permission or authentication errors**: Suggest checking `gh auth status`.
 - **Other errors**: Report the full error to the user.
 
-Do NOT proceed to the confirmation step if PR creation failed.
+Do NOT proceed to the confirmation step if PR creation failed. Leave Step 3 as `in_progress`.
 
-## Step 5: Confirm
+Mark Step 3 complete.
+
+## Step 4: Confirm PR and Suggest Next Steps
+
+Mark Step 4 in progress.
 
 Report to the user:
 - PR number and URL
 - Linked issue (if any)
 - Suggest next step using the actual PR number: "Next: `/clear` then `/mach10:pr-review <pr-number>`"
+
+Mark Step 4 complete.
