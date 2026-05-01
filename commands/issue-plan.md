@@ -97,6 +97,8 @@ Launch 4 exploration agents in parallel using the Task tool (subagent_type: "fea
 - **Integration points**: Identify where new code would connect to existing systems, including extension surfaces, testing infrastructure, and cross-cutting concerns.
 - **Constraints and edge cases**: Investigate constraints and edge cases that the issue does not mention but the codebase reveals. Look for boundary conditions, implicit assumptions, error paths, or environmental requirements in the affected areas.
 
+Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+
 If project planning requirements were identified in Step 2a, include them in each agent's context so exploration covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
@@ -131,6 +133,8 @@ Based on the codebase findings and clarified requirements, launch 2-3 architectu
 - **Minimal changes**: Design the implementation with the smallest change surface. Maximize reuse of existing patterns. Minimize new abstractions.
 - **Clean architecture**: Design the implementation prioritizing clear separation of concerns, maintainability, and well-defined abstractions.
 - **Pragmatic balance**: Design the implementation balancing speed with code quality and extensibility.
+
+Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
 
 Each agent should produce a full implementation blueprint: files to create or modify, component responsibilities, data flow, and a phased build sequence.
 

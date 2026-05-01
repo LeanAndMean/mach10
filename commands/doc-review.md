@@ -85,6 +85,8 @@ Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Ex
 - **Code-level docs**: Docstrings, JSDoc, inline comments in changed files and their immediate neighbors
 - **Config and integration docs**: OpenAPI specs, CLI help text, config file comments, man pages
 
+Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+
 After agents return, compile results into a deduplicated list. Categorize each doc file into logical groups (e.g., "User-facing docs", "API reference", "Developer guides", "Inline code docs").
 
 If a scope was provided, filter to only categories and files matching that scope.
@@ -120,6 +122,8 @@ Each agent returns structured findings as a list:
 - Suggested change
 
 Launch agents in parallel where possible.
+
+Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
 
 Mark Step 4 complete.
 
@@ -168,6 +172,8 @@ Launch 1-2 verification agents using the Task tool (subagent_type: general-purpo
 - **Accuracy**: Do changes accurately reflect what the PR actually does?
 - **Formatting**: Are headings, lists, code blocks, and links well-formed?
 - **Cross-references**: Are links to other files or sections still valid?
+
+Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
 
 Present any verification issues to the user. Apply approved corrections.
 
