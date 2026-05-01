@@ -31,7 +31,7 @@ After parsing input, create the progress-tracking task list. Create a task for S
 
 Mark Step 0 complete.
 
-## Step 1: Gather Context
+## Step 1: Gather context
 
 Mark Step 1 in progress.
 
@@ -101,7 +101,7 @@ If an issue was identified, detect any sub-issues so closing keywords can be inc
 
 Mark Step 1 complete.
 
-## Step 2: Draft PR and Get Approval
+## Step 2: Draft PR and get approval
 
 Mark Step 2 in progress.
 
@@ -144,7 +144,7 @@ If the user selects "Modify", ask what they want to change, apply the changes, a
 
 Mark Step 2 complete.
 
-## Step 3: Create Pull Request
+## Step 3: Create pull request
 
 Mark Step 3 in progress.
 
@@ -180,13 +180,14 @@ Do NOT proceed to the confirmation step if PR creation failed. Leave Step 3 as `
 
 Mark Step 3 complete.
 
-## Step 4: Confirm PR and Suggest Next Steps
+## Step 4: Confirm PR and suggest next steps
 
 Mark Step 4 in progress.
 
 Report to the user:
 - PR number and URL
 - Linked issue (if any)
-- Suggest next step using the actual PR number: "Next: `/clear` then `/mach10:pr-review <pr-number>`"
 
 Mark Step 4 complete.
+
+**CLI output only (do NOT include in the report above):** Suggest next step using the actual PR number: "Next: `/clear` then `/mach10:pr-review <pr-number>`"
