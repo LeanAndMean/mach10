@@ -133,7 +133,7 @@ When no issue exists yet, start here. Claude helps you draft a structured GitHub
 
 **Command:** `/mach10:issue-assessment <number>`
 
-Claude reads the issue, explores the relevant parts of the codebase, and presents its findings -- scope, risks, ambiguities, and a recommended next step.
+Claude reads the issue, explores the relevant parts of the codebase, and presents its findings -- scope, risks, ambiguities, critical evaluation, and a recommended next step.
 
 **Your role:** Read the assessment critically. Push back if the scope is wrong, if risks are missed, or if important ambiguities aren't surfaced. The assessment is posted as a GitHub comment, so it becomes shared context for every future session on this issue.
 
