@@ -61,7 +61,7 @@ If no contributing guide exists, proceed without project-specific requirements.
 
 ### 3b. Explore
 
-Launch 3-6 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification:
+Launch 6 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification. All lenses are required -- Step 4 always evaluates risks, testing, and alternatives, so their corresponding evidence-gathering lenses must always run:
 
 - **Files referenced in the plan**: Trace through each file referenced in the plan comprehensively, confirming they exist, checking their current state, and verifying the plan's characterization of their structure, responsibilities, and integration points is accurate.
 - **Architecture and patterns**: Trace through the relevant architecture comprehensively, validating that the plan aligns with existing codebase conventions, abstractions, data flow, and design decisions.
