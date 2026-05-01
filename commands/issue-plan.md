@@ -90,11 +90,12 @@ If no contributing guide exists, proceed without project-specific requirements.
 
 ### 2b. Explore
 
-Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect:
+Launch 4 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Step 3 always evaluates constraints and edge cases, and Step 4 requires constraint awareness for sound architecture design, so their corresponding evidence-gathering lens must always run:
 
 - **Similar features**: Find existing code that solves related problems. Trace through their implementation comprehensively, identifying patterns and conventions the new work should follow.
 - **Architecture**: Map the architecture and abstractions for the relevant area, tracing through the code comprehensively to understand the layers, data flow, and design decisions.
 - **Integration points**: Identify where new code would connect to existing systems, including extension surfaces, testing infrastructure, and cross-cutting concerns.
+- **Constraints and edge cases**: Investigate constraints and edge cases that the issue does not mention but the codebase reveals. Look for boundary conditions, implicit assumptions, error paths, or environmental requirements in the affected areas.
 
 If project planning requirements were identified in Step 2a, include them in each agent's context so exploration covers the relevant project layers and testing infrastructure.
 
