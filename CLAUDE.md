@@ -110,6 +110,17 @@ Commands should use task-tracking tools to establish visible progress checkpoint
 - **Delegation phase tracking**: When a step delegates to a Skill, include an instruction in the Skill invocation telling it to create sub-tasks. For skills with a defined multi-phase plan (e.g., `/feature-dev:feature-dev` with its 7-phase development plan), instruct it to create a task for each phase. Phase tasks use a `"Step N.M: <action>"` subject convention where N is the parent step number and M is the phase sequence. Hierarchical naming serves dual purpose: it distinguishes delegated phases from command steps AND creates a visible parent-child relationship in the flat task list. This prevents Claude from skipping phases during long executions. For skills without a pre-defined phase structure, the Skill uses best judgment on sub-task granularity -- at least one sub-task must be created.
 - **Shared context**: Skill-tool calls share the same task list. Don't assume task IDs are sequential -- store the ID returned when creating a task for later updates.
 
+### Due-Diligence Steps
+
+Every evaluation output in a command must trace back to a prior step that explicitly instructs evidence gathering for that specific evaluation. If a command asks Claude to "present risks," a prior step must direct investigation toward risks. If a command asks Claude to "determine version bump level," a prior step must gather the information needed to make that determination.
+
+This "Gather then Evaluate" pattern takes two forms:
+
+- **Standalone gather steps**: A dedicated step that reads diffs, descriptions, or other artifacts before an evaluation step consumes them (e.g., `pr-pre-merge.md` Step 4 gathers PR context before Step 5's checklist).
+- **Exploration-agent lenses**: A bullet in an exploration step that directs agents toward the evidence category the evaluation requires (e.g., a "Risks and pitfalls" lens feeding a "Risks" evaluation output).
+
+When adding or modifying a command, verify that every evaluation category in the command's output section has a corresponding evidence-gathering instruction in a prior step. Omitting the gather instruction creates the antipattern: Claude is asked to evaluate without being told to investigate, which encourages shallow outputs or hallucination.
+
 ## Writing Agents
 
 Agent definitions live in the `agents/` directory as markdown files with YAML frontmatter. When adding or modifying agents, follow the existing pattern:
