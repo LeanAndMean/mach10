@@ -17,7 +17,7 @@ The user's input contains:
 
 Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
 
-After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 6 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 7 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
 | Task | Subject | activeForm |
 |------|---------|------------|
@@ -25,9 +25,10 @@ After parsing input, create the progress-tracking task list. Create a task for S
 | Step 1 | Step 1: Read contributing guidelines | Reading contributing guidelines |
 | Step 2 | Step 2: Check out and prepare | Checking out PR branch |
 | Step 3 | Step 3: Check branch freshness | Checking branch freshness |
-| Step 4 | Step 4: Run pre-merge checklist | Running pre-merge checklist |
-| Step 5 | Step 5: Commit checklist changes | Committing checklist changes |
-| Step 6 | Step 6: Present pre-merge report | Presenting report |
+| Step 4 | Step 4: Gather PR context | Gathering PR context |
+| Step 5 | Step 5: Run pre-merge checklist | Running pre-merge checklist |
+| Step 6 | Step 6: Commit checklist changes | Committing checklist changes |
+| Step 7 | Step 7: Present pre-merge report | Presenting report |
 
 Mark Step 0 complete.
 
@@ -116,19 +117,37 @@ git merge origin/<default-branch>
 
 Mark Step 3 complete.
 
-## Step 4: Run pre-merge checklist
+## Step 4: Gather PR context
 
 Mark Step 4 in progress.
 
-Work through each item. For each, report whether action is needed and perform it if so.
+Build a picture of what the PR changed so the checklist in Step 5 can make informed decisions:
 
-### 4a. Documentation
+1. **Changed files**: `gh pr diff <pr-number> --name-only` and `git diff origin/<default-branch>...HEAD --stat`
+2. **PR description**: `gh pr view <pr-number>`
+
+From these, identify what features, APIs, behaviors, or configurations were added, changed, or removed. Produce a brief change summary covering:
+- The nature of the changes (new feature, bug fix, refactor, configuration change, etc.)
+- Which areas of the project are affected
+- Whether there are user-facing behavior changes
+
+This summary provides the foundation for the documentation, version bump, CHANGELOG, and test items in Step 5.
+
+Mark Step 4 complete.
+
+## Step 5: Run pre-merge checklist
+
+Mark Step 5 in progress.
+
+Using the PR context gathered in Step 4, work through each item. For each, report whether action is needed and perform it if so.
+
+### 5a. Documentation
 
 - Are there new features or changed behavior that need documentation updates?
 - Check README.md, any docs/ directory, docstrings, and help text.
 - Update as needed.
 
-### 4b. Version Bump
+### 5b. Version Bump
 
 - Check if the project uses semantic versioning (look for version in package.json, pyproject.toml, setup.cfg, __version__, etc.)
 - If version tracking exists, determine if a bump is warranted:
@@ -140,12 +159,12 @@ Work through each item. For each, report whether action is needed and perform it
   - **Minor**: "New features, non-breaking changes"
   - **Major**: "Breaking changes to existing behavior"
 
-### 4c. CHANGELOG
+### 5c. CHANGELOG
 
 - Check if the project maintains a CHANGELOG.md or CHANGES.md.
 - If so, add an entry for this PR's changes following the existing format.
 
-### 4d. Tests
+### 5d. Tests
 
 Run the project's test suite:
 
@@ -158,25 +177,25 @@ Run the project's test suite:
 
 Report results. If tests fail, investigate and report — do NOT silently ignore failures.
 
-Mark Step 4 complete.
+Mark Step 5 complete.
 
-## Step 5: Commit checklist changes
+## Step 6: Commit checklist changes
 
-Mark Step 5 in progress.
+Mark Step 6 in progress.
 
-Check whether the checklist produced any uncommitted changes by running `git status --porcelain`. If the output is empty, no changes were made — mark Step 5 complete and proceed to Step 6.
+Check whether the checklist produced any uncommitted changes by running `git status --porcelain`. If the output is empty, no changes were made — mark Step 6 complete and proceed to Step 7.
 
 If there are changes, commit and push them:
 
-1. **Stage** only the files modified during this checklist (`git add <file>...`). If staging fails, report the error to the user, leave Step 5 as `in_progress`, and proceed to Step 6.
-2. **Commit** with message: "Pre-merge checklist: [brief summary of what was updated]". If the commit fails (pre-commit hook, empty commit, permissions), report the error to the user, leave Step 5 as `in_progress`, and proceed to Step 6.
-3. **Push** to remote (`git push`). If the push fails, report the error to the user and advise them to retry manually with `git push`. Leave Step 5 as `in_progress` and proceed to Step 6.
+1. **Stage** only the files modified during this checklist (`git add <file>...`). If staging fails, report the error to the user, leave Step 6 as `in_progress`, and proceed to Step 7.
+2. **Commit** with message: "Pre-merge checklist: [brief summary of what was updated]". If the commit fails (pre-commit hook, empty commit, permissions), report the error to the user, leave Step 6 as `in_progress`, and proceed to Step 7.
+3. **Push** to remote (`git push`). If the push fails, report the error to the user and advise them to retry manually with `git push`. Leave Step 6 as `in_progress` and proceed to Step 7.
 
-If all three operations succeeded, mark Step 5 complete.
+If all three operations succeeded, mark Step 6 complete.
 
-## Step 6: Present pre-merge report
+## Step 7: Present pre-merge report
 
-Mark Step 6 in progress.
+Mark Step 7 in progress.
 
 Present a summary of what was done:
 - [ ] Branch freshness: [current with <default-branch> / merged N commits from <default-branch> / auto-resolved conflicts in: <files> / behind <default-branch> (user skipped merge)]
@@ -187,4 +206,4 @@ Present a summary of what was done:
 
 Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`
 
-Mark Step 6 complete.
+Mark Step 7 complete.
