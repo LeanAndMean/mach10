@@ -109,6 +109,8 @@ def rotate_log():
 def main():
     TRAFFIC_DIR.mkdir(exist_ok=True)
     errors = []
+    new_views = 0
+    new_clones = 0
 
     try:
         rotate_log()
