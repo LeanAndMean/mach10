@@ -26,11 +26,15 @@ REPO = "LeanAndMean/mach10"
 
 def gh_api(endpoint):
     """Fetch a GitHub API endpoint. Returns (data, None) or (None, error_msg)."""
-    result = subprocess.run(
-        [GH, "api", f"repos/{REPO}/{endpoint}"],
-        capture_output=True,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            [GH, "api", f"repos/{REPO}/{endpoint}"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        return None, f"gh api {endpoint}: timed out after 60s"
     if result.returncode != 0:
         return None, f"gh api {endpoint}: {result.stderr.strip()}"
     try:
@@ -58,7 +62,7 @@ def atomic_write_json(filepath, data):
 
 
 def merge_timeseries(filepath, new_entries):
-    """Upsert daily entries by date key. Returns (count, None) or (0, error_msg)."""
+    """Upsert daily entries by date key. Returns (new_count, error_msg_or_none)."""
     existing = {}
     if filepath.exists():
         try:
@@ -128,7 +132,12 @@ def main():
             errors.append("traffic/views: response missing 'views' list")
             new_views = 0
         else:
-            new_views, err = merge_timeseries(TRAFFIC_DIR / "views.json", views_list)
+            try:
+                new_views, err = merge_timeseries(TRAFFIC_DIR / "views.json", views_list)
+            except OSError as exc:
+                errors.append(f"views.json: {exc}")
+                new_views = 0
+                err = None
             if err:
                 errors.append(err)
 
@@ -143,9 +152,14 @@ def main():
             errors.append("traffic/clones: response missing 'clones' list")
             new_clones = 0
         else:
-            new_clones, err = merge_timeseries(
-                TRAFFIC_DIR / "clones.json", clones_list
-            )
+            try:
+                new_clones, err = merge_timeseries(
+                    TRAFFIC_DIR / "clones.json", clones_list
+                )
+            except OSError as exc:
+                errors.append(f"clones.json: {exc}")
+                new_clones = 0
+                err = None
             if err:
                 errors.append(err)
 
