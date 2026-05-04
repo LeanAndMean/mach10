@@ -69,11 +69,21 @@ def merge_timeseries(filepath, new_entries):
             return 0, f"{filepath.name}: expected dict, got {type(existing).__name__}"
 
     new_count = 0
+    skipped = 0
     for entry in new_entries:
-        date_key = entry["timestamp"][:10]
+        try:
+            date_key = entry["timestamp"][:10]
+            record = {"count": entry["count"], "uniques": entry["uniques"]}
+        except (KeyError, TypeError):
+            skipped += 1
+            continue
         if date_key not in existing:
             new_count += 1
-        existing[date_key] = {"count": entry["count"], "uniques": entry["uniques"]}
+        existing[date_key] = record
+
+    if skipped:
+        atomic_write_json(filepath, existing)
+        return new_count, f"{filepath.name}: skipped {skipped} malformed entries"
 
     atomic_write_json(filepath, existing)
     return new_count, None
@@ -98,8 +108,12 @@ def rotate_log():
 
 def main():
     TRAFFIC_DIR.mkdir(exist_ok=True)
-    rotate_log()
     errors = []
+
+    try:
+        rotate_log()
+    except OSError as exc:
+        errors.append(f"rotate_log: {exc}")
 
     # Views
     views_data, err = gh_api("traffic/views")
@@ -107,9 +121,14 @@ def main():
         errors.append(err)
         new_views = 0
     else:
-        new_views, err = merge_timeseries(TRAFFIC_DIR / "views.json", views_data["views"])
-        if err:
-            errors.append(err)
+        views_list = views_data.get("views") if isinstance(views_data, dict) else None
+        if not isinstance(views_list, list):
+            errors.append("traffic/views: response missing 'views' list")
+            new_views = 0
+        else:
+            new_views, err = merge_timeseries(TRAFFIC_DIR / "views.json", views_list)
+            if err:
+                errors.append(err)
 
     # Clones
     clones_data, err = gh_api("traffic/clones")
@@ -117,11 +136,16 @@ def main():
         errors.append(err)
         new_clones = 0
     else:
-        new_clones, err = merge_timeseries(
-            TRAFFIC_DIR / "clones.json", clones_data["clones"]
-        )
-        if err:
-            errors.append(err)
+        clones_list = clones_data.get("clones") if isinstance(clones_data, dict) else None
+        if not isinstance(clones_list, list):
+            errors.append("traffic/clones: response missing 'clones' list")
+            new_clones = 0
+        else:
+            new_clones, err = merge_timeseries(
+                TRAFFIC_DIR / "clones.json", clones_list
+            )
+            if err:
+                errors.append(err)
 
     # Referrers
     referrers_data, err = gh_api("traffic/popular/referrers")
