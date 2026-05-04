@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Collect GitHub traffic data and merge into local JSON store.
+"""Collect GitHub traffic data for long-term retention.
 
 GitHub retains only 14 days of traffic data. This script fetches views,
-clones, referrers, and paths, then merges them into local files for
-long-term retention. Designed to run daily via cron.
+clones, referrers, and paths. Views and clones are merged into JSON files
+keyed by date (upsert semantics). Referrers and paths are appended as
+timestamped snapshots to JSONL files. Designed to run daily via cron.
 """
 
 import json
@@ -54,10 +55,16 @@ def atomic_write_json(filepath, data):
         closed = True
         os.replace(tmp_path, filepath)
     except BaseException:
-        if not closed:
-            os.close(fd)
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+        try:
+            if not closed:
+                os.close(fd)
+        except OSError:
+            pass
+        try:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+        except OSError:
+            pass
         raise
 
 
@@ -87,19 +94,31 @@ def merge_timeseries(filepath, new_entries):
 
     new_count = 0
     skipped = 0
+    first_bad = None
     for entry in new_entries:
         try:
             date_key = entry["timestamp"][:10]
             record = {"count": entry["count"], "uniques": entry["uniques"]}
         except (KeyError, TypeError):
             skipped += 1
+            if first_bad is None:
+                first_bad = repr(entry)[:200]
             continue
         if date_key not in existing:
             new_count += 1
         existing[date_key] = record
 
     if skipped:
-        skip_msg = f"{filepath.name}: skipped {skipped} malformed entries"
+        if skipped == len(new_entries) and len(new_entries) > 0:
+            skip_msg = (
+                f"{filepath.name}: ALL {skipped} entries malformed"
+                f" -- possible API format change (sample: {first_bad})"
+            )
+        else:
+            skip_msg = (
+                f"{filepath.name}: skipped {skipped} malformed entries"
+                f" (sample: {first_bad})"
+            )
         error_msg = f"{error_msg}; {skip_msg}" if error_msg else skip_msg
 
     atomic_write_json(filepath, existing)
@@ -112,8 +131,9 @@ def append_snapshot(filepath, data):
         "fetched_at": datetime.now(timezone.utc).isoformat(),
         "data": data,
     }
+    line = json.dumps(snapshot) + "\n"
     with open(filepath, "a") as f:
-        f.write(json.dumps(snapshot) + "\n")
+        f.write(line)
 
 
 def rotate_log():
@@ -183,7 +203,7 @@ def main():
     else:
         try:
             append_snapshot(TRAFFIC_DIR / "referrers.jsonl", referrers_data)
-        except OSError as exc:
+        except (OSError, TypeError) as exc:
             errors.append(f"referrers.jsonl: {exc}")
 
     # Paths
@@ -193,7 +213,7 @@ def main():
     else:
         try:
             append_snapshot(TRAFFIC_DIR / "paths.jsonl", paths_data)
-        except OSError as exc:
+        except (OSError, TypeError) as exc:
             errors.append(f"paths.jsonl: {exc}")
 
     # Report
