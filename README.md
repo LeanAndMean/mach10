@@ -281,6 +281,7 @@ claude --plugin-dir /path/to/mach10
 .claude-plugin/plugin.json   # Plugin manifest (name, version, author)
 agents/                       # Specialized agent definitions (markdown with YAML frontmatter)
 commands/                     # Slash command definitions (markdown with YAML frontmatter)
+scripts/                      # Utility scripts (repo maintenance, data collection)
 ```
 
 ### Customizing with CONTRIBUTING.md
