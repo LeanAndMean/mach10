@@ -51,6 +51,8 @@ Each agent should return findings as a structured list with:
 
 Launch agents in parallel where possible.
 
+Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+
 ## Step 4: Aggregate Results
 
 After all agents complete, aggregate findings:

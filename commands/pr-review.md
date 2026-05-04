@@ -117,6 +117,8 @@ gh pr view <pr-number> --json title,body,comments
 
 Then run an independent assessment of each finding — from both the primary review and any supplementary agents — using the Task tool with a `general-purpose` subagent. Include the review text and the PR context (title, body, and all comments) directly in the subagent prompt — do not ask the subagent to fetch them from GitHub.
 
+Do NOT use `run_in_background: true` when launching this agent.
+
 The subagent prompt should instruct it to:
 
 1. Review the PR title, body, and all existing comments. Note any findings that have already been discussed, resolved, or deferred in the PR conversation.

@@ -49,6 +49,8 @@ Launch 5 exploration agents in parallel using the Task tool (subagent_type: "fea
 - **Counter-evidence**: Look for codebase evidence that challenges the issue's premise or proposed approach. Identify existing patterns, design decisions, or prior solutions that suggest a different approach, reveal the issue may be addressing symptoms rather than root causes, or indicate the problem is a special case of something more general.
 - **Constraints and edge cases**: Investigate what could go wrong with the proposed approach. Look for failure modes, boundary conditions, implicit assumptions, and pitfalls in the affected code areas.
 
+Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
 ## Step 4: Assess
