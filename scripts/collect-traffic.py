@@ -8,6 +8,7 @@ long-term retention. Designed to run daily via cron.
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -16,7 +17,10 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TRAFFIC_DIR = REPO_ROOT / "traffic"
-GH = "/usr/bin/gh"
+GH = shutil.which("gh")
+if GH is None:
+    print("ERROR: 'gh' CLI not found on PATH", file=sys.stderr)
+    sys.exit(1)
 REPO = "LeanAndMean/mach10"
 
 
@@ -29,7 +33,10 @@ def gh_api(endpoint):
     )
     if result.returncode != 0:
         return None, f"gh api {endpoint}: {result.stderr.strip()}"
-    return json.loads(result.stdout), None
+    try:
+        return json.loads(result.stdout), None
+    except json.JSONDecodeError as exc:
+        return None, f"gh api {endpoint}: invalid JSON response: {exc}"
 
 
 def atomic_write_json(filepath, data):
@@ -51,10 +58,15 @@ def atomic_write_json(filepath, data):
 
 
 def merge_timeseries(filepath, new_entries):
-    """Upsert daily entries by date key. Returns count of new dates added."""
+    """Upsert daily entries by date key. Returns (count, None) or (0, error_msg)."""
     existing = {}
     if filepath.exists():
-        existing = json.loads(filepath.read_text())
+        try:
+            existing = json.loads(filepath.read_text())
+        except json.JSONDecodeError as exc:
+            return 0, f"{filepath.name}: corrupt JSON: {exc}"
+        if not isinstance(existing, dict):
+            return 0, f"{filepath.name}: expected dict, got {type(existing).__name__}"
 
     new_count = 0
     for entry in new_entries:
@@ -64,7 +76,7 @@ def merge_timeseries(filepath, new_entries):
         existing[date_key] = {"count": entry["count"], "uniques": entry["uniques"]}
 
     atomic_write_json(filepath, existing)
-    return new_count
+    return new_count, None
 
 
 def append_snapshot(filepath, data):
@@ -95,7 +107,9 @@ def main():
         errors.append(err)
         new_views = 0
     else:
-        new_views = merge_timeseries(TRAFFIC_DIR / "views.json", views_data["views"])
+        new_views, err = merge_timeseries(TRAFFIC_DIR / "views.json", views_data["views"])
+        if err:
+            errors.append(err)
 
     # Clones
     clones_data, err = gh_api("traffic/clones")
@@ -103,23 +117,31 @@ def main():
         errors.append(err)
         new_clones = 0
     else:
-        new_clones = merge_timeseries(
+        new_clones, err = merge_timeseries(
             TRAFFIC_DIR / "clones.json", clones_data["clones"]
         )
+        if err:
+            errors.append(err)
 
     # Referrers
     referrers_data, err = gh_api("traffic/popular/referrers")
     if err:
         errors.append(err)
     else:
-        append_snapshot(TRAFFIC_DIR / "referrers.jsonl", referrers_data)
+        try:
+            append_snapshot(TRAFFIC_DIR / "referrers.jsonl", referrers_data)
+        except OSError as exc:
+            errors.append(f"referrers.jsonl: {exc}")
 
     # Paths
     paths_data, err = gh_api("traffic/popular/paths")
     if err:
         errors.append(err)
     else:
-        append_snapshot(TRAFFIC_DIR / "paths.jsonl", paths_data)
+        try:
+            append_snapshot(TRAFFIC_DIR / "paths.jsonl", paths_data)
+        except OSError as exc:
+            errors.append(f"paths.jsonl: {exc}")
 
     # Report
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
