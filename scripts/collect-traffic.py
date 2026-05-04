@@ -64,13 +64,26 @@ def atomic_write_json(filepath, data):
 def merge_timeseries(filepath, new_entries):
     """Upsert daily entries by date key. Returns (new_count, error_msg_or_none)."""
     existing = {}
+    error_msg = None
     if filepath.exists():
         try:
             existing = json.loads(filepath.read_text())
         except json.JSONDecodeError as exc:
-            return 0, f"{filepath.name}: corrupt JSON: {exc}"
+            backup = filepath.with_suffix(".corrupt")
+            try:
+                filepath.rename(backup)
+            except OSError:
+                pass
+            existing = {}
+            error_msg = f"{filepath.name}: corrupt JSON backed up, starting fresh: {exc}"
         if not isinstance(existing, dict):
-            return 0, f"{filepath.name}: expected dict, got {type(existing).__name__}"
+            backup = filepath.with_suffix(".corrupt")
+            try:
+                filepath.rename(backup)
+            except OSError:
+                pass
+            error_msg = f"{filepath.name}: expected dict, got {type(existing).__name__}; backed up, starting fresh"
+            existing = {}
 
     new_count = 0
     skipped = 0
@@ -86,11 +99,11 @@ def merge_timeseries(filepath, new_entries):
         existing[date_key] = record
 
     if skipped:
-        atomic_write_json(filepath, existing)
-        return new_count, f"{filepath.name}: skipped {skipped} malformed entries"
+        skip_msg = f"{filepath.name}: skipped {skipped} malformed entries"
+        error_msg = f"{error_msg}; {skip_msg}" if error_msg else skip_msg
 
     atomic_write_json(filepath, existing)
-    return new_count, None
+    return new_count, error_msg
 
 
 def append_snapshot(filepath, data):
