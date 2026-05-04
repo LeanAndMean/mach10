@@ -119,7 +119,7 @@ def main():
     try:
         rotate_log()
     except OSError as exc:
-        errors.append(f"rotate_log: {exc}")
+        print(f"  WARNING: rotate_log: {exc}", file=sys.stderr)
 
     # Views
     views_data, err = gh_api("traffic/views")
