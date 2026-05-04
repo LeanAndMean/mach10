@@ -72,17 +72,17 @@ def merge_timeseries(filepath, new_entries):
             backup = filepath.with_suffix(".corrupt")
             try:
                 filepath.rename(backup)
-            except OSError:
-                pass
+                error_msg = f"{filepath.name}: corrupt JSON backed up, starting fresh: {exc}"
+            except OSError as rename_exc:
+                error_msg = f"{filepath.name}: corrupt JSON found (backup failed: {rename_exc}), starting fresh: {exc}"
             existing = {}
-            error_msg = f"{filepath.name}: corrupt JSON backed up, starting fresh: {exc}"
         if not isinstance(existing, dict):
             backup = filepath.with_suffix(".corrupt")
             try:
                 filepath.rename(backup)
-            except OSError:
-                pass
-            error_msg = f"{filepath.name}: expected dict, got {type(existing).__name__}; backed up, starting fresh"
+                error_msg = f"{filepath.name}: expected dict, got {type(existing).__name__}; backed up, starting fresh"
+            except OSError as rename_exc:
+                error_msg = f"{filepath.name}: expected dict, got {type(existing).__name__}; backup failed ({rename_exc}), starting fresh"
             existing = {}
 
     new_count = 0
