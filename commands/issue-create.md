@@ -35,12 +35,26 @@ Draft a structured issue with these sections:
 ### Body
 - **Summary**: 2-3 sentences describing the problem or feature
 - **Current Behavior** (for bugs/improvements): What happens now
-- **Proposed Behavior**: What should happen
-- **Acceptance Criteria**: Bullet list of verifiable conditions that define "done"
+- **Proposed Behavior**: What should happen -- describe desired outcomes rather than implementation steps. If the issue's subject is a command definition, agent definition, or workflow specification, naming the specific file and section as the target of a behavioral change is appropriate here; move to Technical Notes only when describing the mechanism of the change (algorithm, control flow, data structure choices).
+- **Acceptance Criteria**: Bullet list of verifiable end-state conditions that define "done", independent of implementation approach. Exception: when the artifact being changed is itself a specification (command definitions, config schemas, workflow files, documentation), implementation-specific criteria are appropriate because the spec IS the implementation.
 - **Context** (optional): Links to related PRs, issues, or discussions
 - **Technical Notes** (optional): Implementation hints, relevant files, architectural considerations
 
+### Drafting notes
+
+**PII and sensitive content**: During drafting, paraphrase rather than include verbatim: API tokens (patterns like `ghp_`, `sk-`, `Bearer eyJ`), passwords, private keys, personal email addresses, and internal hostnames/IPs. When paraphrasing, preserve the semantic role of the content (e.g., "the reporter's email" instead of the literal address, "an API token" instead of the literal value). Do not use placeholder artifacts like `[REDACTED]` -- the draft should read naturally. Track what was paraphrased for a brief summary in Step 3.
+
+Safe-list of routine content that must NOT be paraphrased or flagged: file paths, GitHub usernames, branch names, config key names, public URLs, API response fragments, GitHub comment IDs (`issuecomment-N` form), HTML comment markers (`<!-- ... -->`), jq filter expressions, shell command invocations, and YAML frontmatter key-value pairs.
+
+When the input ($ARGUMENTS or user response) is structured output from another mach10 command (identifiable by F/S identifiers, `<!-- mach10-* -->` markers, or step-reference formatting), treat all content as specification-artifact material and do not apply PII paraphrasing.
+
+**Proposed Behavior boundary**: Outcome vs. implementation decision test -- if a sentence describes a specific implementation mechanism (algorithm, data structure, control flow decision, code pattern), it belongs in Technical Notes. Naming a specific file or section as the target of a behavioral change is Proposed Behavior, not implementation detail. This distinction matters especially in plugin/specification repos where command files and their sections are the behavioral surface.
+
+**Acceptance Criteria constraint**: Observable end-state framing. Each criterion should be confirmable regardless of implementation path. Exception for specification artifacts (command definitions, config schemas, workflow files, documentation) where the spec is the deliverable -- in those cases, implementation-specific criteria are appropriate because they describe the desired state of the specification itself.
+
 ## Step 3: Review
+
+If any content was paraphrased during drafting, include a single-sentence note before the draft (e.g., "Note: 1 sensitive item was paraphrased in the draft below"). If no content was paraphrased, skip the note.
 
 Present the drafted issue to the user, then use `AskUserQuestion` to ask for approval with these options:
 
@@ -48,7 +62,7 @@ Present the drafted issue to the user, then use `AskUserQuestion` to ask for app
 - **Modify**: "Edit the issue title, body, labels, or assignees"
 - **Cancel**: "Abort without creating an issue"
 
-If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again.
+If the user selects "Modify", ask what they want to change, apply the changes, and present the updated draft for approval again. If the user wants to restore paraphrased content to its original form, honor the request -- the user has final authority over what appears in the issue.
 
 ## Step 4: Check for Duplicates
 
