@@ -68,6 +68,15 @@ def atomic_write_json(filepath, data):
         raise
 
 
+def _backup_corrupt(filepath, reason):
+    """Back up a corrupt file and return an error message describing the outcome."""
+    try:
+        filepath.rename(filepath.with_suffix(".corrupt"))
+        return f"{filepath.name}: {reason}; backed up, starting fresh"
+    except OSError as exc:
+        return f"{filepath.name}: {reason}; backup failed ({exc}), starting fresh"
+
+
 def merge_timeseries(filepath, new_entries):
     """Upsert daily entries by date key. Returns (new_count, error_msg_or_none)."""
     existing = {}
@@ -76,20 +85,12 @@ def merge_timeseries(filepath, new_entries):
         try:
             existing = json.loads(filepath.read_text())
         except json.JSONDecodeError as exc:
-            backup = filepath.with_suffix(".corrupt")
-            try:
-                filepath.rename(backup)
-                error_msg = f"{filepath.name}: corrupt JSON backed up, starting fresh: {exc}"
-            except OSError as rename_exc:
-                error_msg = f"{filepath.name}: corrupt JSON found (backup failed: {rename_exc}), starting fresh: {exc}"
+            error_msg = _backup_corrupt(filepath, f"corrupt JSON: {exc}")
             existing = {}
         if not isinstance(existing, dict):
-            backup = filepath.with_suffix(".corrupt")
-            try:
-                filepath.rename(backup)
-                error_msg = f"{filepath.name}: expected dict, got {type(existing).__name__}; backed up, starting fresh"
-            except OSError as rename_exc:
-                error_msg = f"{filepath.name}: expected dict, got {type(existing).__name__}; backup failed ({rename_exc}), starting fresh"
+            error_msg = _backup_corrupt(
+                filepath, f"expected dict, got {type(existing).__name__}"
+            )
             existing = {}
 
     new_count = 0
@@ -143,78 +144,60 @@ def rotate_log():
         log_path.replace(TRAFFIC_DIR / "cron.log.1")
 
 
+def collect_timeseries(endpoint, list_key, filename, errors):
+    """Fetch a timeseries endpoint and merge into a JSON file.
+
+    Returns the number of new date entries added (0 on any failure).
+    Appends error descriptions to the errors list.
+    """
+    data, err = gh_api(endpoint)
+    if err:
+        errors.append(err)
+        return 0
+
+    entries = data.get(list_key) if isinstance(data, dict) else None
+    if not isinstance(entries, list):
+        errors.append(f"{endpoint}: response missing '{list_key}' list")
+        return 0
+
+    try:
+        new_count, err = merge_timeseries(TRAFFIC_DIR / filename, entries)
+    except OSError as exc:
+        errors.append(f"{filename}: {exc}")
+        return 0
+    if err:
+        errors.append(err)
+    return new_count
+
+
+def collect_snapshot(endpoint, filename, errors):
+    """Fetch a snapshot endpoint and append to a JSONL file.
+
+    Appends error descriptions to the errors list.
+    """
+    data, err = gh_api(endpoint)
+    if err:
+        errors.append(err)
+        return
+    try:
+        append_snapshot(TRAFFIC_DIR / filename, data)
+    except (OSError, TypeError) as exc:
+        errors.append(f"{filename}: {exc}")
+
+
 def main():
     TRAFFIC_DIR.mkdir(exist_ok=True)
     errors = []
-    new_views = 0
-    new_clones = 0
 
     try:
         rotate_log()
     except OSError as exc:
         print(f"  WARNING: rotate_log: {exc}", file=sys.stderr)
 
-    # Views
-    views_data, err = gh_api("traffic/views")
-    if err:
-        errors.append(err)
-        new_views = 0
-    else:
-        views_list = views_data.get("views") if isinstance(views_data, dict) else None
-        if not isinstance(views_list, list):
-            errors.append("traffic/views: response missing 'views' list")
-            new_views = 0
-        else:
-            try:
-                new_views, err = merge_timeseries(TRAFFIC_DIR / "views.json", views_list)
-            except OSError as exc:
-                errors.append(f"views.json: {exc}")
-                new_views = 0
-                err = None
-            if err:
-                errors.append(err)
-
-    # Clones
-    clones_data, err = gh_api("traffic/clones")
-    if err:
-        errors.append(err)
-        new_clones = 0
-    else:
-        clones_list = clones_data.get("clones") if isinstance(clones_data, dict) else None
-        if not isinstance(clones_list, list):
-            errors.append("traffic/clones: response missing 'clones' list")
-            new_clones = 0
-        else:
-            try:
-                new_clones, err = merge_timeseries(
-                    TRAFFIC_DIR / "clones.json", clones_list
-                )
-            except OSError as exc:
-                errors.append(f"clones.json: {exc}")
-                new_clones = 0
-                err = None
-            if err:
-                errors.append(err)
-
-    # Referrers
-    referrers_data, err = gh_api("traffic/popular/referrers")
-    if err:
-        errors.append(err)
-    else:
-        try:
-            append_snapshot(TRAFFIC_DIR / "referrers.jsonl", referrers_data)
-        except (OSError, TypeError) as exc:
-            errors.append(f"referrers.jsonl: {exc}")
-
-    # Paths
-    paths_data, err = gh_api("traffic/popular/paths")
-    if err:
-        errors.append(err)
-    else:
-        try:
-            append_snapshot(TRAFFIC_DIR / "paths.jsonl", paths_data)
-        except (OSError, TypeError) as exc:
-            errors.append(f"paths.jsonl: {exc}")
+    new_views = collect_timeseries("traffic/views", "views", "views.json", errors)
+    new_clones = collect_timeseries("traffic/clones", "clones", "clones.json", errors)
+    collect_snapshot("traffic/popular/referrers", "referrers.jsonl", errors)
+    collect_snapshot("traffic/popular/paths", "paths.jsonl", errors)
 
     # Report
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
