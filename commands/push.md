@@ -113,4 +113,19 @@ gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'
 ```
 
 - **If on the default branch:** Suggest issue-oriented next steps (e.g., "Next: `/clear` then `/mach10:issue-assessment $ISSUE`" or "Next: `/clear` then `/mach10:issue-implement $ISSUE next-stage`"). Do not suggest `/mach10:pr-create` or `/mach10:pr-review`.
-- **If on a feature branch:** Suggest PR-oriented next steps (e.g., "Next: `/clear` then `/mach10:pr-create`" or "Next: `/clear` then `/mach10:pr-review $PR`").
+- **If on a feature branch**, apply these checks in order:
+
+  1. **PR exists** (`gh pr view --json number` succeeds): Suggest "Next: `/clear` then `/mach10:pr-review $PR`". Stop here -- plan detection is irrelevant once a PR exists.
+
+  2. **Session context provides stage info**: If `issue-implement` was invoked earlier in this session, you already know the issue number, stage number (or range), and total stage count from reading the plan. Use this directly:
+     - If more stages remain (next stage = current + 1, or last-in-range + 1 for multi-stage invocations like `stages 3-4`): Suggest "Next: `/clear` then `/mach10:issue-implement <issue> <next-stage>`".
+     - If the current stage was the last: Suggest "Next: `/clear` then `/mach10:pr-create`".
+
+  3. **No session context (fresh session)**: If no `issue-implement` context is available, attempt a lightweight plan lookup:
+     - Determine the issue number from Step 4's resolved target (or from the branch-name issue-number pattern if Step 4 did not resolve one).
+     - If an issue number is available, run `gh issue view <issue-number> --comments` and search for the `<!-- mach10-plan -->` marker (use the last match if multiple exist).
+     - If a plan is found, count stages by matching `^##+ Stage \d+` headings (ignore stage references in prose paragraphs).
+     - Use best judgment to determine the most recently completed stage from progress comments or commit history on the branch.
+     - If stages remain: Suggest "Next: `/clear` then `/mach10:issue-implement <issue> <next-stage>`". If the next stage is ambiguous, omit the stage number so the user supplies it.
+     - If all stages are complete: Suggest "Next: `/clear` then `/mach10:pr-create`".
+     - If no issue number is available, no plan is found, or stage count cannot be determined: fall back to suggesting "Next: `/clear` then `/mach10:pr-create`".
