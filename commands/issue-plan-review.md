@@ -1,7 +1,7 @@
 ---
 description: Read a GitHub issue and all comments, review the implementation plan, and present findings
 argument-hint: <issue-number>
-allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
+allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
 model: opus
 ---
 
@@ -11,14 +11,28 @@ You are reviewing the implementation plan for a GitHub issue. Your goal is to re
 
 **User input:** $ARGUMENTS
 
-## Step 1: Parse Input
+## Step 0: Parse input and create task list
 
 The user's input contains:
 - An **issue number** (required)
 
 Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
 
-## Step 2: Read the Issue
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 4 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
+
+| Task | Subject | activeForm |
+|------|---------|------------|
+| Step 0 | Step 0: Parse input and create task list | Parsing input |
+| Step 1 | Step 1: Read the issue and locate plan | Reading the issue |
+| Step 2 | Step 2: Explore the codebase | Exploring the codebase |
+| Step 3 | Step 3: Review the plan | Reviewing the plan |
+| Step 4 | Step 4: Present findings and execute decision | Presenting findings |
+
+Mark Step 0 complete.
+
+## Step 1: Read the issue and locate plan
+
+Mark Step 1 in progress.
 
 Read the issue title and body:
 
@@ -37,11 +51,15 @@ Understand:
 - The implementation plan (typically posted as a comment)
 - Any discussion, decisions, or clarifications in the comment thread
 
-Locate the implementation plan comment by searching all issue comments for the `<!-- mach10-plan -->` HTML marker. If multiple comments contain the marker, use the last one (the most recent revision). If no comment contains the marker, fall back to identifying the most recent substantive comment that contains a staged implementation plan. If no plan exists at all, inform the user and suggest running `/mach10:issue-plan <issue-number>` first.
+Locate the implementation plan comment by searching all issue comments for the `<!-- mach10-plan -->` HTML marker. If multiple comments contain the marker, use the last one (the most recent revision). If no comment contains the marker, fall back to identifying the most recent substantive comment that contains a staged implementation plan. If no plan exists at all, leave Step 1 as `in_progress`. Delete the remaining pending tasks (Steps 2-4) since recovery requires a fresh session. Inform the user and suggest running `/mach10:issue-plan <issue-number>` first.
 
-## Step 3: Explore the Codebase
+Mark Step 1 complete.
 
-### 3a. Read Contributing Guidelines
+## Step 2: Explore the Codebase
+
+Mark Step 2 in progress.
+
+### 2a. Read Contributing Guidelines
 
 Before launching exploration agents, look for project contribution guidelines in order of precedence:
 
@@ -55,13 +73,13 @@ Read only the first file found; skip the rest.
 
 If found, read the file and extract any planning-relevant guidance: expected project layers (e.g., models, migrations, API routes, services, UI, documentation), testing expectations (test frameworks, coverage requirements, test types), and any other requirements that a complete plan should satisfy.
 
-Record these as **project review criteria** -- they will serve as benchmarks when assessing the plan in Step 4.
+Record these as **project review criteria** -- they will serve as benchmarks when assessing the plan in Step 3.
 
 If no contributing guide exists, proceed without project-specific requirements.
 
-### 3b. Explore
+### 2b. Explore
 
-Launch 6 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification. All lenses are required -- Step 4 always evaluates risks, testing, and alternatives, so their corresponding evidence-gathering lenses must always run:
+Launch 6 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification. All lenses are required -- Step 3 always evaluates risks, testing, and alternatives, so their corresponding evidence-gathering lenses must always run:
 
 - **Files referenced in the plan**: Trace through each file referenced in the plan comprehensively, confirming they exist, checking their current state, and verifying the plan's characterization of their structure, responsibilities, and integration points is accurate.
 - **Architecture and patterns**: Trace through the relevant architecture comprehensively, validating that the plan aligns with existing codebase conventions, abstractions, data flow, and design decisions.
@@ -72,11 +90,15 @@ Launch 6 exploration agents in parallel using the Task tool (subagent_type: "fea
 
 Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
 
-If project review criteria were recorded in Step 3a, include them in each agent's context so exploration can verify whether the plan covers the relevant project layers and testing infrastructure.
+If project review criteria were recorded in Step 2a, include them in each agent's context so exploration can verify whether the plan covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of key files and observations. After agents complete, read all identified files.
 
-## Step 4: Review the Plan
+Mark Step 2 complete.
+
+## Step 3: Review the Plan
+
+Mark Step 3 in progress.
 
 For each stage in the plan, assess:
 
@@ -91,10 +113,14 @@ Also assess the plan holistically:
 - Does it address all requirements and acceptance criteria from the issue?
 - Does it follow existing codebase patterns and conventions?
 - Are there alternative approaches worth considering?
-- **Project-layer coverage**: Does the plan address all project layers discovered during codebase exploration or specified in the project review criteria recorded in Step 3a? Flag any affected layer that no stage covers.
+- **Project-layer coverage**: Does the plan address all project layers discovered during codebase exploration or specified in the project review criteria recorded in Step 2a? Flag any affected layer that no stage covers.
 - **Test coverage planning**: If the project has an existing test suite or the project review criteria specify testing expectations, does each stage that introduces or modifies behavior include adequate test planning (what to test, test types, behaviors to cover)? If the project has no testable runtime code, verify the plan notes this rather than omitting test planning silently.
 
-## Step 5: Present Findings
+Mark Step 3 complete.
+
+## Step 4: Present Findings and Execute Decision
+
+Mark Step 4 in progress.
 
 Present your review to the user, organized as:
 
@@ -113,7 +139,9 @@ Use `AskUserQuestion` to ask the user how they want to proceed:
 - **Discuss findings**: "Explore specific findings in more detail before deciding"
 - **Cancel**: "Stop here without updating or proceeding (a brief audit note will be posted)"
 
-If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions). If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed.
+If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions). Mark Step 4 complete.
+
+If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. Step 4 remains in progress across all discussion iterations until the user selects a terminal option (Update, Proceed, or Cancel).
 
 If the user selects "Proceed as-is" and at least one Critical or Important finding exists, post a decision comment on the issue to record the user's choice:
 
@@ -129,7 +157,9 @@ Comment format:
 
 When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-If the user selects "Proceed as-is" and all findings are Suggestions only, do NOT post a decision comment -- proceeding past suggestions is the expected path.
+Mark Step 4 complete.
+
+If the user selects "Proceed as-is" and all findings are Suggestions only, do NOT post a decision comment -- proceeding past suggestions is the expected path. Mark Step 4 complete.
 
 If the user selects "Cancel":
 
@@ -148,6 +178,8 @@ If the user selects "Cancel":
 
    When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
-**CLI output only (do NOT include in any GitHub comment):** Suggest next step: `/clear` then `/mach10:issue-plan-review <issue-number>` to re-run the review, or `/mach10:issue-implement <issue-number> 1` to proceed with the existing plan.
+   Mark Step 4 complete.
+
+   **CLI output only (do NOT include in any GitHub comment):** Suggest next step: `/clear` then `/mach10:issue-plan-review <issue-number>` to re-run the review, or `/mach10:issue-implement <issue-number> 1` to proceed with the existing plan.
 
 After the user's choice is executed (unless cancelled), suggest as **CLI output only (do NOT include in any GitHub comment):** `/clear` then `/mach10:issue-implement <issue-number> 1` to begin implementation.
