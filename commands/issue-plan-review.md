@@ -51,9 +51,9 @@ Understand:
 - The implementation plan (typically posted as a comment)
 - Any discussion, decisions, or clarifications in the comment thread
 
-Locate the implementation plan comment by searching all issue comments for the `<!-- mach10-plan -->` HTML marker. If multiple comments contain the marker, use the last one (the most recent revision). If no comment contains the marker, fall back to identifying the most recent substantive comment that contains a staged implementation plan. If no plan exists at all, leave Step 1 as `in_progress`. Delete the remaining pending tasks (Steps 2-4) since recovery requires a fresh session. Inform the user and suggest running `/mach10:issue-plan <issue-number>` first.
+Locate the implementation plan comment by searching all issue comments for the `<!-- mach10-plan -->` HTML marker. If multiple comments contain the marker, use the last one (the most recent revision). If no comment contains the marker, fall back to identifying the most recent substantive comment that contains a staged implementation plan. If no plan exists at all, leave Step 1 as `in_progress`. Delete the remaining pending tasks (Steps 2-4) since recovery requires a fresh session. Inform the user and suggest running `/mach10:issue-plan <issue-number>` first. Stop -- do not continue to Step 2.
 
-Mark Step 1 complete.
+On success, mark Step 1 complete.
 
 ## Step 2: Explore the Codebase
 
