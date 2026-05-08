@@ -255,12 +255,14 @@ claude --plugin-dir /path/to/mach10
 | Command | Description |
 |---------|-------------|
 | `/mach10:pr-create [issue] [context]` | Create a PR for the current branch with structured description |
-| `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
+| `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, execute any documented `## Test plan` checklist, post results, then independently assess each finding |
 | `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]` | Fix specific review findings via feature-dev |
 | `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
 | `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
 | `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests) |
 | `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
+
+> **Note:** `pr-review` invokes the `mach10:test-plan-executor` agent to dynamically run the items in a PR's `## Test plan` checklist. This is distinct from the `pr-review-toolkit:pr-test-analyzer` agent, which statically analyzes test coverage in the diff.
 
 #### Utilities
 

@@ -167,16 +167,46 @@ Using the PR context gathered in Step 4, work through each item. For each, repor
 
 ### 5d. Tests
 
-Run the project's test suite:
+Check whether `/mach10:pr-review` recently ran the test plan and surface those results when fresh, instead of running the suite again.
 
-```
-# Auto-detect test runner
-# Python: pytest, unittest
-# JavaScript: npm test, jest
-# etc.
-```
+1. Fetch the most recent `<!-- mach10-review -->` comment on the PR:
 
-Report results. If tests fail, investigate and report — do NOT silently ignore failures.
+   ```
+   gh pr view <pr-number> --json comments --jq '[.comments[] | select(.body | contains("<!-- mach10-review -->"))] | last'
+   ```
+
+   The query returns the comment object (with `createdAt` and `body`), or `null` if none was found.
+
+2. **Marker found and the comment body contains a `## Test plan results` section:** compare the comment's `createdAt` to the latest commit timestamp on the branch. Convert both to Unix epoch seconds before comparing -- string comparison of ISO 8601 timestamps with mixed timezone offsets gives the wrong answer.
+
+   - Comment epoch: `date -u -d "<createdAt>" +%s` (where `<createdAt>` is the ISO 8601 string from the JSON above).
+   - Branch epoch: `git log -1 --format=%ct` (committer time as Unix seconds).
+
+   Then:
+
+   - **Fresh** (comment epoch >= branch epoch): surface the prior summary line and per-item statuses in CLI output and skip running the auto-detected suite. Record the outcome for the Step 7 report.
+   - **Stale** (branch epoch > comment epoch): use `AskUserQuestion` to ask how to proceed:
+
+     - **Re-run pr-review (stops the checklist)**: "Stop this session and run a fresh review (recovery: `/clear` then `/mach10:pr-review <pr>`)"
+     - **Accept stale results**: "Trust the prior summary even though the branch has new commits since"
+     - **Run suite directly**: "Skip the test plan and run only the auto-detected test suite"
+
+     If the user selects **Re-run pr-review (stops the checklist)**, stop the session and instruct the user to run the recovery command. Leave Step 5 as `in_progress`.
+
+     If the user selects **Accept stale results**, surface the prior summary in CLI output and skip running the suite. Record the outcome for the Step 7 report.
+
+     If the user selects **Run suite directly**, fall through to step 3 below.
+
+3. **No marker, marker without a `## Test plan results` section, or user selected "Run suite directly":** run the project's test suite:
+
+   ```
+   # Auto-detect test runner
+   # Python: pytest, unittest
+   # JavaScript: npm test, jest
+   # etc.
+   ```
+
+   Report results. If tests fail, investigate and report -- do NOT silently ignore failures.
 
 Mark Step 5 complete.
 
@@ -203,7 +233,7 @@ Present a summary of what was done:
 - [ ] Documentation: [updated / no changes needed]
 - [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed]
 - [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
-- [ ] Tests: [all passing / N failures noted]
+- [ ] Tests: [from pr-review: P passed, F failed, B blocked / stale results accepted (P passed, F failed, B blocked) / suite passing / N failures noted]
 
 Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`
 
