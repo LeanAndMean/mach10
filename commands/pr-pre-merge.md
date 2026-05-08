@@ -177,15 +177,21 @@ Check whether `/mach10:pr-review` recently ran the test plan and surface those r
 
    The query returns the comment object (with `createdAt` and `body`), or `null` if none was found.
 
-2. **Marker found and the comment body contains a `## Test plan results` section:** compare the comment's `createdAt` to the latest commit timestamp on the branch. Convert both to Unix epoch seconds before comparing -- string comparison of ISO 8601 timestamps with mixed timezone offsets gives the wrong answer.
+2. **Marker found and the comment body contains a `## Test plan results` section with at least one parseable per-item table row:** compare the comment's `createdAt` to the latest commit timestamp on the branch. Convert both to Unix epoch seconds before comparing -- string comparison of ISO 8601 timestamps with mixed timezone offsets gives the wrong answer.
+
+   First, validate the section is well-formed. Extract the body between the `## Test plan results` heading and the next `^#` heading (or end of comment), and require at least one parseable table data row -- a line beginning with `|` containing three or more pipe-delimited cells, excluding the header row (`| Item | Status | Notes |` or similar) and the separator row (`|---|---|---|`). If the section heading is present but no parseable rows are found, treat this as a malformed prior result: surface a CLI note "Prior review's test plan results section was malformed; ran suite directly", and fall through to step 3 below.
+
+   Then capture the epoch values:
 
    - Comment epoch: `date -u -d "<createdAt>" +%s` (where `<createdAt>` is the ISO 8601 string from the JSON above).
    - Branch epoch: `git log -1 --format=%ct` (committer time as Unix seconds).
 
+   Validate that both values are non-empty integers (e.g., `[[ "$comment_epoch" =~ ^[0-9]+$ ]]` and `[[ "$branch_epoch" =~ ^[0-9]+$ ]]`) before comparing. If either validation fails (BSD `date` without `-d` support, malformed `createdAt`, unexpected `git log` output, etc.), treat the result as stale, surface a CLI note "Could not parse comment timestamp; treating as stale", and proceed to the stale path below -- do not skip the suite based on an invalid comparison.
+
    Then:
 
    - **Fresh** (comment epoch >= branch epoch): surface the prior summary line and per-item statuses in CLI output and skip running the auto-detected suite. Record the outcome for the Step 7 report.
-   - **Stale** (branch epoch > comment epoch): use `AskUserQuestion` to ask how to proceed:
+   - **Stale** (branch epoch > comment epoch, or epoch validation failed above): use `AskUserQuestion` to ask how to proceed:
 
      - **Re-run pr-review (stops the checklist)**: "Stop this session and run a fresh review (recovery: `/clear` then `/mach10:pr-review <pr>`)"
      - **Accept stale results**: "Trust the prior summary even though the branch has new commits since"
@@ -197,7 +203,7 @@ Check whether `/mach10:pr-review` recently ran the test plan and surface those r
 
      If the user selects **Run suite directly**, fall through to step 3 below.
 
-3. **No marker, marker without a `## Test plan results` section, or user selected "Run suite directly":** run the project's test suite:
+3. **No marker, marker without a `## Test plan results` section, marker with a malformed (no parseable rows) section, or user selected "Run suite directly":** run the project's test suite:
 
    ```
    # Auto-detect test runner

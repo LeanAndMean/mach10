@@ -55,17 +55,18 @@ Return early in these cases without attempting to execute anything:
 - **Missing section** -- the PR body has no `## Test plan` heading. Return a single note: `PR description does not contain a test plan section`.
 - **Empty section** -- the heading is present but contains no items. Return a single note: `Test plan section is empty`.
 - **Multiple sections** -- use the first match; ignore subsequent sections.
-- **Placeholder text** -- one or more items still contain the literal `<bulleted checklist...>` template placeholder. Return a single note: `Test plan still uses the template placeholder`.
+- **Placeholder text** -- one or more items still contain an unfilled angle-bracketed template token. Detect both backticked tokens (e.g., `` `<test command>` ``, `` `<service>` ``, `` `<teardown command>` ``) and bare angle-bracketed placeholder phrases (e.g., `<expected outcome>`, `<observable behavior>`). The current `commands/pr-create.md` template seeds these tokens; an unfilled template trips this case. Return a single note: `Test plan still uses the template placeholder`.
 
 ## Destructive-Pattern Filter
 
 Refused command patterns (regex, matched case-insensitively):
 
-- `\brm\b[^|;&\n]*\s(/|\$HOME|~|\*|\$\{?HOME\}?)(\s|$)` -- any `rm` (with any flag combination) targeting root, home, tilde, or wildcard
+- `\brm\b[^|;&\n]*\s(/|\$HOME|~|\*|\$\{?HOME\}?)` -- any `rm` invocation whose argument begins with root, `$HOME`, tilde, wildcard, or `${HOME}`, including subpaths (`/etc`, `/var/log`, `$HOME/.ssh`, `~/.config`, `/*`)
 - `\bsudo\b`
 - `\b(curl|wget)\b[^|]*\|\s*(sh|bash)`
 - `\b(eval|source)\s+<\s*\(`
-- `>\s*(/dev/sd[a-z]|/dev/disk)`
+- `>\s*(/dev/sd[a-z]|/dev/disk)` -- shell-redirect writes to a block device
+- `\b(dd|mkfs(\.[a-z0-9]+)?|shred|parted)\b[^|;&\n]*/dev/(sd[a-z]|disk|nvme)` -- direct destructive operations against a block device via program flags (e.g., `dd of=/dev/sda`, `mkfs.ext4 /dev/sda`, `shred /dev/sda`, `parted /dev/sda mklabel`)
 
 When a command is refused, the item becomes `BLOCKED` with the matched pattern in the note (e.g., `filtered for safety: matched destructive rm -rf pattern`). Do not attempt a sanitized variant -- if the user wants the command run, they can run it manually.
 
