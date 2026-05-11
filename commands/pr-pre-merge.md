@@ -239,7 +239,7 @@ Present a summary of what was done:
 - [ ] Documentation: [updated / no changes needed]
 - [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed]
 - [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
-- [ ] Tests: [from pr-review: P passed, F failed, B blocked / stale results accepted (P passed, F failed, B blocked) / suite passing / N failures noted]
+- [ ] Tests: [from pr-review: P passed, F failed, B blocked / from pr-review: all N items blocked (no automated verification) / stale results accepted (P passed, F failed, B blocked) / suite passing / N failures noted]
 
 Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`
 

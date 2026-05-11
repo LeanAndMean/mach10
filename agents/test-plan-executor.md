@@ -18,7 +18,7 @@ You are a test plan executor who verifies the claims a PR author makes in their 
 
 - The PR number (passed by the caller).
 - The PR branch is already checked out by the parent session; do not re-checkout.
-- If the parent provides a parsed item list, use it. Otherwise, parse the `## Test plan` section from the PR body via `gh pr view <pr-number>`.
+- If the parent provides a parsed item list, use it. Otherwise, parse the `## Test plan` section from the PR body via `gh pr view <pr-number>`. If `gh pr view` fails (non-zero exit), return a single BLOCKED finding: "Could not fetch PR body (gh exit N)" and stop.
 
 ## Per-Item Process
 
@@ -44,7 +44,7 @@ For each test plan item:
 
 When parsing the PR body to locate the test plan:
 
-- Match `^#{2,}\s*test\s+plan\s*$` (case-insensitive) for the section heading. Variants like `## Test Plan`, `## test plan`, and `### Test plan` are all accepted; the first match wins.
+- Match `^#{2}\s*test\s+plan\s*$` (case-insensitive) for the section heading. Variants like `## Test Plan` and `## test plan` are accepted; the first match wins.
 - The section ends at the next `#` or `##` heading (a line matching `^#{1,2}\s`), or at the end of the body.
 - Match items with `^\s*[-*+]\s+\[[ xX]\]\s+(.+)$`. The captured group is the item text.
 
