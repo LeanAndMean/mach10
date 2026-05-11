@@ -179,14 +179,14 @@ Check whether `/mach10:pr-review` recently ran the test plan and surface those r
 
 2. **Marker found and the comment body contains a `## Test plan results` section with at least one parseable per-item table row:** compare the comment's `createdAt` to the latest commit timestamp on the branch. Convert both to Unix epoch seconds before comparing -- string comparison of ISO 8601 timestamps with mixed timezone offsets gives the wrong answer.
 
-   First, validate the section is well-formed. Extract the body between the `## Test plan results` heading and the next `^#` heading (or end of comment), and require at least one parseable table data row -- a line beginning with `|` containing three or more pipe-delimited cells, excluding the header row (`| Item | Status | Notes |` or similar) and the separator row (`|---|---|---|`). If the section heading is present but no parseable rows are found, treat this as a malformed prior result: surface a CLI note "Prior review's test plan results section was malformed; ran suite directly", and fall through to step 3 below.
+   First, validate the section is well-formed. Extract the body between the `## Test plan results` heading and the next heading of the same or higher level (`^#{1,2}\s`, or end of comment), and require at least one parseable table data row -- a line beginning with `|` containing three or more pipe-delimited cells, excluding the header row (`| Item | Status | Notes |` or similar) and the separator row (`|---|---|---|`). If the section heading is present but no parseable rows are found, treat this as a malformed prior result: surface a CLI note "Prior review's test plan results section was malformed; ran suite directly", and fall through to step 3 below.
 
    Then capture the epoch values:
 
    - Comment epoch: `date -u -d "<createdAt>" +%s` (where `<createdAt>` is the ISO 8601 string from the JSON above).
    - Branch epoch: `git log -1 --format=%ct --no-merges` (committer time of the latest non-merge commit; `--no-merges` excludes merge commits that Step 3 may have created, which would otherwise make a fresh review appear stale).
 
-   Validate that both values are non-empty integers (e.g., `[[ "$comment_epoch" =~ ^[0-9]+$ ]]` and `[[ "$branch_epoch" =~ ^[0-9]+$ ]]`) before comparing. If either validation fails (BSD `date` without `-d` support, malformed `createdAt`, unexpected `git log` output, etc.), treat the result as stale, surface a CLI note "Could not parse comment timestamp; treating as stale", and proceed to the stale path below -- do not skip the suite based on an invalid comparison.
+   Validate that both values are non-empty integers (e.g., `[[ "$comment_epoch" =~ ^[0-9]+$ ]]` and `[[ "$branch_epoch" =~ ^[0-9]+$ ]]`) before comparing. If `comment_epoch` validation fails (BSD `date` without `-d` support, malformed `createdAt`, etc.), treat the result as stale and surface a CLI note "Could not parse comment timestamp; treating as stale". If `branch_epoch` validation fails (unexpected `git log` output, branch with only merge commits, etc.), treat the result as stale and surface a CLI note "Could not determine branch commit timestamp; treating as stale". In either case, proceed to the stale path below -- do not skip the suite based on an invalid comparison.
 
    Then:
 
