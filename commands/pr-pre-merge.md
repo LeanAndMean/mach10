@@ -175,7 +175,7 @@ Check whether `/mach10:pr-review` recently ran the test plan and surface those r
    gh pr view <pr-number> --json comments --jq '[.comments[] | select(.body | contains("<!-- mach10-review -->"))] | last'
    ```
 
-   The query returns the comment object (with `createdAt` and `body`), or `null` if none was found.
+   The query returns the comment object (with `createdAt` and `body`), or `null` if none was found. Check the `gh pr view` exit code: on non-zero exit (auth expired, rate limit, network error, JSON parse error), surface a CLI note "Could not fetch PR comments (gh exit N); running suite as a precaution" and fall through to step 3 below. Only proceed to step 2 when the command succeeded (exit 0).
 
 2. **Marker found and the comment body contains a `## Test plan results` section with at least one parseable per-item table row:** compare the comment's `createdAt` to the latest commit timestamp on the branch. Convert both to Unix epoch seconds before comparing -- string comparison of ISO 8601 timestamps with mixed timezone offsets gives the wrong answer.
 
@@ -184,7 +184,7 @@ Check whether `/mach10:pr-review` recently ran the test plan and surface those r
    Then capture the epoch values:
 
    - Comment epoch: `date -u -d "<createdAt>" +%s` (where `<createdAt>` is the ISO 8601 string from the JSON above).
-   - Branch epoch: `git log -1 --format=%ct` (committer time as Unix seconds).
+   - Branch epoch: `git log -1 --format=%ct --no-merges` (committer time of the latest non-merge commit; `--no-merges` excludes merge commits that Step 3 may have created, which would otherwise make a fresh review appear stale).
 
    Validate that both values are non-empty integers (e.g., `[[ "$comment_epoch" =~ ^[0-9]+$ ]]` and `[[ "$branch_epoch" =~ ^[0-9]+$ ]]`) before comparing. If either validation fails (BSD `date` without `-d` support, malformed `createdAt`, unexpected `git log` output, etc.), treat the result as stale, surface a CLI note "Could not parse comment timestamp; treating as stale", and proceed to the stale path below -- do not skip the suite based on an invalid comparison.
 
