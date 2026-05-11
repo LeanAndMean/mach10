@@ -167,16 +167,52 @@ Using the PR context gathered in Step 4, work through each item. For each, repor
 
 ### 5d. Tests
 
-Run the project's test suite:
+Check whether `/mach10:pr-review` recently ran the test plan and surface those results when fresh, instead of running the suite again.
 
-```
-# Auto-detect test runner
-# Python: pytest, unittest
-# JavaScript: npm test, jest
-# etc.
-```
+1. Fetch the most recent `<!-- mach10-review -->` comment on the PR:
 
-Report results. If tests fail, investigate and report — do NOT silently ignore failures.
+   ```
+   gh pr view <pr-number> --json comments --jq '[.comments[] | select(.body | contains("<!-- mach10-review -->"))] | last'
+   ```
+
+   The query returns the comment object (with `createdAt` and `body`), or `null` if none was found. Check the `gh pr view` exit code: on non-zero exit (auth expired, rate limit, network error, JSON parse error), surface a CLI note "Could not fetch PR comments (gh exit N); running suite as a precaution" and fall through to step 3 below. Only proceed to step 2 when the command succeeded (exit 0).
+
+2. **Marker found and the comment body contains a `## Test plan results` section with at least one parseable per-item table row:** compare the comment's `createdAt` to the latest commit timestamp on the branch. Convert both to Unix epoch seconds before comparing -- string comparison of ISO 8601 timestamps with mixed timezone offsets gives the wrong answer.
+
+   First, validate the section is well-formed. Extract the body between the `## Test plan results` heading and the next heading of the same or higher level (`^#{1,2}\s`, or end of comment), and require at least one parseable table data row -- a line beginning with `|` containing three or more pipe-delimited cells, excluding the header row (`| Item | Status | Notes |` or similar) and the separator row (`|---|---|---|`). If the section heading is present but no parseable rows are found, treat this as a malformed prior result: surface a CLI note "Prior review's test plan results section was malformed; ran suite directly", and fall through to step 3 below.
+
+   Then capture the epoch values:
+
+   - Comment epoch: `date -u -d "<createdAt>" +%s` (where `<createdAt>` is the ISO 8601 string from the JSON above).
+   - Branch epoch: `git log -1 --format=%ct --no-merges` (committer time of the latest non-merge commit; `--no-merges` excludes merge commits that Step 3 may have created, which would otherwise make a fresh review appear stale).
+
+   Validate that both values are non-empty integers (e.g., `[[ "$comment_epoch" =~ ^[0-9]+$ ]]` and `[[ "$branch_epoch" =~ ^[0-9]+$ ]]`) before comparing. If `comment_epoch` validation fails (BSD `date` without `-d` support, malformed `createdAt`, etc.), treat the result as stale and surface a CLI note "Could not parse comment timestamp; treating as stale". If `branch_epoch` validation fails (unexpected `git log` output, branch with only merge commits, etc.), treat the result as stale and surface a CLI note "Could not determine branch commit timestamp; treating as stale". In either case, proceed to the stale path below -- do not skip the suite based on an invalid comparison.
+
+   Then:
+
+   - **Fresh** (comment epoch >= branch epoch): surface the prior summary line and per-item statuses in CLI output and skip running the auto-detected suite. Record the outcome for the Step 7 report.
+   - **Stale** (branch epoch > comment epoch, or epoch validation failed above): use `AskUserQuestion` to ask how to proceed:
+
+     - **Re-run pr-review (stops the checklist)**: "Stop this session and run a fresh review (recovery: `/clear` then `/mach10:pr-review <pr>`)"
+     - **Accept stale results**: "Trust the prior summary even though the branch has new commits since"
+     - **Run suite directly**: "Skip the test plan and run only the auto-detected test suite"
+
+     If the user selects **Re-run pr-review (stops the checklist)**, stop the session and instruct the user to run the recovery command. Leave Step 5 as `in_progress`.
+
+     If the user selects **Accept stale results**, surface the prior summary in CLI output and skip running the suite. Record the outcome for the Step 7 report.
+
+     If the user selects **Run suite directly**, fall through to step 3 below.
+
+3. **No marker, marker without a `## Test plan results` section, marker with a malformed (no parseable rows) section, or user selected "Run suite directly":** run the project's test suite:
+
+   ```
+   # Auto-detect test runner
+   # Python: pytest, unittest
+   # JavaScript: npm test, jest
+   # etc.
+   ```
+
+   Report results. If tests fail, investigate and report -- do NOT silently ignore failures.
 
 Mark Step 5 complete.
 
@@ -203,7 +239,7 @@ Present a summary of what was done:
 - [ ] Documentation: [updated / no changes needed]
 - [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed]
 - [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
-- [ ] Tests: [all passing / N failures noted]
+- [ ] Tests: [from pr-review: P passed, F failed, B blocked / stale results accepted (P passed, F failed, B blocked) / suite passing / N failures noted]
 
 Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`
 

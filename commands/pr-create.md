@@ -118,7 +118,17 @@ Compose a PR title and body based on the gathered context.
 - <bullet points summarizing the changes>
 
 ## Test plan
-- [ ] <bulleted checklist of how to verify the changes>
+<!--
+Test plan guidance:
+- Be specific: include the command and the observable pass/fail criterion (e.g. `pytest tests/auth/`, expected: all green) rather than vague phrasing ("verify auth works").
+- Wrap shell commands in backticks so they can be lifted directly.
+- One action per item: keep a command and its expected outcome in the same bullet; split bullets that combine multiple distinct actions or independent checks.
+- Order setup -> action -> teardown when items have dependencies.
+- Replace the example bullets below with your actual verification steps.
+-->
+- [ ] Run `<test command>` and confirm <expected outcome>
+- [ ] Start `<service>` and verify <observable behavior>
+- [ ] Run `<teardown command>` and confirm clean shutdown
 
 Fixes #<issue-number>
 
