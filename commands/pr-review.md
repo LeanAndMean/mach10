@@ -2,7 +2,6 @@
 description: Run a comprehensive PR review, post results, then independently assess each finding
 argument-hint: <pr-number> [aspects] [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Skill, AskUserQuestion
-model: opus
 ---
 
 # Review PR

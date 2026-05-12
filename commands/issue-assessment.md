@@ -2,7 +2,6 @@
 description: Read a GitHub issue, perform an independent assessment, and present findings
 argument-hint: <issue-number>
 allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
-model: opus
 ---
 
 # Issue Assessment

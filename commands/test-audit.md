@@ -2,7 +2,6 @@
 description: Fan out subagents to audit test quality across the repo
 argument-hint: [optional-scope]
 allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
-model: opus
 ---
 
 # Audit Tests

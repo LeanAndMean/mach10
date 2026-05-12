@@ -2,7 +2,6 @@
 description: Review and update documentation based on PR changes
 argument-hint: <pr-number> [scope]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Edit, Write, AskUserQuestion
-model: opus
 ---
 
 # Documentation Review

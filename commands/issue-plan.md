@@ -2,7 +2,6 @@
 description: Read a GitHub issue, analyze the codebase, and create a staged implementation plan
 argument-hint: <issue-number>
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
-model: opus
 ---
 
 # Issue Plan

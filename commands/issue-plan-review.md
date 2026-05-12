@@ -2,7 +2,6 @@
 description: Read a GitHub issue and all comments, review the implementation plan, and present findings
 argument-hint: <issue-number>
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
-model: opus
 ---
 
 # Issue Plan Review
