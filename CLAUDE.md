@@ -51,6 +51,7 @@ When composing content for GitHub comments or issue bodies:
 
 When adding or modifying commands, follow the existing pattern:
 - YAML frontmatter must include `description` and `argument-hint`
+- Use `[context]` as the standard name for any optional free-text argument in `argument-hint`. Do not use command-specific labels like `[scope]`, `[aspects]`, or `[optional-description]`. For commands that delegate to a Skill, forward context using `> **User context:** <context>` as the last item in the Skill invocation block (include only when context was provided). For commands that launch exploration/review agents, include context in each agent's prompt to focus their work.
 - Set `allowed-tools` to the minimum set needed (principle of least privilege)
 - Omit the `model` field from command frontmatter so commands inherit the user's session model. For commands requiring deep reasoning (reviews, planning, assessment), add a bold startup notice after `**User input:** $ARGUMENTS` recommending Opus: `**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.`
 - End commands with a "next step" suggestion that includes `/clear` guidance for session boundaries (omit `/clear` when the next command needs session context, e.g., `/mach10:push` after implementation)
