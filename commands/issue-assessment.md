@@ -1,6 +1,6 @@
 ---
 description: Read a GitHub issue, perform an independent assessment, and present findings
-argument-hint: <issue-number>
+argument-hint: <issue-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
 ---
 
@@ -16,8 +16,9 @@ You are performing an independent assessment of a GitHub issue. Your goal is to 
 
 The user's input contains:
 - An **issue number** (required)
+- Additional **context** or constraints (optional)
 
-Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
+Extract the issue number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use in Steps 3-4.
 
 ## Step 2: Read the Issue
 
@@ -52,9 +53,13 @@ Launch 5 exploration agents in parallel using the Task tool (subagent_type: "fea
 
 Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
 
+If the user provided context, include it in each agent's prompt to focus exploration on the user's areas of concern.
+
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
 
 ## Step 4: Assess
+
+If the user provided context in Step 1, ensure your assessment explicitly engages with their areas of concern in the relevant categories below. The user's focus should be visible in the matching section (e.g., a backward-compatibility concern surfaces in Risks; a scoping concern surfaces in Scope or Gaps; a premise challenge surfaces in Critical evaluation). Do not omit other categories to make room -- the user's focus weights the depth of coverage, not the breadth.
 
 Based on your understanding of the issue and codebase, present your assessment to the user:
 

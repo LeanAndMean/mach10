@@ -1,6 +1,6 @@
 ---
 description: Run pre-merge checklist — branch freshness, docs, version, CHANGELOG, tests
-argument-hint: <pr-number>
+argument-hint: <pr-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write, AskUserQuestion, TaskCreate, TaskUpdate
 ---
 
@@ -14,8 +14,9 @@ You are running the pre-merge checklist for a PR that has passed review. Walk th
 
 The user's input contains:
 - A **PR number** (required)
+- Additional **context** or constraints (optional)
 
-Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+Extract the PR number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use in Step 5.
 
 After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 7 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
@@ -140,6 +141,14 @@ Mark Step 4 complete.
 
 Mark Step 5 in progress.
 
+If the user provided context, honor it as guidance for this checklist:
+
+- **Skip directives** (e.g., "skip version bump", "no changelog needed"): Skip the named checklist section entirely and report it as "skipped per user request" in Step 7. Do not run the section's logic, even partially.
+- **Focus directives** (e.g., "focus on docs", "scrutinize the test coverage"): Examine the named section more thoroughly. Surface findings that a routine pass might overlook.
+- **Other context**: Use as supplementary information when running the relevant sections (e.g., a note about what changed informs documentation review).
+
+Per-item confirmation gates inside a section that runs (e.g., the bump-level `AskUserQuestion` in 5b) remain authoritative -- context can skip the whole section, but it cannot pre-answer the gates inside a section that is executing.
+
 Using the PR context gathered in Step 4, work through each item. For each, report whether action is needed and perform it if so.
 
 ### 5a. Documentation
@@ -200,10 +209,10 @@ Mark Step 7 in progress.
 
 Present a summary of what was done:
 - [ ] Branch freshness: [current with <default-branch> / merged N commits from <default-branch> / auto-resolved conflicts in: <files> / behind <default-branch> (user skipped merge)]
-- [ ] Documentation: [updated / no changes needed]
-- [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed]
-- [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
-- [ ] Tests: [all passing / N failures noted]
+- [ ] Documentation: [updated / no changes needed / skipped per user request]
+- [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed / skipped per user request]
+- [ ] CHANGELOG: [updated / no changelog maintained / no changes needed / skipped per user request]
+- [ ] Tests: [all passing / N failures noted / skipped per user request]
 
 Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`
 

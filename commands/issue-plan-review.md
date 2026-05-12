@@ -1,6 +1,6 @@
 ---
 description: Read a GitHub issue and all comments, review the implementation plan, and present findings
-argument-hint: <issue-number>
+argument-hint: <issue-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
 ---
 
@@ -16,8 +16,9 @@ You are reviewing the implementation plan for a GitHub issue. Your goal is to re
 
 The user's input contains:
 - An **issue number** (required)
+- Additional **context** or constraints (optional)
 
-Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
+Extract the issue number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use during exploration and review.
 
 After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 4 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
@@ -91,6 +92,8 @@ Launch 6 exploration agents in parallel using the Task tool (subagent_type: "fea
 
 Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
 
+If the user provided context, include it in each agent's prompt to focus review on the user's areas of concern.
+
 If project review criteria were recorded in Step 2a, include them in each agent's context so exploration can verify whether the plan covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of key files and observations. After agents complete, read all identified files.
@@ -100,6 +103,8 @@ Mark Step 2 complete.
 ## Step 3: Review the Plan
 
 Mark Step 3 in progress.
+
+If the user provided context in Step 0, weight the review toward the areas they emphasized -- surface findings on those areas even at Suggestions-level severity, and note in Step 4 how the user's focus shaped the findings (e.g., "User emphasized testing strategy; this raised three suggestions in that area that would otherwise be borderline."). Apply this weighting across all six axes below; do not let it crowd out coverage of the other axes.
 
 For each stage in the plan, assess:
 

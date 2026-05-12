@@ -1,6 +1,6 @@
 ---
 description: Commit, push, and post a progress comment using session context or branch detection
-argument-hint: [optional-commit-message]
+argument-hint: [context]
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -30,7 +30,7 @@ Generate a commit message that:
 - Follows the repository's existing commit message style
 - Summarizes the nature of the changes (new feature, bug fix, refactor, etc.)
 - Focuses on the "why" rather than the "what"
-- Uses the user's override message if one was provided: $ARGUMENTS
+- If context was provided ($ARGUMENTS): if it reads like a commit message, use it verbatim; otherwise, treat it as guidance for commit message generation. Context may also inform the progress comment (Step 4) and next-step suggestions (Step 5).
 
 Create the commit. Use a HEREDOC for the message to ensure proper formatting:
 

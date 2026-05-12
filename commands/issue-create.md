@@ -1,6 +1,6 @@
 ---
 description: Create a structured GitHub issue from current context or description
-argument-hint: [optional-description]
+argument-hint: [context]
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
 ---
 
@@ -8,13 +8,16 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
 
 You are creating a structured GitHub issue. This may be invoked at any point in the workflow — to capture deferred review findings, document refactoring needs, or track new feature ideas.
 
-**Initial context (optional):** $ARGUMENTS
+**Context (optional):** $ARGUMENTS
 
 ## Step 1: Gather Context
 
-If a description was provided ($ARGUMENTS), use it as the starting point.
+If context was provided ($ARGUMENTS), parse it for two kinds of input and act on each:
 
-If no description was provided, ask the user what the issue is about.
+- **Descriptive content** (problem statement, feature description, observed behavior, motivation): Use as the starting point for drafting the issue body in Step 2.
+- **Meta-directives about the issue itself** (e.g., "use the bug template", "tag as priority-high", "assign me", "make this a tracking issue"): Note these for the appropriate downstream step. Template choice steers the template selection later in this step. Labels and assignees are applied via `gh issue create` / `gh issue edit` flags in Step 5. Honor meta-directives explicitly -- do not fold them into the issue body as descriptive text.
+
+If no context was provided, ask the user what the issue is about.
 
 Check if the repository has issue templates:
 
@@ -125,6 +128,12 @@ Add labels if the user specified them or if the repo has standard labels:
 
 ```
 gh issue edit <number> --add-label "..."
+```
+
+Add assignees if the user specified them (e.g., an "assign me" meta-directive maps to the current authenticated user retrieved via `gh api user --jq .login`):
+
+```
+gh issue edit <number> --add-assignee "..."
 ```
 
 ## Step 6: Confirm

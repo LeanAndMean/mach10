@@ -123,7 +123,7 @@ The methodology in action across a feature's lifecycle. Each step below runs in 
 
 ### Phase 0: Create the issue
 
-**Command:** `/mach10:issue-create`
+**Command:** `/mach10:issue-create [context]`
 
 When no issue exists yet, start here. Claude helps you draft a structured GitHub issue from a description of the problem or feature you have in mind. The command walks you through title, body, and labels, then creates the issue. If you already have an issue, skip directly to Phase 1.
 
@@ -131,7 +131,7 @@ When no issue exists yet, start here. Claude helps you draft a structured GitHub
 
 ### Phase 1: Understand the issue
 
-**Command:** `/mach10:issue-assessment <number>`
+**Command:** `/mach10:issue-assessment <number> [context]`
 
 Claude reads the issue, explores the relevant parts of the codebase, and presents its findings -- scope, risks, ambiguities, critical evaluation, and a recommended next step.
 
@@ -139,7 +139,7 @@ Claude reads the issue, explores the relevant parts of the codebase, and present
 
 ### Phase 2: Plan the implementation
 
-**Command:** `/mach10:issue-plan <number>`
+**Command:** `/mach10:issue-plan <number> [context]`
 
 Claude explores the codebase, asks clarifying questions about underspecified requirements, then presents multiple architecture approaches (minimal changes, clean architecture, pragmatic balance) for you to choose from before drafting a staged implementation plan. The plan is posted as a GitHub comment, and a feature branch is created. If the project has a `CONTRIBUTING.md` (or `DEVELOPMENT.md` / `.github/CONTRIBUTING.md`), the plan incorporates its guidance on project layers and testing expectations (see [Customizing with CONTRIBUTING.md](#customizing-with-contributingmd) below).
 
@@ -151,7 +151,7 @@ The plan is *staged* because each stage will get its own session with a full con
 
 ### Phase 3: Review the plan
 
-**Command:** `/mach10:issue-plan-review <number>`
+**Command:** `/mach10:issue-plan-review <number> [context]`
 
 A fresh Claude session independently reviews the plan against the codebase. If the project has contributing guidelines, the review checks the plan against their requirements for layer coverage and testing. Plans can be reviewed just like code -- this is a second pair of eyes on the architecture before implementation begins.
 
@@ -159,7 +159,7 @@ A fresh Claude session independently reviews the plan against the codebase. If t
 
 ### Phase 4: Implement stage by stage
 
-**Commands:** `/mach10:issue-implement <issue> <stage>` then `/mach10:push` (one session per stage)
+**Commands:** `/mach10:issue-implement <issue> <stage> [context]` then `/mach10:push [context]` (one session per stage)
 
 Each stage is implemented in its own fresh session, then committed and pushed with a progress comment on the issue. One stage per session means full context budget for codebase exploration, implementation, and testing.
 
@@ -167,13 +167,13 @@ Each stage is implemented in its own fresh session, then committed and pushed wi
 
 ### Phase 5: Create a PR
 
-**Command:** `/mach10:pr-create [issue]`
+**Command:** `/mach10:pr-create [issue] [context]`
 
 Create a PR linking back to the issue with a structured description summarizing what was built.
 
 ### Phase 6: Review-fix cycle
 
-**Commands:** `/mach10:pr-review <pr>`, `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]`, `/mach10:pr-ci-fix <pr>`
+**Commands:** `/mach10:pr-review <pr> [context]`, `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]`, `/mach10:pr-ci-fix <pr> [context]`
 
 This is an iterative cycle: review in one session, fix in the next, re-review, repeat. Each review posts its findings as a PR comment, then independently assesses every finding to classify it as genuine, nitpick, false positive, or deferred. The assessment includes a staged implementation plan that groups genuine issues into required stages and nitpicks into optional stages, giving you a ready-made fix list for the next session. The assessment serves as the convergence signal -- when all remaining findings are nitpicks or false positives, the PR is ready to merge.
 
@@ -183,7 +183,7 @@ If CI fails after a fix, use `pr-ci-fix` to diagnose and resolve the failure.
 
 ### Phase 7: Merge
 
-**Commands:** `/mach10:doc-review <pr>` (optional), `/mach10:pr-pre-merge <pr>`, `/mach10:pr-merge <pr>`
+**Commands:** `/mach10:doc-review <pr> [context]` (optional), `/mach10:pr-pre-merge <pr> [context]`, `/mach10:pr-merge <pr> [context]`
 
 Once the review-fix cycle converges (the assessment shows no genuine issues remaining), optionally run a deep documentation review with `doc-review`, run the pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests), and merge.
 
@@ -244,30 +244,36 @@ claude --plugin-dir /path/to/mach10
 
 | Command | Description |
 |---------|-------------|
-| `/mach10:issue-assessment <number>` | Read issue, perform independent assessment, and present findings with recommended next step |
-| `/mach10:issue-plan <number>` | Read issue, explore codebase, ask clarifying questions, design architecture with user, create staged implementation plan, post as comment, create feature branch |
-| `/mach10:issue-plan-review <number>` | Read issue and all comments, review the implementation plan, and present findings |
-| `/mach10:issue-implement <issue> <stage>` | Implement a specific stage of the plan via feature-dev |
-| `/mach10:issue-create` | Create a structured GitHub issue from current context |
+| `/mach10:issue-assessment <number> [context]` | Read issue, perform independent assessment, and present findings with recommended next step |
+| `/mach10:issue-plan <number> [context]` | Read issue, explore codebase, ask clarifying questions, design architecture with user, create staged implementation plan, post as comment, create feature branch |
+| `/mach10:issue-plan-review <number> [context]` | Read issue and all comments, review the implementation plan, and present findings |
+| `/mach10:issue-implement <issue> <stage> [context]` | Implement a specific stage of the plan via feature-dev |
+| `/mach10:issue-create [context]` | Create a structured GitHub issue from current context |
 
 #### PR lifecycle
 
 | Command | Description |
 |---------|-------------|
 | `/mach10:pr-create [issue] [context]` | Create a PR for the current branch with structured description |
-| `/mach10:pr-review <pr> [aspects]` | Run comprehensive PR review, post results, then independently assess each finding |
+| `/mach10:pr-review <pr> [context]` | Run comprehensive PR review, post results, then independently assess each finding |
 | `/mach10:pr-review-fix <pr> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]` | Fix specific review findings via feature-dev |
 | `/mach10:pr-ci-fix <pr> [context]` | Diagnose and fix failing CI checks via feature-dev |
-| `/mach10:doc-review <pr> [scope]` | Review and update documentation based on PR changes |
-| `/mach10:pr-pre-merge <pr>` | Run pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests) |
-| `/mach10:pr-merge <pr>` | Merge PR, delete branch, optionally create release |
+| `/mach10:doc-review <pr> [context]` | Review and update documentation based on PR changes |
+| `/mach10:pr-pre-merge <pr> [context]` | Run pre-merge checklist (branch freshness, docs, version, CHANGELOG, tests) |
+| `/mach10:pr-merge <pr> [context]` | Merge PR, delete branch, optionally create release |
 
 #### Utilities
 
 | Command | Description |
 |---------|-------------|
-| `/mach10:push` | Commit, push, and post progress comment on the associated PR/issue |
-| `/mach10:test-audit` | Fan out subagents to audit test quality across the repo |
+| `/mach10:push [context]` | Commit, push, and post progress comment on the associated PR/issue |
+| `/mach10:test-audit [context]` | Fan out subagents to audit test quality across the repo |
+
+### How `[context]` works
+
+Most commands accept an optional trailing `[context]` argument -- free text passed after the structured arguments. Context is user guidance that steers Claude's behavior within that command's workflow. It can include both *descriptive content* (e.g., "I'm worried about backward compatibility", "focus on the auth module") and *directives* (e.g., "skip the version bump", "use the bug template", "tag as v2.0.0"). Different commands route context to different places: agent-driven commands include it in their exploration agents' prompts to focus the investigation; most Skill-delegating commands forward it as user guidance to the downstream Skill; direct-action commands use it to inform drafts and recommended defaults.
+
+Claude treats context as guidance to honor, not just metadata to display. Skip directives (e.g., "skip release", "skip version bump") are honored without re-asking the user -- they bypass the routing question that would have asked whether to perform that optional step, since the user has already declined. Create or modify directives (e.g., "tag as v2.0.0") set the recommended default and pre-fill drafts, but Claude still gets explicit approval before executing the substantive action -- the user reviews the actual draft (tag, title, notes; commit message; issue body) and can approve, modify, or bail. The expectation: context shapes *how* a command runs and removes redundant prompts, but Claude never executes a substantive action without an explicit approval gate.
 
 ### Design principles
 

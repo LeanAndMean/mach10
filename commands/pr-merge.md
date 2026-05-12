@@ -1,6 +1,6 @@
 ---
 description: Merge a PR, delete the feature branch, and optionally create a release
-argument-hint: <pr-number>
+argument-hint: <pr-number> [context]
 allowed-tools: Bash, AskUserQuestion
 ---
 
@@ -14,8 +14,9 @@ You are merging a PR that has passed review and the pre-merge checklist, then op
 
 The user's input contains:
 - A **PR number** (required)
+- Additional **context** or constraints (optional)
 
-Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+Extract the PR number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use in later steps (e.g., release notes guidance, version tag preference).
 
 ## Step 2: Verify Readiness
 
@@ -60,7 +61,15 @@ git branch -d <branch-name-from-above>
 
 ## Step 4: Ask About Release
 
-Use `AskUserQuestion` to ask whether to create a release:
+If the user provided context about release creation, honor it as guidance for this step:
+
+- **Skip directives** (e.g., "skip release", "no release this time"): Skip the `AskUserQuestion` below entirely and proceed directly to Step 6. Report in CLI output: "Skipping release per user request." The user has already declined; re-asking is friction without safety benefit. No release will be created; this is the safe path.
+- **Release-creating directives** (e.g., "tag as v2.0.0", "highlight the auth changes"): Still ask the question below, but frame it to acknowledge the user wants to create a release and present "Create release" as the recommended choice in the question text. Stash the specific details (tag, highlights, notes style) for the Step 5 draft. The yes/no gate is preserved because a release is a substantive action -- Claude should not draft and create one without an explicit confirmation, even if the user named a tag.
+- **No release-relevant context**: Ask the question below as a neutral yes/no.
+
+Step 5's draft-approval gate is the content-review gate for the release itself -- it always runs when a release is being created, regardless of context.
+
+If no skip directive was given, use `AskUserQuestion` to ask whether to create a release:
 
 - **Create release**: "Create a release for this merge"
 - **Skip release**: "Skip release creation"
@@ -80,6 +89,8 @@ If there are existing releases, read the most recent one for format reference:
 ```
 gh release view <latest-tag>
 ```
+
+If the user provided context, use it to inform the release draft (e.g., specific tag, highlighted changes, notes style).
 
 Draft a release:
 - **Tag**: Follow existing tagging convention (e.g., `v1.2.3`, `1.2.3`). If a version bump was done in pre-merge, use that version.
