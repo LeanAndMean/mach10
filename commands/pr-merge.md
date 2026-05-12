@@ -1,6 +1,6 @@
 ---
 description: Merge a PR, delete the feature branch, and optionally create a release
-argument-hint: <pr-number>
+argument-hint: <pr-number> [context]
 allowed-tools: Bash, AskUserQuestion
 ---
 
@@ -14,8 +14,9 @@ You are merging a PR that has passed review and the pre-merge checklist, then op
 
 The user's input contains:
 - A **PR number** (required)
+- Additional **context** or constraints (optional)
 
-Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+Extract the PR number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use in later steps (e.g., release notes guidance, version tag preference).
 
 ## Step 2: Verify Readiness
 
@@ -60,6 +61,8 @@ git branch -d <branch-name-from-above>
 
 ## Step 4: Ask About Release
 
+If the user provided context about release creation (e.g., "skip release", "tag as v2.0.0"), let it inform the options presented. Context does not auto-execute -- it guides the draft and defaults.
+
 Use `AskUserQuestion` to ask whether to create a release:
 
 - **Create release**: "Create a release for this merge"
@@ -80,6 +83,8 @@ If there are existing releases, read the most recent one for format reference:
 ```
 gh release view <latest-tag>
 ```
+
+If the user provided context, use it to inform the release draft (e.g., specific tag, highlighted changes, notes style).
 
 Draft a release:
 - **Tag**: Follow existing tagging convention (e.g., `v1.2.3`, `1.2.3`). If a version bump was done in pre-merge, use that version.

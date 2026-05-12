@@ -1,6 +1,6 @@
 ---
 description: Read a GitHub issue, analyze the codebase, and create a staged implementation plan
-argument-hint: <issue-number>
+argument-hint: <issue-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
 ---
 
@@ -26,8 +26,9 @@ Implementation happens in separate sessions via `/mach10:issue-implement`.
 
 The user's input contains:
 - An **issue number** (required)
+- Additional **context** or constraints (optional)
 
-Extract the issue number from the input. If the input is ambiguous, ask the user to clarify.
+Extract the issue number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use during exploration and planning.
 
 After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 6 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
@@ -100,6 +101,8 @@ Launch 4 exploration agents in parallel using the Task tool (subagent_type: "fea
 
 Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
 
+If the user provided context, include it in each agent's prompt to guide exploration focus.
+
 If project planning requirements were identified in Step 2a, include them in each agent's context so exploration covers the relevant project layers and testing infrastructure.
 
 Each agent should return a list of 5-10 key files. After agents complete, read all identified files to build deep understanding.
@@ -136,6 +139,8 @@ Based on the codebase findings and clarified requirements, launch 2-3 architectu
 - **Pragmatic balance**: Design the implementation balancing speed with code quality and extensibility.
 
 Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+
+If the user provided context, include it in each agent's prompt so architecture designs account for the user's constraints or preferences.
 
 Each agent should produce a full implementation blueprint: files to create or modify, component responsibilities, data flow, and a phased build sequence.
 

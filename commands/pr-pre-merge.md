@@ -1,6 +1,6 @@
 ---
 description: Run pre-merge checklist — branch freshness, docs, version, CHANGELOG, tests
-argument-hint: <pr-number>
+argument-hint: <pr-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write, AskUserQuestion, TaskCreate, TaskUpdate
 ---
 
@@ -14,8 +14,9 @@ You are running the pre-merge checklist for a PR that has passed review. Walk th
 
 The user's input contains:
 - A **PR number** (required)
+- Additional **context** or constraints (optional)
 
-Extract the PR number from the input. If the input is ambiguous, ask the user to clarify.
+Extract the PR number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use in Step 5.
 
 After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 7 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
@@ -139,6 +140,8 @@ Mark Step 4 complete.
 ## Step 5: Run pre-merge checklist
 
 Mark Step 5 in progress.
+
+If the user provided context, use it to inform checklist priorities (e.g., "skip version bump" means skip 5b, "focus on docs" means be thorough in 5a). Context never bypasses the user confirmation gates -- it only guides which items to prioritize.
 
 Using the PR context gathered in Step 4, work through each item. For each, report whether action is needed and perform it if so.
 
