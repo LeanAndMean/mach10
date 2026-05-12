@@ -59,6 +59,8 @@ Each agent should return a list of 5-10 key files. After agents complete, read a
 
 ## Step 4: Assess
 
+If the user provided context in Step 1, ensure your assessment explicitly engages with their areas of concern in the relevant categories below. The user's focus should be visible in the matching section (e.g., a backward-compatibility concern surfaces in Risks; a scoping concern surfaces in Scope or Gaps; a premise challenge surfaces in Critical evaluation). Do not omit other categories to make room -- the user's focus weights the depth of coverage, not the breadth.
+
 Based on your understanding of the issue and codebase, present your assessment to the user:
 
 1. **Summary**: What the issue is asking for in your own words.

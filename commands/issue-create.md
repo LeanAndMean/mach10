@@ -12,7 +12,10 @@ You are creating a structured GitHub issue. This may be invoked at any point in 
 
 ## Step 1: Gather Context
 
-If context was provided ($ARGUMENTS), use it as the starting point for drafting.
+If context was provided ($ARGUMENTS), parse it for two kinds of input and act on each:
+
+- **Descriptive content** (problem statement, feature description, observed behavior, motivation): Use as the starting point for drafting the issue body in Step 2.
+- **Meta-directives about the issue itself** (e.g., "use the bug template", "tag as priority-high", "create as a sub-issue of 137", "assign me", "make this a tracking issue", "create as draft"): Note these for the appropriate downstream step. Template choice influences Step 2's template selection. Labels, assignees, parent issue, and draft state are applied via `gh issue create` / `gh issue edit` flags in Step 5. Honor meta-directives explicitly -- do not fold them into the issue body as descriptive text.
 
 If no context was provided, ask the user what the issue is about.
 

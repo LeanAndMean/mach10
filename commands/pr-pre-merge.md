@@ -141,7 +141,13 @@ Mark Step 4 complete.
 
 Mark Step 5 in progress.
 
-If the user provided context, use it to inform checklist priorities (e.g., "skip version bump" means skip 5b, "focus on docs" means be thorough in 5a). Context never bypasses the user confirmation gates -- it only guides which items to prioritize.
+If the user provided context, honor it as guidance for this checklist:
+
+- **Skip directives** (e.g., "skip version bump", "no changelog needed"): Skip the named checklist section entirely and report it as "skipped per user request" in Step 7. Do not run the section's logic, even partially.
+- **Focus directives** (e.g., "focus on docs", "scrutinize the test coverage"): Examine the named section more thoroughly. Surface findings that a routine pass might overlook.
+- **Other context**: Use as supplementary information when running the relevant sections (e.g., a note about what changed informs documentation review).
+
+Per-item confirmation gates inside a section that runs (e.g., the bump-level `AskUserQuestion` in 5b) remain authoritative -- context can skip the whole section, but it cannot pre-answer the gates inside a section that is executing.
 
 Using the PR context gathered in Step 4, work through each item. For each, report whether action is needed and perform it if so.
 

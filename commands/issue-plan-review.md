@@ -104,6 +104,8 @@ Mark Step 2 complete.
 
 Mark Step 3 in progress.
 
+If the user provided context in Step 0, weight the review toward the areas they emphasized -- surface findings on those areas even at Suggestions-level severity, and note in Step 4 how the user's focus shaped the findings (e.g., "User emphasized testing strategy; this raised three suggestions in that area that would otherwise be borderline."). Apply this weighting across all six axes below; do not let it crowd out coverage of the other axes.
+
 For each stage in the plan, assess:
 
 1. **Correctness**: Does the stage accurately describe what needs to happen? Are the files and changes correct?
