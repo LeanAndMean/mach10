@@ -209,10 +209,10 @@ Mark Step 7 in progress.
 
 Present a summary of what was done:
 - [ ] Branch freshness: [current with <default-branch> / merged N commits from <default-branch> / auto-resolved conflicts in: <files> / behind <default-branch> (user skipped merge)]
-- [ ] Documentation: [updated / no changes needed]
-- [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed]
-- [ ] CHANGELOG: [updated / no changelog maintained / no changes needed]
-- [ ] Tests: [all passing / N failures noted]
+- [ ] Documentation: [updated / no changes needed / skipped per user request]
+- [ ] Version: [bumped to X.Y.Z / no version tracking / no changes needed / skipped per user request]
+- [ ] CHANGELOG: [updated / no changelog maintained / no changes needed / skipped per user request]
+- [ ] Tests: [all passing / N failures noted / skipped per user request]
 
 Recommend next step: `/clear` then `/mach10:pr-merge <pr-number>`
 
