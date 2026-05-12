@@ -10,6 +10,8 @@ You are creating a staged implementation plan for a GitHub issue. Your goal is t
 
 **User input:** $ARGUMENTS
 
+**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.
+
 ## Guardrails
 
 This command is strictly for **planning**. Do NOT:

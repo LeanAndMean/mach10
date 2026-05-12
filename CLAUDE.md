@@ -18,7 +18,7 @@ scripts/                      # Utility scripts (repo maintenance, data collecti
 ```
 
 Each command file is a self-contained workflow specification with:
-- **YAML frontmatter**: `description`, `argument-hint`, `allowed-tools`, `model`
+- **YAML frontmatter**: `description`, `argument-hint`, `allowed-tools`
 - **Markdown body**: Step-by-step instructions Claude Code follows when the command is invoked
 
 ## Command Structure
@@ -52,7 +52,7 @@ When composing content for GitHub comments or issue bodies:
 When adding or modifying commands, follow the existing pattern:
 - YAML frontmatter must include `description` and `argument-hint`
 - Set `allowed-tools` to the minimum set needed (principle of least privilege)
-- Set `model: opus` for commands requiring deep reasoning (reviews, planning, implementation)
+- Omit the `model` field from command frontmatter so commands inherit the user's session model. For commands requiring deep reasoning (reviews, planning, assessment), add a bold startup notice after `**User input:** $ARGUMENTS` recommending Opus: `**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.`
 - End commands with a "next step" suggestion that includes `/clear` guidance for session boundaries (omit `/clear` when the next command needs session context, e.g., `/mach10:push` after implementation)
 - Use `gh` CLI for all GitHub operations (issues, PRs, comments, CI logs)
 - Commands that modify code delegate to `/feature-dev:feature-dev` via the Skill tool
@@ -71,6 +71,7 @@ When adding or modifying commands, follow the existing pattern:
 - **Step 0 bootstrap sync**: The Step 0 bootstrap instruction (sequential task creation, step-order constraint, pending status) is duplicated between `CLAUDE.md` (Task Tracking section, normative definition) and seven command files: `commands/pr-review.md`, `commands/pr-review-fix.md`, `commands/pr-pre-merge.md`, `commands/doc-review.md`, `commands/issue-plan.md`, `commands/pr-create.md`, and `commands/issue-plan-review.md` (each in their Step 0 block). The command-file instances vary only in step count. Any change to the bootstrap wording or sequencing logic must be applied to all eight locations.
 - **Guard-sentence sync**: The guard-sentence framing ("All lenses are required -- [justification], so their corresponding evidence-gathering lens(es) must always run:") is duplicated across three command files: `commands/issue-assessment.md` (Step 3), `commands/issue-plan-review.md` (Step 2b), and `commands/issue-plan.md` (Step 2b). Only the framing structure is synchronized; justifications are intentionally command-specific (each references the evaluation steps and categories particular to that command). Any change to the framing pattern must be applied to all three locations.
 - **No-background-agent sync**: The `run_in_background` prohibition instruction is duplicated across six command files at nine agent-spawn sites. The multi-agent wording is: "Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead." The single-agent wording (used at one site) is: "Do NOT use `run_in_background: true` when launching this agent." The nine sites are: `commands/issue-assessment.md` (Step 3), `commands/issue-plan.md` (Steps 2b and 4), `commands/issue-plan-review.md` (Step 2b), `commands/doc-review.md` (Steps 3, 4, and 7), `commands/test-audit.md` (Step 3), and `commands/pr-review.md` (Step 4). All sites use the multi-agent wording except `commands/pr-review.md` Step 4, which uses the single-agent variant because it spawns a single sequential agent rather than a parallel fan-out. Any change to the instruction wording must be applied to all nine sites. Note: `commands/pr-review.md` Step 2 (line 67) contains a separate Skill pass-through instruction that tells the downstream `pr-review-toolkit` Skill not to use background agents -- that is a different mechanism (Skill delegation vs. direct Task call) and is not part of this sync.
+- **Opus-recommendation notice sync**: The bold startup notice `**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.` is duplicated across four command files: `commands/pr-review.md`, `commands/issue-plan.md`, `commands/issue-plan-review.md`, and `commands/issue-assessment.md`. Each notice appears after `**User input:** $ARGUMENTS` and before the first step heading. Any change to the notice wording must be applied to all four locations.
 
 ### User Interaction Patterns
 
@@ -130,7 +131,7 @@ Agent definitions live in the `agents/` directory as markdown files with YAML fr
 
 - YAML frontmatter must include `name`, `description`, `model`, and `color`
 - `description` should explain when the agent should be used, with `<example>` blocks showing trigger scenarios
-- Set `model: inherit` to use the caller's model, or specify a model explicitly (e.g., `model: opus`)
+- Default to `model: inherit` so agents use the caller's model. Only specify an explicit model in rare, proven-necessary cases where a specific model is required regardless of caller context
 - `color` provides visual distinction in CLI output (e.g., `magenta`, `cyan`)
 - The markdown body defines the agent's system prompt: its role, review process, output format, and tone
 - Agents are invoked via the Task tool with `subagent_type` -- they do not have `allowed-tools` or `argument-hint` fields

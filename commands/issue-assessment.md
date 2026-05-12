@@ -10,6 +10,8 @@ You are performing an independent assessment of a GitHub issue. Your goal is to 
 
 **User input:** $ARGUMENTS
 
+**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.
+
 ## Step 1: Parse Input
 
 The user's input contains:

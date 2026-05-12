@@ -10,6 +10,8 @@ You are reviewing the implementation plan for a GitHub issue. Your goal is to re
 
 **User input:** $ARGUMENTS
 
+**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.
+
 ## Step 0: Parse input and create task list
 
 The user's input contains:

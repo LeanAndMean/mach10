@@ -199,7 +199,7 @@ gh pr comment <pr-number> --body "..."
 The comment should include:
 - Files reviewed and what was updated
 - Findings that were rejected (for the record)
-- Attribution: "Documentation reviewed by Claude Opus 4.6"
+- Attribution -- identify yourself by your actual model name (e.g., "Documentation reviewed by Claude Sonnet 4.6" if running on Sonnet)
 
 When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
 
