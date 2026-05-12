@@ -1,6 +1,6 @@
 ---
 description: Run a comprehensive PR review, post results, then independently assess each finding
-argument-hint: <pr-number> [aspects] [context]
+argument-hint: <pr-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Skill, AskUserQuestion
 ---
 
@@ -16,15 +16,14 @@ You are running a comprehensive review of a pull request, posting the results, t
 
 The user's input typically contains:
 - A **PR number** (required)
-- **Review aspects** to focus on (optional)
-- Additional context or constraints (optional)
+- Additional **context**, focus areas, or constraints (optional)
 
 Example inputs:
 - `108`
 - `108 error handling and test coverage`
 - `108 focus on the new API endpoints`
 
-Extract the PR number. If specific review aspects are mentioned, note them for Step 2. If the input is ambiguous, ask the user to clarify.
+Extract the PR number. If context was provided, note it for Step 2. If the input is ambiguous, ask the user to clarify.
 
 After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 8 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
@@ -63,8 +62,8 @@ Mark Step 2 complete when all sub-tasks of the delegation below are completed.
 
 Use the Skill tool to invoke `/pr-review-toolkit:review-pr` with the appropriate context:
 
-- If specific aspects were requested, pass them: "Review PR #<pr-number>. Focus on: <aspects>"
-- If no aspects specified, run a full review: "Review PR #<pr-number>"
+- If context was provided, pass it: "Review PR #<pr-number>. Additional context: <context>"
+- If no context was provided, run a full review: "Review PR #<pr-number>"
 - **Always** include this instruction in the Skill invocation: "IMPORTANT: Do NOT use `run_in_background: true` when launching review agents. For parallel execution, launch multiple foreground Task calls in a single message instead."
 - **Always** include this instruction in the Skill invocation: "You are authorized to use review-relevant agents from any installed plugin, not just the agents bundled with pr-review-toolkit. When launching review agents in parallel, also include any domain-relevant agents from other installed plugins that would provide useful analysis for the PR content (e.g., plugin-dev:skill-reviewer when reviewing skill definitions, plugin-dev:plugin-validator when reviewing plugin code). Only include supplementary agents when they are relevant to the content being reviewed."
 - **Always** include this instruction in the Skill invocation: "If the PR has a linked issue (look for issue references like 'Fixes #N', 'Closes #N', 'Resolves #N', 'Part of #N', 'Issue #N', or a bare '#N' in the PR description), include the `feature-completeness-checker` agent alongside the other review agents. This agent verifies that the PR fully implements the requirements from the linked issue's acceptance criteria and implementation plan. Do not launch this agent if no linked issue is detected."

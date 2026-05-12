@@ -1,6 +1,6 @@
 ---
 description: Review and update documentation based on PR changes
-argument-hint: <pr-number> [scope]
+argument-hint: <pr-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Edit, Write, AskUserQuestion
 ---
 
@@ -14,14 +14,14 @@ You are performing a thorough review of documentation against the changes in a p
 
 The user's input typically contains:
 - A **PR number** (required)
-- A **scope** to narrow the review (optional)
+- Additional **context** or scope to narrow the review (optional)
 
 Example inputs:
 - `108`
 - `108 focus on API docs`
 - `108 only README`
 
-Extract the PR number. If a scope is provided, note it for filtering in Step 3 onward. If the input is ambiguous, ask the user to clarify.
+Extract the PR number. If context is provided, note it for filtering and focus in Step 3 onward. If the input is ambiguous, ask the user to clarify.
 
 After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 8 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
@@ -88,7 +88,7 @@ Do NOT use `run_in_background: true` when launching these agents. For parallel e
 
 After agents return, compile results into a deduplicated list. Categorize each doc file into logical groups (e.g., "User-facing docs", "API reference", "Developer guides", "Inline code docs").
 
-If a scope was provided, filter to only categories and files matching that scope.
+If context was provided, use it to narrow or focus the review: if it names specific docs or areas, filter to those; if it reads as prose guidance, pass it to review agents in Step 4.
 
 Present the discovered documentation as a summary table (category, file path, brief description) before proceeding.
 
@@ -104,6 +104,7 @@ Each agent receives:
 - Its assigned doc files (read them in full)
 - A summary of what the PR changed (from Step 2)
 - The PR description
+- If prose context was provided, include it in the agent's briefing to focus the review
 
 Each agent evaluates:
 - **Stale content**: Text that describes old behavior the PR has changed

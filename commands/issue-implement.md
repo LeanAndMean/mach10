@@ -139,6 +139,10 @@ Use the Skill tool to invoke `/feature-dev:feature-dev` with the following conte
 
 > Read issue #<issue-number> (both the issue body and all comments). Locate the staged implementation plan in the comments, then implement the requested stage(s) using the 7-phase development plan. Use the issue body for context on the problem statement, requirements, and acceptance criteria. IMPORTANT: After reading the development plan phases, add each phase as a task to your todo list so you do not skip any phases.
 
+If the user provided additional context or constraints in their input (parsed in Step 1), append it:
+
+> **User context:** <the additional context or constraints from the user's input>
+
 If the stage reveals issues with the original plan, note them and suggest plan adjustments rather than silently deviating.
 
 After implementation is complete, suggest: "Next: `/mach10:push` to commit, push, and document progress."
