@@ -148,7 +148,7 @@ Post the assessment immediately as a reply comment on the PR — do not ask the 
 - Reference the review comment it is assessing (link to the specific comment URL from Step 3)
 - List each finding with its classification and reasoning
 - End with the staged implementation plan
-- Include model attribution at the bottom
+- Include model attribution at the bottom -- identify yourself by your actual model name (e.g., "Assessed by Claude Sonnet 4.6" if running on Sonnet)
 
 ```
 gh pr comment <pr-number> --body "..."
