@@ -2,7 +2,6 @@
 description: Fix specific issues from a PR review using feature-dev
 argument-hint: <pr-number> [--review-comment <id>] [--assessment-comment <id>] [findings] [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Edit, Write, Skill, AskUserQuestion
-model: opus
 ---
 
 # Fix Review Issues

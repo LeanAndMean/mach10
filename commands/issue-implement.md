@@ -2,7 +2,6 @@
 description: Implement a specific stage of an issue's implementation plan using feature-dev
 argument-hint: <issue-number> <stage(s)> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write, Skill, AskUserQuestion
-model: opus
 ---
 
 # Implement Stage

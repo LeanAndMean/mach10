@@ -2,7 +2,6 @@
 description: Read a GitHub issue, analyze the codebase, and create a staged implementation plan
 argument-hint: <issue-number>
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
-model: opus
 ---
 
 # Issue Plan
@@ -10,6 +9,8 @@ model: opus
 You are creating a staged implementation plan for a GitHub issue. Your goal is to deeply understand the issue, explore the relevant codebase, and produce a plan where each stage can be implemented within a single Claude Code CLI session.
 
 **User input:** $ARGUMENTS
+
+**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.
 
 ## Guardrails
 

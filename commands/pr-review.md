@@ -2,7 +2,6 @@
 description: Run a comprehensive PR review, post results, then independently assess each finding
 argument-hint: <pr-number> [aspects] [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, Skill, AskUserQuestion
-model: opus
 ---
 
 # Review PR
@@ -10,6 +9,8 @@ model: opus
 You are running a comprehensive review of a pull request, posting the results, then independently assessing each finding to separate genuine issues from nitpicks and false positives.
 
 **User input:** $ARGUMENTS
+
+**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.
 
 ## Step 0: Parse input and create task list
 
@@ -88,7 +89,7 @@ The comment must include:
 - `<!-- mach10-review -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions)
 - The complete review findings (Critical, Important, Suggestions, Strengths), including any findings from supplementary agents merged into the appropriate severity categories with inline source attribution (e.g., "per plugin-dev:skill-reviewer")
 - F/S identifiers on every finding -- Critical and Important findings use `F<n>` numbered sequentially across both sections, Suggestions use `S<n>` with a separate counter (e.g., `**F1:** ...`, `**F2:** ...`, `**S1:** ...`)
-- Model attribution at the bottom (e.g., "Reviewed by Claude Opus 4.6")
+- Model attribution at the bottom -- identify yourself by your actual model name (e.g., "Reviewed by Claude Sonnet 4.6" if running on Sonnet)
 - A note that this is an automated review
 
 Format the comment as a well-structured markdown document that can serve as input to a future `/mach10:pr-review-fix` session.
@@ -147,7 +148,7 @@ Post the assessment immediately as a reply comment on the PR — do not ask the 
 - Reference the review comment it is assessing (link to the specific comment URL from Step 3)
 - List each finding with its classification and reasoning
 - End with the staged implementation plan
-- Include model attribution at the bottom
+- Include model attribution at the bottom -- identify yourself by your actual model name (e.g., "Assessed by Claude Sonnet 4.6" if running on Sonnet)
 
 ```
 gh pr comment <pr-number> --body "..."

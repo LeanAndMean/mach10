@@ -2,7 +2,6 @@
 description: Read a GitHub issue, perform an independent assessment, and present findings
 argument-hint: <issue-number>
 allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion
-model: opus
 ---
 
 # Issue Assessment
@@ -10,6 +9,8 @@ model: opus
 You are performing an independent assessment of a GitHub issue. Your goal is to deeply understand the issue, explore the relevant codebase, and present your findings with a recommended next step.
 
 **User input:** $ARGUMENTS
+
+**Note:** This command performs best with an Opus-class model. On Sonnet or Haiku, results may be shallower.
 
 ## Step 1: Parse Input
 

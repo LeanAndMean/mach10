@@ -2,7 +2,6 @@
 description: Diagnose and fix failing CI checks on a pull request
 argument-hint: <pr-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, Edit, Write, Skill
-model: opus
 ---
 
 # Fix CI Failures
