@@ -31,7 +31,7 @@ Present the categories to the user as a summary table (category name, file count
 
 ## Step 3: Fan Out Review Agents
 
-For each category, launch a subagent using the Task tool (subagent_type: general-purpose) to review that category's test files. If prose context was provided in $ARGUMENTS, include it in each agent's prompt to steer the quality assessment (e.g., "focus on mocking patterns" or "prioritize the auth module"). Each agent should evaluate:
+For each category, delegate that category's test files to a `general-purpose` subagent for review. If prose context was provided in $ARGUMENTS, include it in each agent's prompt to steer the quality assessment (e.g., "focus on mocking patterns" or "prioritize the auth module"). Each agent should evaluate:
 
 **Quality criteria:**
 - **Fake assertions**: Tests that assert `True`, `is not None` on values that can never be None, or other tautological checks
@@ -50,7 +50,7 @@ Each agent should return findings as a structured list with:
 
 Launch agents in parallel where possible.
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 ## Step 4: Aggregate Results
 

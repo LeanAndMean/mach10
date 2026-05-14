@@ -81,7 +81,7 @@ If no contributing guide exists, proceed without project-specific requirements.
 
 ### 2b. Explore
 
-Launch 6 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect of plan verification. All lenses are required -- Step 3 always evaluates risks, testing, and alternatives, so their corresponding evidence-gathering lenses must always run:
+Launch 6 exploration agents of type `feature-dev:code-explorer` in parallel by delegating to subagents. Each agent should trace through the code comprehensively and target a different aspect of plan verification. All lenses are required -- Step 3 always evaluates risks, testing, and alternatives, so their corresponding evidence-gathering lenses must always run:
 
 - **Files referenced in the plan**: Trace through each file referenced in the plan comprehensively, confirming they exist, checking their current state, and verifying the plan's characterization of their structure, responsibilities, and integration points is accurate.
 - **Architecture and patterns**: Trace through the relevant architecture comprehensively, validating that the plan aligns with existing codebase conventions, abstractions, data flow, and design decisions.
@@ -90,7 +90,7 @@ Launch 6 exploration agents in parallel using the Task tool (subagent_type: "fea
 - **Alternative approaches**: Look for codebase evidence that a different approach could achieve the same goals. Identify existing patterns, abstractions, or design decisions that suggest a simpler, more idiomatic, or more robust solution than what the plan proposes.
 - **Test infrastructure**: Examine the project's test suite -- frameworks, patterns, test organization, coverage approach, and any test utilities or fixtures relevant to the areas the plan modifies.
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 If the user provided context, include it in each agent's prompt to focus review on the user's areas of concern.
 

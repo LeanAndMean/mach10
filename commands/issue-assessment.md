@@ -43,7 +43,7 @@ Parse and understand:
 
 ## Step 3: Explore the Codebase
 
-Launch 5 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Step 4 always evaluates risks and critical premises, so their corresponding evidence-gathering lenses must always run:
+Launch 5 exploration agents of type `feature-dev:code-explorer` in parallel by delegating to subagents. Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Step 4 always evaluates risks and critical premises, so their corresponding evidence-gathering lenses must always run:
 
 - **Relevant code**: Find existing code related to the issue. Trace through their implementation comprehensively, identifying patterns, conventions, and the design decisions that shaped them.
 - **Architecture**: Map the relevant architecture layers, abstractions, and data flow, tracing through the code comprehensively to understand how components interact and where boundaries lie.
@@ -51,7 +51,7 @@ Launch 5 exploration agents in parallel using the Task tool (subagent_type: "fea
 - **Counter-evidence**: Look for codebase evidence that challenges the issue's premise or proposed approach. Identify existing patterns, design decisions, or prior solutions that suggest a different approach, reveal the issue may be addressing symptoms rather than root causes, or indicate the problem is a special case of something more general.
 - **Constraints and edge cases**: Investigate what could go wrong with the proposed approach. Look for failure modes, boundary conditions, implicit assumptions, and pitfalls in the affected code areas.
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 If the user provided context, include it in each agent's prompt to focus exploration on the user's areas of concern.
 
