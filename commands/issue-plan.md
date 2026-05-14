@@ -92,14 +92,14 @@ If no contributing guide exists, proceed without project-specific requirements.
 
 ### 2b. Explore
 
-Launch 4 exploration agents in parallel using the Task tool (subagent_type: "feature-dev:code-explorer"). Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Step 3 always evaluates constraints and edge cases, and Step 4 requires constraint awareness for sound architecture design, so their corresponding evidence-gathering lens must always run:
+Launch 4 exploration agents of type `feature-dev:code-explorer` in parallel by delegating to subagents. Each agent should trace through the code comprehensively and target a different aspect. All lenses are required -- Step 3 always evaluates constraints and edge cases, and Step 4 requires constraint awareness for sound architecture design, so their corresponding evidence-gathering lens must always run:
 
 - **Similar features**: Find existing code that solves related problems. Trace through their implementation comprehensively, identifying patterns and conventions the new work should follow.
 - **Architecture**: Map the architecture and abstractions for the relevant area, tracing through the code comprehensively to understand the layers, data flow, and design decisions.
 - **Integration points**: Identify where new code would connect to existing systems, including extension surfaces, testing infrastructure, and cross-cutting concerns.
 - **Constraints and edge cases**: Investigate constraints and edge cases that the issue does not mention but the codebase reveals. Look for boundary conditions, implicit assumptions, error paths, or environmental requirements in the affected areas.
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 If the user provided context, include it in each agent's prompt to guide exploration focus.
 
@@ -132,13 +132,13 @@ Mark Step 3 complete.
 
 Mark Step 4 in progress.
 
-Based on the codebase findings and clarified requirements, launch 2-3 architecture agents in parallel using the Task tool (subagent_type: "feature-dev:code-architect"). Assign each agent a different architectural lens:
+Based on the codebase findings and clarified requirements, launch 2-3 architecture agents of type `feature-dev:code-architect` in parallel by delegating to subagents. Assign each agent a different architectural lens:
 
 - **Minimal changes**: Design the implementation with the smallest change surface. Maximize reuse of existing patterns. Minimize new abstractions.
 - **Clean architecture**: Design the implementation prioritizing clear separation of concerns, maintainability, and well-defined abstractions.
 - **Pragmatic balance**: Design the implementation balancing speed with code quality and extensibility.
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 If the user provided context, include it in each agent's prompt so architecture designs account for the user's constraints or preferences.
 

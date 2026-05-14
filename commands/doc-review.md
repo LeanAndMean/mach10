@@ -78,13 +78,13 @@ Mark Step 2 complete.
 
 Mark Step 3 in progress.
 
-Launch 2-3 exploration agents in parallel using the Task tool (subagent_type: Explore). Each agent should target a different documentation surface:
+Launch 2-3 exploration agents of type `Explore` in parallel by delegating to subagents. Each agent should target a different documentation surface:
 
 - **Repo-level docs**: README, CONTRIBUTING, CHANGELOG, docs/ directory, top-level .md files
 - **Code-level docs**: Docstrings, JSDoc, inline comments in changed files and their immediate neighbors
 - **Config and integration docs**: OpenAPI specs, CLI help text, config file comments, man pages
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 After agents return, compile results into a deduplicated list. Categorize each doc file into logical groups (e.g., "User-facing docs", "API reference", "Developer guides", "Inline code docs").
 
@@ -98,7 +98,7 @@ Mark Step 3 complete.
 
 Mark Step 4 in progress.
 
-For each documentation category, launch a subagent using the Task tool (subagent_type: general-purpose) to review that category's files. Batch small categories together to keep the total agent count between 3 and 6.
+For each documentation category, delegate that category's files to a `general-purpose` subagent for review. Batch small categories together to keep the total agent count between 3 and 6.
 
 Each agent receives:
 - Its assigned doc files (read them in full)
@@ -123,7 +123,7 @@ Each agent returns structured findings as a list:
 
 Launch agents in parallel where possible.
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 Mark Step 4 complete.
 
@@ -166,14 +166,14 @@ Mark Step 6 complete.
 
 Mark Step 7 in progress.
 
-Launch 1-2 verification agents using the Task tool (subagent_type: general-purpose) on the modified files only. Each agent checks:
+Launch 1-2 verification agents of type `general-purpose` on the modified files only by delegating to subagents. Each agent checks:
 
 - **Internal consistency**: Do updated sections contradict other sections in the same file?
 - **Accuracy**: Do changes accurately reflect what the PR actually does?
 - **Formatting**: Are headings, lists, code blocks, and links well-formed?
 - **Cross-references**: Are links to other files or sections still valid?
 
-Do NOT use `run_in_background: true` when launching these agents. For parallel execution, launch multiple foreground Task calls in a single message instead.
+Do not run these subagents in the background. For parallel execution, launch them in a single message instead.
 
 Present any verification issues to the user. Apply approved corrections.
 

@@ -63,7 +63,7 @@ Mark Step 2 complete when all sub-tasks of the delegation below are completed.
 Use the Skill tool to invoke `/pr-review-toolkit:review-pr`:
 
 - Pass `"Review PR #<pr-number>"` as the invocation string.
-- **Always** include this instruction in the Skill invocation: "IMPORTANT: Do NOT use `run_in_background: true` when launching review agents. For parallel execution, launch multiple foreground Task calls in a single message instead."
+- **Always** include this instruction in the Skill invocation: "IMPORTANT: Do not run review agents in the background. For parallel execution, launch them in a single message instead."
 - **Always** include this instruction in the Skill invocation: "You are authorized to use review-relevant agents from any installed plugin, not just the agents bundled with pr-review-toolkit. When launching review agents in parallel, also include any domain-relevant agents from other installed plugins that would provide useful analysis for the PR content (e.g., plugin-dev:skill-reviewer when reviewing skill definitions, plugin-dev:plugin-validator when reviewing plugin code). Only include supplementary agents when they are relevant to the content being reviewed."
 - **Always** include this instruction in the Skill invocation: "If the PR has a linked issue (look for issue references like 'Fixes #N', 'Closes #N', 'Resolves #N', 'Part of #N', 'Issue #N', or a bare '#N' in the PR description), include the `feature-completeness-checker` agent alongside the other review agents. This agent verifies that the PR fully implements the requirements from the linked issue's acceptance criteria and implementation plan. Do not launch this agent if no linked issue is detected."
 - **Always** include this instruction in the Skill invocation: "Label each Critical and Important finding with a sequential F-prefixed identifier (F1, F2, F3, ...) numbered continuously across both sections. Label each Suggestion with a sequential S-prefixed identifier (S1, S2, S3, ...) using a separate counter. Use bold prefixes in the output (e.g., `**F1:** Missing null check`, `**S1:** Consider extracting helper`)."
@@ -115,9 +115,9 @@ First, fetch the PR context so the assessment can account for prior discussion:
 gh pr view <pr-number> --json title,body,comments
 ```
 
-Then run an independent assessment of each finding — from both the primary review and any supplementary agents — using the Task tool with a `general-purpose` subagent. Include the review text and the PR context (title, body, and all comments) directly in the subagent prompt — do not ask the subagent to fetch them from GitHub.
+Then run an independent assessment of each finding — from both the primary review and any supplementary agents — by delegating to a `general-purpose` subagent. Include the review text and the PR context (title, body, and all comments) directly in the subagent prompt — do not ask the subagent to fetch them from GitHub.
 
-Do NOT use `run_in_background: true` when launching this agent.
+Do not run this subagent in the background.
 
 The subagent prompt should instruct it to:
 
