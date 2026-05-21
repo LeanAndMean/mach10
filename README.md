@@ -246,7 +246,7 @@ claude --plugin-dir /path/to/mach10
 |---------|-------------|
 | `/mach10:issue-assessment <number> [context]` | Read issue, perform independent assessment, and present findings with recommended next step |
 | `/mach10:issue-plan <number> [context]` | Read issue, explore codebase, ask clarifying questions, design architecture with user, create staged implementation plan, post as comment, create feature branch |
-| `/mach10:issue-plan-review <number> [context]` | Read issue and all comments, review the implementation plan, and present findings |
+| `/mach10:issue-plan-review <number> [context]` | Read issue and all comments, review the implementation plan, independently assess each finding, and present findings |
 | `/mach10:issue-implement <issue> <stage> [context]` | Implement a specific stage of the plan via feature-dev |
 | `/mach10:issue-create [context]` | Create a structured GitHub issue from current context |
 
