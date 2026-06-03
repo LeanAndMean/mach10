@@ -1,5 +1,5 @@
 ---
-description: Read a GitHub issue and all comments, review the implementation plan, and present findings
+description: Read a GitHub issue and all comments, review the implementation plan, independently assess each finding, and present findings
 argument-hint: <issue-number> [context]
 allowed-tools: Bash, Read, Grep, Glob, Task, TaskCreate, TaskUpdate, AskUserQuestion
 ---
@@ -20,7 +20,7 @@ The user's input contains:
 
 Extract the issue number from the input. If the input is ambiguous, ask the user to clarify. If context was provided, note it for use during exploration and review.
 
-After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 4 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
+After parsing input, create the progress-tracking task list. Create a task for Step 0 and immediately mark it in progress. Then create tasks for each of the remaining 5 steps one at a time, in step order, all starting as pending. Task list display order matches creation order, so each task must be a separate sequential call -- do not batch multiple task creations in a single message. Store each returned task ID for later use -- do not assume IDs are sequential.
 
 | Task | Subject | activeForm |
 |------|---------|------------|
@@ -28,7 +28,8 @@ After parsing input, create the progress-tracking task list. Create a task for S
 | Step 1 | Step 1: Read the issue and locate plan | Reading the issue |
 | Step 2 | Step 2: Explore the codebase | Exploring the codebase |
 | Step 3 | Step 3: Review the plan | Reviewing the plan |
-| Step 4 | Step 4: Present findings and execute decision | Presenting findings |
+| Step 4 | Step 4: Run independent assessment | Running independent assessment |
+| Step 5 | Step 5: Present findings and execute decision | Presenting findings |
 
 Mark Step 0 complete.
 
@@ -104,7 +105,7 @@ Mark Step 2 complete.
 
 Mark Step 3 in progress.
 
-If the user provided context in Step 0, weight the review toward the areas they emphasized -- surface findings on those areas even at Suggestions-level severity, and note in Step 4 how the user's focus shaped the findings (e.g., "User emphasized testing strategy; this raised three suggestions in that area that would otherwise be borderline."). Apply this weighting across all six axes below; do not let it crowd out coverage of the other axes.
+If the user provided context in Step 0, weight the review toward the areas they emphasized -- surface findings on those areas even at Suggestions-level severity, and note in Step 5 how the user's focus shaped the findings (e.g., "User emphasized testing strategy; this raised three suggestions in that area that would otherwise be borderline."). Apply this weighting across all six axes below; do not let it crowd out coverage of the other axes.
 
 For each stage in the plan, assess:
 
@@ -122,17 +123,50 @@ Also assess the plan holistically:
 - **Project-layer coverage**: Does the plan address all project layers discovered during codebase exploration or specified in the project review criteria recorded in Step 2a? Flag any affected layer that no stage covers.
 - **Test coverage planning**: If the project has an existing test suite or the project review criteria specify testing expectations, does each stage that introduces or modifies behavior include adequate test planning (what to test, test types, behaviors to cover)? If the project has no testable runtime code, verify the plan notes this rather than omitting test planning silently.
 
+Assign stable identifiers to every finding so the assessment in Step 4 can reference them unambiguously. Label each Critical and Important finding with a sequential F-prefixed identifier (F1, F2, F3, ...) numbered continuously across both sections. Label each Suggestion with a sequential S-prefixed identifier (S1, S2, S3, ...) using a separate counter. Use bold prefixes in the finding text (e.g., `**F1:** Stage 2 omits the migration file`, `**S1:** Consider splitting stage 3`).
+
 Mark Step 3 complete.
 
-## Step 4: Present Findings and Execute Decision
+## Step 4: Run independent assessment
 
 Mark Step 4 in progress.
+
+Run an independent assessment of each finding from Step 3 by delegating to a `general-purpose` subagent. Include the following directly in the subagent prompt -- do not ask the subagent to re-fetch anything from GitHub:
+
+- The issue title and body (read in Step 1)
+- All issue comments (read in Step 1), including the implementation plan being reviewed
+- The exploration findings and key files identified by the Step 2 agents
+- The complete Step 3 review text with every finding's F/S identifier preserved
+
+Do not run this subagent in the background.
+
+The subagent prompt should instruct it to:
+
+1. Review the issue, the implementation plan, the comment history, and the Step 2 exploration findings. Note any findings that have already been discussed, resolved, or deferred in the issue conversation.
+2. For each Step 3 finding, **re-read the actual plan text** referenced and **independently verify** whether the issue exists, using the Step 2 exploration findings as codebase evidence.
+3. Classify each finding using its F/S identifier from the review (e.g., "F1 -- Genuine", "S2 -- Nitpick"). Classify as one of:
+   - **Genuine issue** -- Real problem with the plan that should be addressed before implementation. Explain why, referencing the specific plan text or codebase evidence.
+   - **Nitpick** -- Stylistic preference or minor point that doesn't affect the plan's correctness or feasibility. Explain why it doesn't matter.
+   - **False positive** -- The reviewer flagged something that isn't actually a problem. Explain why the plan is sound.
+   - **Deferred** -- Real concern but out of scope for this plan -- should be tracked separately. Explain why it shouldn't block this plan.
+   - If a finding was already addressed or resolved in the issue comments, classify it as **False positive** with a note that it has been addressed. If explicitly deferred in discussion, classify it as **Deferred** and reference the relevant comment.
+4. Return all classifications as a list, each with the original finding summary and a 1-2 sentence justification referencing the plan text or specific code.
+
+Note for maintainers: unlike `commands/pr-review.md` Step 4, this subagent does NOT produce a staged implementation plan. Step 5 drafts the revised plan directly from the Genuine and Deferred findings, so a subagent-produced plan would be redundant. Do not back-fill a staged-plan instruction here.
+
+Present the classifications in CLI before continuing to Step 5. Show each finding with its F/S identifier, its classification, and the 1-2 sentence justification, followed by summary counts (genuine / nitpick / false positive / deferred). The assessment is **CLI-only** -- do not post it as an issue comment.
+
+Mark Step 4 complete.
+
+## Step 5: Present Findings and Execute Decision
+
+Mark Step 5 in progress.
 
 Present your review to the user, organized as:
 
 1. **Plan summary**: Brief restatement of what the plan proposes.
 2. **Strengths**: What the plan gets right.
-3. **Issues**: Problems found, classified by severity:
+3. **Issues**: Problems found, classified by severity. Show each finding with its F/S identifier from Step 3 and its classification from Step 4 (Genuine / Nitpick / False positive / Deferred):
    - **Critical**: Will cause the implementation to fail or produce incorrect results.
    - **Important**: Significant gaps or risks that should be addressed before implementation.
    - **Suggestions**: Improvements that would make the plan better but are not blockers.
@@ -140,18 +174,18 @@ Present your review to the user, organized as:
 
 Use `AskUserQuestion` to ask the user how they want to proceed:
 
-- **Update the plan**: "Post a revised plan addressing the findings"
+- **Update the plan**: "Post a revised plan addressing the genuine and deferred findings"
 - **Proceed as-is**: "Continue with the current plan despite findings"
 - **Discuss findings**: "Explore specific findings in more detail before deciding"
 - **Cancel**: "Stop here without updating or proceeding (a brief audit note will be posted)"
 
-If the user selects "Update the plan", draft a revised plan incorporating the findings, and present it for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions).
+If the user selects "Update the plan", first check whether any findings were classified as **Genuine** or **Deferred** in Step 4. If none were (i.e., every finding is Nitpick or False positive), do NOT draft or post a revised plan -- inform the user in CLI that no revisions are warranted because no findings were assessed as Genuine or Deferred, then mark Step 5 complete and continue to the next-step suggestion. Otherwise, draft a revised plan incorporating only the Genuine and Deferred findings -- suppress findings classified as Nitpick or False positive. Present the revised plan for review before posting. When posting the revised plan as a comment, include `<!-- mach10-plan -->` as the very first line of the comment body (this invisible HTML marker enables reliable identification in future sessions).
 
-Mark Step 4 complete.
+Mark Step 5 complete.
 
-If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. Step 4 remains in progress across all discussion iterations until the user selects a terminal option (Update, Proceed, or Cancel).
+If the user selects "Discuss findings", walk through the specific findings they want to explore, then ask again how to proceed. Step 5 remains in progress across all discussion iterations until the user selects a terminal option (Update, Proceed, or Cancel).
 
-If the user selects "Proceed as-is" and at least one Critical or Important finding exists, post a decision comment on the issue to record the user's choice:
+If the user selects "Proceed as-is" and at least one Critical or Important finding was classified Genuine or Deferred in Step 4, post a decision comment on the issue to record the user's choice:
 
 ```
 gh issue comment <issue-number> --body "..."
@@ -160,14 +194,14 @@ gh issue comment <issue-number> --body "..."
 Comment format:
 - First line: `<!-- mach10-decisions -->`
 - A note that a plan review was conducted and the user chose to proceed without changes
-- Each Critical and Important finding on its own line (one sentence each)
+- Each Critical and Important finding classified Genuine or Deferred on its own line (one sentence each, with its F identifier and classification label). Findings classified Nitpick or False positive are suppressed.
 - Keep the entire comment body under 15 lines
 
-When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs. F/S identifiers (e.g., F1, S2) from Step 3 are permitted.
 
-Mark Step 4 complete.
+Mark Step 5 complete.
 
-If the user selects "Proceed as-is" and all findings are Suggestions only, do NOT post a decision comment -- proceeding past suggestions is the expected path. Mark Step 4 complete.
+If the user selects "Proceed as-is" and no Critical or Important findings were classified Genuine or Deferred, do NOT post a decision comment -- proceeding past nothing-load-bearing is the expected path. Mark Step 5 complete.
 
 If the user selects "Cancel":
 
@@ -184,9 +218,9 @@ If the user selects "Cancel":
    - Finding counts by severity (e.g., "2 Critical, 1 Important, 3 Suggestions")
    - Keep the entire comment body to 5 lines or fewer
 
-   When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs.
+   When referring to numbered items (findings, suggestions, stages) in the comment body, use plain words like "finding 3" or "suggestion 3" -- not `#<number>` notation, which GitHub auto-links to issues/PRs. F/S identifiers (e.g., F1, S2) from Step 3 are permitted.
 
-   Mark Step 4 complete.
+   Mark Step 5 complete.
 
    **CLI output only (do NOT include in any GitHub comment):** Suggest next step: `/clear` then `/mach10:issue-plan-review <issue-number>` to re-run the review, or `/mach10:issue-implement <issue-number> 1` to proceed with the existing plan.
 
